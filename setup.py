@@ -18,32 +18,31 @@
 from distutils.core import setup
 from setuptools import setup, find_packages
 from distutils.command.build import build as _build
+import firenado
 
 import os, sys
 import subprocess
 
 
-
 install_requires = [
-        "tornado>=4.1",
-        "redis>=2.9.1",
-        "sqlalchemy==0.9.4",
-    ] 
+    "tornado>=4.1",
+    "redis>=2.9.1",
+    "sqlalchemy==0.9.4",
+]
 
 setup(
     name='Firenado',
-    version= '0.0.1',
-    description='Web Framework that extends Tornado Web adding new features to the original framework.',
+    version=firenado.__version__,
+    description='Componentized web framework.',
     license='Apache License V2.0',
     author='Flavio Garcia',
     author_email='piraz@candango.org',
-    install_requires=install_requires,
-    cmdclass={
-        'build': CustomBuildCommand,
-    },
     url='http://www.firenado.io/',
     packages=[
         'firenado',
+        'firenado.core',
+        'firenado.core.management',
+        'firenado.util',
     ],
     package_dir={'firenado': 'firenado'},
     classifiers=[
@@ -63,7 +62,7 @@ setup(
     ],
     scripts=['firenado/bin/firenado.py'],
     entry_points={'console_scripts': [
-        'firenado = firenado.core.scaffolding:run_from_command_line',
+        'firenado = firenado.core.management:run_from_command_line',
     ]},
 )
 
