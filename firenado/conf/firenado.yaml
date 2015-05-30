@@ -1,0 +1,17 @@
+#
+# Firenado Framework configuration
+#
+component:
+  components:
+    # Basic firenado Admin component
+      - id: admin
+        class: firenado.components.admin.AdminComponent
+      - id: info
+        class: firenado.components.info.InfoComponent
+
+data:
+  connectors:
+    - name: redis
+      class: firenado.core.data.connectors.RedisConnector
+    - name: sqlalchemy
+      class: firenado.core.data.connectors.SqlAlchemyDataConnector
