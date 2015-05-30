@@ -65,4 +65,3 @@ setup(
         'firenado = firenado.core.management:run_from_command_line',
     ]},
 )
-
