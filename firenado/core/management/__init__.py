@@ -34,7 +34,7 @@ command_categories = dict()
 def run_from_command_line():
     """ Run Firenado's management commands from a command line
     """
-    for key, module in firenado.conf.scaffolding['commands'].iteritems():
+    for key, module in firenado.conf.management['commands'].iteritems():
         exec('import %s' % module)
     command_index = 1
     for arg in sys.argv[1:]:
@@ -57,7 +57,7 @@ def get_command_header(parser, usage=False):
     """ Return the command line header
     """
     loader = template.Loader(os.path.join(
-                firenado.conf.ROOT, 'core','scaffolding', 'templates', 'help'))
+                firenado.conf.ROOT, 'core', 'management', 'templates', 'help'))
     return loader.load("header.txt").generate(parser=parser, usage=usage)
 
 

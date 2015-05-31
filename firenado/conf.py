@@ -48,9 +48,11 @@ if os.path.isfile(LIB_CONFIG_FILE):
 
 # Data default configuration
 data = dict()
-
 data['connectors'] = dict()
 
+# Management default configuration
+management = dict()
+management['commands'] = dict()
 
 def process_config(config):
     """ Processes a configuration loaded from a config file populating
