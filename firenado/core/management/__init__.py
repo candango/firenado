@@ -27,15 +27,14 @@ import sys
 from tornado import template
 
 # Commands will be registered here. This is done by ManagementCommand
-#
 command_categories = dict()
 
 
 def run_from_command_line():
     """ Run Firenado's management commands from a command line
     """
-    for key, module in firenado.conf.management['commands'].iteritems():
-        exec('import %s' % module)
+    for commands_conf in firenado.conf.management['commands']:
+        exec('import %s' % commands_conf['module'])
     command_index = 1
     for arg in sys.argv[1:]:
         command_index += 1
@@ -97,3 +96,88 @@ def run_command(command, args):
             if command == existing_command.name:
                 existing_command.run_tasks(args)
 
+
+class ManagementCommand():
+    """
+    Defines a management command. Commands are classified by categories and
+    the Firenado category is the default one. Those commands are shipped with
+    the framework.
+    Developers can create new categories of commands and commands and
+    distribute them with their application and/or components.
+    """
+
+    def __init__(self, category, name, description, cmd_help, tasks=None):
+        """
+        To register a management command it is necessary inform the category
+        you the command belongs, it's name and description and a meaningful
+        help to be displayed.
+
+        :param category: The category the command belongs to
+        :param name: Command's name
+        :param description: Command's description
+        :param cmd_help: Meaningful help to be displayed
+        :param tasks: Tasks to be executed when this command is called
+        """
+
+        self.category = category
+        self.name = name
+        self.description = description
+        self.help = cmd_help
+        self.tasks = []
+        if isinstance(tasks, list):
+            for task in tasks:
+                self.tasks.append(task(self))
+        else:
+            self.tasks.append(tasks(self))
+        global command_categories
+        if category not in command_categories:
+            command_categories[category] = []
+        command_categories[category].append(self)
+
+    def get_help(self):
+        return self.help
+
+    def run_tasks(self, args):
+        cmd_parser = FirenadoArgumentParser(
+            prog=os.path.split(sys.argv[0])[1], usage='%(prog)s [options]',)
+        cmd_parser.add_argument("command", help="Command to executed")
+        try:
+            for task in self.tasks:
+                task.add_arguments(cmd_parser)
+            namespace = cmd_parser.parse_args(args)
+            for task in self.tasks:
+                task.run(namespace)
+        except ArgumentParserException:
+            command_help = ""
+            for task in self.tasks:
+                if task.get_help():
+                    command_help += '\n'.join([command_help, task.get_help()])
+            print(command_help)
+
+
+class ManagementTask():
+    """
+    Defines a management tasks. Tasks are the concrete actions executed by a
+    command.
+    """
+    def __init__(self, action):
+        self.action = action
+
+    def add_arguments(self, parser):
+        """
+        Implement this method to add arguments to the current argparse parser
+        being handled by the command.
+        """
+        pass
+
+    def get_help(self):
+        """
+        Implement this method to add a help text to the help message to be
+        displayed by the command.
+        """
+        return None
+
+    def run(self, namespace=None):
+        """
+        Task implementation is done here.
+        """
