@@ -54,23 +54,45 @@ data['connectors'] = dict()
 management = dict()
 management['commands'] = dict()
 
+
 def process_config(config):
-    """ Processes a configuration loaded from a config file populating
-    the module data.
+    """
+    Process the configuration loaded from a given config file populating
+    the firenado.conf module.
+
     :param config: Configuration loaded from a config file
     """
     if 'data' in config:
-        process_data_config(config['data'])
+        if 'data' in config:
+            process_data_config(config['data'])
+        if 'management' in config:
+            process_management_config(config['management'])
 
 
 def process_data_config(data_config):
-    """ Processes the data configuration section loaded from a config file.
-    :param data_config: Data configuration section from a configuration loaded
-    from a file.
+    """
+    Process the data configuration section loaded from a parsed configuration
+    data.
+
+    :param data_config: Data configuration section from a parsed configuration
+    data.
     """
     global data
     if 'connectors' in data_config:
         data['connectors'] = data_config['connectors']
+
+
+def process_management_config(management_config):
+    """
+    Process the management configuration section from a parsed configuration
+    data.
+
+    :param management_config: Management configuration section from a parsed
+    configuration data.
+    """
+    global management
+    if 'commands' in management_config:
+        management['commands'] = management_config['commands']
 
 
 if HAS_LIB_CONFIG_FILE:
