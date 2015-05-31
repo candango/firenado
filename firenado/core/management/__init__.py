@@ -27,7 +27,6 @@ import sys
 from tornado import template
 
 # Commands will be registered here. This is done by ManagementCommand
-#
 command_categories = dict()
 
 
@@ -125,20 +124,20 @@ class ManagementCommand():
         self.description = description
         self.help = cmd_help
         self.tasks = []
-        """if isinstance(tasks, list):
+        if isinstance(tasks, list):
             for task in tasks:
                 self.tasks.append(task(self))
         else:
-            self.tasks.append(tasks(self))"""
-        if category not in sys.modules[__name__].command_categories:
-            sys.modules[__name__].command_categories[category] = []
-        sys.modules[__name__].command_categories[category].append(self)
+            self.tasks.append(tasks(self))
+        global command_categories
+        if category not in command_categories:
+            command_categories[category] = []
+        command_categories[category].append(self)
 
     def get_help(self):
         return self.help
 
     def run_tasks(self, args):
-        #print args
         cmd_parser = FirenadoArgumentParser(
             prog=os.path.split(sys.argv[0])[1], usage='%(prog)s [options]',)
         cmd_parser.add_argument("command", help="Command to executed")
@@ -156,25 +155,29 @@ class ManagementCommand():
             print(command_help)
 
 
-class ScaffoldingTask():
-    """ Interface that defines a scaffolding tasks. Tasks are the concrete
-    actions executed by a command.
+class ManagementTask():
+    """
+    Defines a management tasks. Tasks are the concrete actions executed by a
+    command.
     """
     def __init__(self, action):
         self.action = action
 
     def add_arguments(self, parser):
-        """ Implement this method to add arguments to the current parsers being
-        handled by the command.
+        """
+        Implement this method to add arguments to the current argparse parser
+        being handled by the command.
         """
         pass
 
     def get_help(self):
-        """ Implement this method to add a help text to the help message to be
+        """
+        Implement this method to add a help text to the help message to be
         displayed by the command.
         """
         return None
 
     def run(self, namespace=None):
-        """ Task implementation is done here.
+        """
+        Task implementation is done here.
         """

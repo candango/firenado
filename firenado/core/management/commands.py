@@ -16,20 +16,20 @@
 #
 # vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4:
 
-#from firenado.core.management import tasks
+from firenado.core.management import tasks
 #from firenado.core.managemnt.tasks import download
 from firenado.core.management import ManagementCommand
 
 ManagementCommand(
     'Firenado', 'download',
     'download extra or 3th party resources to the framework or application',
-    '', None)
+    '', tasks.CreateProjectTask)
 ManagementCommand(
     'Firenado', 'init',
-    'start a new project in the given directory', '', None)
+    'start a new project in the given directory', '', tasks.CreateProjectTask)
 ManagementCommand(
-    'Firenado', 'install', 'install an application', '', None)
+    'Firenado', 'install', 'install an application', '', tasks.CreateProjectTask)
 ManagementCommand(
-    'Firenado', 'run', 'run an application', '', None)
+    'Firenado', 'run', 'run an application', '', tasks.CreateProjectTask)
 ManagementCommand(
-    'Firenado', 'show', 'show application properties', '', None)
+    'Firenado', 'show', 'show application properties', '', tasks.CreateProjectTask)
