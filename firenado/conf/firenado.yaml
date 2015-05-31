@@ -11,11 +11,10 @@ component:
 
 data:
   connectors:
-    drivers:
-      - name: redis
-        class: firenado.core.data.connectors.RedisConnectorDriver
-      - name: sqlalchemy
-        class: firenado.core.data.connectors.SqlAlchemyDataConnectorDriver
+    - name: redis
+      class: firenado.core.data.connectors.RedisConnector
+    - name: sqlalchemy
+      class: firenado.core.data.connectors.SqlAlchemyConnector
 
 management:
   commands:
