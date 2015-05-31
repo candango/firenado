@@ -60,7 +60,7 @@ setup(
         'Topic :: Software Development :: Libraries :: Application Frameworks',
         'Topic :: Software Development :: Libraries :: Python Modules',
     ],
-    scripts=['firenado/bin/firenado.py'],
+    scripts=['firenado/bin/firenado-cli.py'],
     entry_points={'console_scripts': [
         'firenado = firenado.core.management:run_from_command_line',
     ]},
