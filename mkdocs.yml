@@ -1,6 +1,6 @@
 site_name: Firenado Framework
 repo_url: https://github.com/candango/firenado/
 pages:
-- ['Home': 'index.md']
-- ['About': 'about.md']
+- Home: 'index.md'
+- About: 'about.md'
 theme: 'readthedocs'
