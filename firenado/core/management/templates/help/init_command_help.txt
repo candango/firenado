@@ -1,0 +1,3 @@
+Firenado Framework
+
+Usage: init <project_name>

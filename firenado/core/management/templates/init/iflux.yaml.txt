@@ -1,0 +1,37 @@
+application:
+  port: 8888
+  data:
+    connectors:
+        # Set here references from connector instances defined on
+        # data.connectors.instances
+        instances:
+            - session
+
+data:
+    connectors:
+        instances:
+            - name: session
+              type: redis
+              # host: localhost
+              # port: 6379
+              # db: 0
+component:
+  components:
+    - id: {{app_name}}
+      class: {{module}}.{{component}}Component
+      enabled: true
+    #- id: admin
+    #  enabled: true
+    #- id: info
+    #  enabled: true
+
+# Session types could be:
+# file or redis.
+session:
+  type: redis
+  enabled: true
+  data:
+    connectors:
+       instance: session
+  # Fire related configuration
+  # path: /tmp
