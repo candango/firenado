@@ -46,13 +46,28 @@ if os.path.isfile(LIB_CONFIG_FILE):
     HAS_LIB_CONFIG_FILE = True
     stack.append(LIB_CONFIG_FILE)
 
+# Setting firenado's default variables
+
+# Application default configuration
+application = {}
+# Key to to be used on on the session context to store and retrieve the current
+# logged user
+application['current_user_key'] = '__FIRENADO_CURRENT_USER_KEY__'
+application['data'] = {}
+application['data']['sources'] = []
+application['python_path'] = None
+application['port'] = 8888
+application['login'] = {}
+application['login']['urls'] = {}
+application['login']['urls']['default'] = '/login'
+
 # Data default configuration
-data = dict()
-data['connectors'] = dict()
+data = {}
+data['connectors'] = {}
 
 # Management default configuration
-management = dict()
-management['commands'] = dict()
+management = {}
+management['commands'] = {}
 
 
 def process_config(config):

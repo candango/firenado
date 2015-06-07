@@ -147,11 +147,11 @@ class ManagementCommand():
             namespace = cmd_parser.parse_args(args)
             for task in self.tasks:
                 task.run(namespace)
-        except ArgumentParserException:
+        except ArgumentParserException as exception:
             command_help = ""
             for task in self.tasks:
-                if task.get_help():
-                    command_help += '\n'.join([command_help, task.get_help()])
+                if task.get_error_message(cmd_parser, exception):
+                    command_help += '\n'.join([command_help, task.get_error_message(cmd_parser, exception)])
             print(command_help)
 
 
@@ -176,6 +176,9 @@ class ManagementTask():
         displayed by the command.
         """
         return None
+
+    def get_error_message(self, parser, exception):
+        return ""
 
     def run(self, namespace=None):
         """

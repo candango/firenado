@@ -16,18 +16,22 @@
 #
 # vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4:
 
-from firenado.core.management import tasks
-from firenado.core.management import ManagementCommand
+from __future__ import (absolute_import, division,
+                        print_function, with_statement)
+
+import tornado.web
 
 
-ManagementCommand(
-    'Firenado', 'app', 'Application related commands', '',
-    tasks.CreateProjectTask)
-ManagementCommand(
-    'Firenado', 'project',
-    'Project related commands', '', tasks.ValidateProjectCommandsTask)
-ManagementCommand(
-    'Firenado', 'repo',
-    'Repository related commands',
-    '', tasks.CreateProjectTask)
+class TornadoApplication(tornado.web.Application):
+    """
+    Firenado basic Tornado application.
+    """
 
+    def __init__(self, handlers=None, default_host="", transforms=None,
+                 **settings):
+        self.components = {}
+
+        composed_handlers = handlers
+
+        tornado.web.Application.__init__(self, composed_handlers, default_host,
+                                         transforms, **settings)

@@ -22,7 +22,28 @@ from firenado.util import file as _file
 
 import os
 import sys
+from tornado import template
 
+class ValidateProjectCommandsTask(ManagementTask):
+    """
+    Validates project related commands
+    """
+    def run(self, namespace):
+        if namespace.project_command == 'init':
+            task = CreateProjectTask()
+            task.add_arguments(namespace)
+
+    def add_arguments(self, parser):
+        parser.add_argument(
+            'project_command', type=str,
+            choices=['init'], help="The project module")
+
+    def get_error_message(self, parser, exception):
+        help_header_message = ""#get_command_header(parser, true)
+        loader = template.Loader(os.path.join(
+            firenado.conf.ROOT, 'core', 'management', 'templates', 'project'))
+        help_message = loader.load("init_command_help.txt").generate()
+        return help_message
 
 class CreateProjectTask(ManagementTask):
     """
