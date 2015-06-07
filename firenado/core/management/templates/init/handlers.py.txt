@@ -1,7 +1,7 @@
 import firenado.core
 
 {% for handler_name in handlers %}
-class {{ handler_name }}Handler(firenado.core.TornadoOnFireHandler):
+class {{ handler_name }}Handler(firenado.core.TornadoHandler):
 
     def get(self):
         self.write("{{ handler_name }}Handler output")
