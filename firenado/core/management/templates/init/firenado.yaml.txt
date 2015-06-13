@@ -1,4 +1,4 @@
-application:
+app:
   port: 8888
   data:
     sources:

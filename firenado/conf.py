@@ -49,17 +49,18 @@ if os.path.isfile(LIB_CONFIG_FILE):
 # Setting firenado's default variables
 
 # Application default configuration
-application = {}
+app = {}
 # Key to to be used on on the session context to store and retrieve the current
 # logged user
-application['current_user_key'] = '__FIRENADO_CURRENT_USER_KEY__'
-application['data'] = {}
-application['data']['sources'] = []
-application['python_path'] = None
-application['port'] = 8888
-application['login'] = {}
-application['login']['urls'] = {}
-application['login']['urls']['default'] = '/login'
+app['current_user_key'] = '__FIRENADO_CURRENT_USER_KEY__'
+app['data'] = {}
+app['data']['sources'] = []
+app['python_path'] = None
+app['port'] = 8888
+app['login'] = {}
+app['login']['urls'] = {}
+app['login']['urls']['default'] = '/login'
+app['is_on_dir'] = False
 
 # Data default configuration
 data = {}
