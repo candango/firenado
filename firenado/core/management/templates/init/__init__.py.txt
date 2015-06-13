@@ -1,7 +1,7 @@
 import {{module}}.handlers
 import firenado.core
 
-class {{component}}Component(firenado.core.TornadoOnFireComponent):
+class {{component}}Component(firenado.core.TornadoComponent):
 
     def get_handlers(self):
         return handlers = [

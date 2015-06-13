@@ -4,8 +4,8 @@
    contain the root `toctree` directive.
 
 
-|Firenado Framework|
-====================
+Firenado Framework
+==================
 
 Firenado is a Python web framework that extends `Tornado <http://www.tornadoweb.org>`_ adding new
 features such as but not limited to application loose couple components, server side session layer,
@@ -17,10 +17,12 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
-
+   guide
 
 Indices and tables
 ==================
+
+
 
 * :ref:`genindex`
 * :ref:`modindex`

@@ -20,7 +20,7 @@ from __future__ import (absolute_import, division,
                         print_function, with_statement)
 
 import firenado.conf
-from firenado.util.argparse_util import ArgumentParserException
+from firenado.util.argparse_util import FirenadoArgumentError
 from firenado.util.argparse_util import FirenadoArgumentParser
 import os
 import sys
@@ -48,7 +48,7 @@ def run_from_command_line():
             show_command_line_usage(parser)
         else:
             run_command(namespace.command, sys.argv[command_index-1:])
-    except ArgumentParserException:
+    except FirenadoArgumentError:
         show_command_line_usage(parser, True)
 
 
@@ -147,11 +147,11 @@ class ManagementCommand():
             namespace = cmd_parser.parse_args(args)
             for task in self.tasks:
                 task.run(namespace)
-        except ArgumentParserException:
+        except FirenadoArgumentException as exception:
             command_help = ""
             for task in self.tasks:
-                if task.get_help():
-                    command_help += '\n'.join([command_help, task.get_help()])
+                if task.get_error_message(cmd_parser, exception):
+                    command_help += '\n'.join([command_help, task.get_error_message(cmd_parser, exception)])
             print(command_help)
 
 
@@ -177,7 +177,11 @@ class ManagementTask():
         """
         return None
 
+    def get_error_message(self, parser, exception):
+        return ""
+
     def run(self, namespace=None):
         """
         Task implementation is done here.
         """
+
