@@ -22,7 +22,7 @@ from firenado.core.management import ManagementCommand
 
 ManagementCommand(
     'Firenado', 'app', 'Application related commands', '',
-    tasks.CreateProjectTask)
+    tasks.ValidateAppCommandsTask)
 ManagementCommand(
     'Firenado', 'project',
     'Project related commands', '', tasks.ValidateProjectCommandsTask)

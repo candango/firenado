@@ -20,8 +20,8 @@ import argparse
 from gettext import gettext as _
 
 
-class ArgumentParserException(Exception):
-    """ Class to be used IfluxArgumentParser when an error occur.
+class FirenadoArgumentError(Exception):
+    """ An error thrown while parsing arguments with FirenadoArgumentParser.
     """
     pass
 
@@ -33,4 +33,5 @@ class FirenadoArgumentParser(argparse.ArgumentParser):
     def error(self, message):
         args = {'prog': self.prog, 'message': message}
         message = _('%(prog)s: error: %(message)s\n') % args
-        raise ArgumentParserException(message)
+        raise FirenadoArgumentError(message)
+
