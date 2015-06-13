@@ -40,11 +40,24 @@ stack = []
 
 LIB_CONFIG_FILE = os.path.join(ROOT, 'conf', FIRENADO_CONFIG_FILE)
 
+# Application file
+APP_CONFIG_ROOT_PATH = os.path.join(os.getcwd())
+# If FIRENADO_CURRENT_APP_PATH is not set than return current directory conf dir
+APP_CONFIG_PATH = os.getenv('FIRENADO_CURRENT_APP_CONFIG_PATH',
+                            os.path.join(APP_CONFIG_ROOT_PATH, 'conf'))
+APP_CONFIG_FILE = os.path.join(APP_CONFIG_PATH, FIRENADO_CONFIG_FILE)
+
 HAS_LIB_CONFIG_FILE = False
+HAS_APP_CONFIG_FILE = False
 
 if os.path.isfile(LIB_CONFIG_FILE):
     HAS_LIB_CONFIG_FILE = True
     stack.append(LIB_CONFIG_FILE)
+
+if os.path.isfile(APP_CONFIG_FILE):
+    if APP_CONFIG_FILE != LIB_CONFIG_FILE:
+        HAS_APP_CONFIG_FILE = True
+        stack.append(APP_CONFIG_FILE)
 
 # Setting firenado's default variables
 
