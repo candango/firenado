@@ -19,21 +19,39 @@
 import firenado.conf
 from firenado.core.management import ManagementTask
 from firenado.util import file as _file
+from firenado.util.argparse_util import FirenadoArgumentError
 
 import os
 import sys
 from tornado import template
 
-class ValidateProjectCommandsTask(ManagementTask):
+class ValidateAppCommandsTask(ManagementTask):
+    """Validate application related commands
     """
-    Validates project related commands
+    def run(self, namespace):
+        print "buuu"
+        if namespace.app_command == 'start':
+            task = StartAppTask(namespace)
+
+    def add_arguments(self, parser):
+        parser.add_argument(
+            'app_command', type=str,
+            choices=['start'], help="The ")
+
+class ValidateProjectCommandsTask(ManagementTask):
+    """Validate project related commands
     """
     def run(self, namespace):
         if namespace.project_command == 'init':
-            task = CreateProjectTask()
-            task.add_arguments(namespace)
+            task = CreateProjectTask(namespace)
+            task.add_arguments(self.parser)
+            try:
+                self.parser.parse_args()
+            except FirenadoArgumentError as exception:
+                print exception.message
 
     def add_arguments(self, parser):
+        self.parser = parser
         parser.add_argument(
             'project_command', type=str,
             choices=['init'], help="The project module")
@@ -44,6 +62,7 @@ class ValidateProjectCommandsTask(ManagementTask):
             firenado.conf.ROOT, 'core', 'management', 'templates', 'project'))
         help_message = loader.load("init_command_help.txt").generate()
         return help_message
+
 
 class CreateProjectTask(ManagementTask):
     """
@@ -96,3 +115,23 @@ class CreateProjectTask(ManagementTask):
         task.
         """
         parser.add_argument('module', help="The project module")
+
+    def get_error_message(self, parser, exception):
+        return exception.message
+        
+
+
+class StartAppTask(ManagementTask):
+    """ Task that starts an Firenado Tornado Application based 
+    on the it's project configuration
+    """
+    def run(self, namespace):
+        import tornado.ioloop
+        import tornado.httpserver
+        # TODO: Resolve module if doesnt exists
+        if firenado.conf.app['python_path']:
+            sys.path.append(firenado.conf.app['python_path'])
+        http_server = tornado.httpserver.HTTPServer(
+            firenado.core.TornadoApplication())
+        http_server.listen(firenado.conf.app['port'])
+        tornado.ioloop.IOLoop.instance().start()
