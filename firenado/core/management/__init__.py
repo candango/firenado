@@ -118,7 +118,6 @@ class ManagementCommand():
         :param cmd_help: Meaningful help to be displayed
         :param tasks: Tasks to be executed when this command is called
         """
-
         self.category = category
         self.name = name
         self.description = description
@@ -147,11 +146,12 @@ class ManagementCommand():
             namespace = cmd_parser.parse_args(args)
             for task in self.tasks:
                 task.run(namespace)
-        except FirenadoArgumentException as exception:
+        except FirenadoArgumentError as exception:
             command_help = ""
             for task in self.tasks:
-                if task.get_error_message(cmd_parser, exception):
-                    command_help += '\n'.join([command_help, task.get_error_message(cmd_parser, exception)])
+                error_message = task.get_error_message(cmd_parser, exception)
+                if error_message:
+                    command_help += '\n'.join([command_help, error_message])
             print(command_help)
 
 
@@ -184,4 +184,3 @@ class ManagementTask():
         """
         Task implementation is done here.
         """
-
