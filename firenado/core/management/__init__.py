@@ -146,10 +146,10 @@ class ManagementCommand():
             namespace = cmd_parser.parse_args(args)
             for task in self.tasks:
                 task.run(namespace)
-        except FirenadoArgumentError as exception:
+        except FirenadoArgumentError as error:
             command_help = ""
             for task in self.tasks:
-                error_message = task.get_error_message(cmd_parser, exception)
+                error_message = task.get_error_message(cmd_parser, error)
                 if error_message:
                     command_help += '\n'.join([command_help, error_message])
             print(command_help)
@@ -177,7 +177,7 @@ class ManagementTask():
         """
         return None
 
-    def get_error_message(self, parser, exception):
+    def get_error_message(self, parser, error):
         return ""
 
     def run(self, namespace=None):
