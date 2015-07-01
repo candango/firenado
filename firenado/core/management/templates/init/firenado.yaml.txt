@@ -13,15 +13,14 @@ data:
       # host: localhost
       # port: 6379
       # db: 0
-component:
-  components:
-    - id: {{app_name}}
-      class: {{module}}.{{component}}Component
-      enabled: true
-    #- id: admin
-    #  enabled: true
-    #- id: info
-    #  enabled: true
+components:
+  - id: {{app_name}}
+    class: {{module}}.{{component}}Component
+    enabled: true
+  #- id: admin
+  #  enabled: true
+  #- id: info
+  #  enabled: true
 
 # Session types could be:
 # file or redis.

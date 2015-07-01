@@ -42,7 +42,8 @@ LIB_CONFIG_FILE = os.path.join(ROOT, 'conf', FIRENADO_CONFIG_FILE)
 
 # Application file
 APP_CONFIG_ROOT_PATH = os.path.join(os.getcwd())
-# If FIRENADO_CURRENT_APP_PATH is not set than return current directory conf dir
+# If FIRENADO_CURRENT_APP_PATH is not set than return current directory
+# conf dir
 APP_CONFIG_PATH = os.getenv('FIRENADO_CURRENT_APP_CONFIG_PATH',
                             os.path.join(APP_CONFIG_ROOT_PATH, 'conf'))
 APP_CONFIG_FILE = os.path.join(APP_CONFIG_PATH, FIRENADO_CONFIG_FILE)
@@ -75,7 +76,10 @@ app['login']['urls'] = {}
 app['login']['urls']['default'] = '/login'
 app['is_on_dir'] = False
 
-# Data default configuration
+# Component section configutaion
+components = {}
+
+# Data section configuration
 data = {}
 data['connectors'] = {}
 
@@ -85,45 +89,95 @@ management['commands'] = {}
 
 
 def process_config(config):
-    """
-    Process the configuration loaded from a given config file populating
-    the firenado.conf module.
+    """ Populates firenado.conf attributes from the loaded configuration
+    dict. It handles data and management aspects from the configuration.
 
-    :param config: Configuration loaded from a config file
+    :param config: Loaded configuration dict
     """
+    if 'components' in config:
+        process_components_config_section(config['components'])
     if 'data' in config:
-        if 'data' in config:
-            process_data_config(config['data'])
-        if 'management' in config:
-            process_management_config(config['management'])
+        process_data_config_section(config['data'])
+    if 'management' in config:
+        process_management_config_section(config['management'])
 
 
-def process_data_config(data_config):
+def process_app_config(config):
+    """ Populates firenado.conf attributes from the loaded configuration
+    dict. It handles everything that process_config does plus application
+    configuation.
+
+    :param config: Loaded configuration dict
     """
-    Process the data configuration section loaded from a parsed configuration
-    data.
+    process_config(config)
+    if 'app' in config:
+        process_app_config_section(config['app'])
 
-    :param data_config: Data configuration section from a parsed configuration
+
+def process_app_config_section(app_config):
+    """ Processes the app section from a configuration dict.
+
+    :param app_config: App section from a config dict
     data.
+    """
+    global app
+    if 'data' in app_config:
+        if 'sources' in app_config['data']:
+            app['data']['sources'] = app_config['data']['sources']
+    if 'pythonpath' in app_config:
+        app['pythonpath'] = app_config['pythonpath']
+    if 'port' in app_config:
+        app['port'] = app_config['port']
+
+
+def process_components_config_section(components_config):
+    """ Processes the components section from a configuration dict.
+
+    :param components_config: Data section from a config dict.
+    """
+    global components
+    for component_config in components_config:
+        if 'id' not in component_config:
+            raise Exception('The component %s was defined without an id.' %
+                            component_config)
+        component_id = component_config['id']
+        if component_id not in components:
+            components[component_id] = {}
+            components[component_id]['enabled'] = False
+            components[component_id]['config'] = {}
+        if 'class' in component_config:
+            class_config_x = component_config['class'].split('.')
+            components[component_id]['class'] = class_config_x[1]
+            components[component_id]['module'] = '.'.join(class_config_x[:-1])
+        if 'enabled' in component_config:
+            components[component_id]['enabled'] = bool(
+                component_config['enabled'])
+
+
+def process_data_config_section(data_config):
+    """ Processes the data configuration section from the configuration
+    dict.
+
+    :param data_config: Data configuration section from a config dict.
     """
     global data
     if 'connectors' in data_config:
         data['connectors'] = data_config['connectors']
 
 
-def process_management_config(management_config):
-    """
-    Process the management configuration section from a parsed configuration
-    data.
+def process_management_config_section(management_config):
+    """ Processes the management section from a configuration dict.
 
-    :param management_config: Management configuration section from a parsed
-    configuration data.
+    :param management_config: Management section from a config dict.
     """
     global management
     if 'commands' in management_config:
         management['commands'] = management_config['commands']
 
-
 if HAS_LIB_CONFIG_FILE:
     lib_config = yaml.safe_load(file(LIB_CONFIG_FILE, 'r'))
     process_config(lib_config)
+
+if HAS_APP_CONFIG_FILE:
+    app_config = yaml.safe_load(file(APP_CONFIG_FILE, 'r'))
+    process_app_config(app_config)
