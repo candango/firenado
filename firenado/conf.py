@@ -61,14 +61,14 @@ if os.path.isfile(APP_CONFIG_FILE):
 
 # Setting firenado's default variables
 
-# Application default configuration
+# Application section configuration
 app = {}
 # Key to to be used on on the session context to store and retrieve the current
 # logged user
 app['current_user_key'] = '__FIRENADO_CURRENT_USER_KEY__'
 app['data'] = {}
 app['data']['sources'] = []
-app['python_path'] = None
+app['pythonpath'] = None
 app['port'] = 8888
 app['login'] = {}
 app['login']['urls'] = {}
@@ -79,7 +79,7 @@ app['is_on_dir'] = False
 data = {}
 data['connectors'] = {}
 
-# Management default configuration
+# Management section configuration
 management = {}
 management['commands'] = {}
 
