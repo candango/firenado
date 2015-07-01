@@ -73,8 +73,6 @@ def show_command_line_usage(parser, usage=False):
     )
     # TODO: This print has to go. Use proper stream instead(stdout or stderr)
     print(''.join([help_header_message, help_message]))
-    print("\n    --name=value    whatever")
-    print("    --help          display help")
 
 
 def command_exists(command):
@@ -94,48 +92,70 @@ def run_command(command, args):
     for category, commands in command_categories.iteritems():
         for existing_command in commands:
             if command == existing_command.name:
-                existing_command.run_tasks(args)
+                existing_command.run(args)
 
 
 class ManagementCommand():
-    """
-    Defines a management command. Commands are classified by categories and
+    """ Defines a management command. Commands are classified by categories and
     the Firenado category is the default one. Those commands are shipped with
     the framework.
     Developers can create new categories of commands and commands and
     distribute them with their application and/or components.
     """
 
-    def __init__(self, category, name, description, cmd_help, tasks=None):
-        """
-        To register a management command it is necessary inform the category
-        you the command belongs, it's name and description and a meaningful
-        help to be displayed.
+    def __init__(self, name, description, cmd_help, category=None,
+                 sub_commands=None, tasks=None, parent=None):
+        """ To register a management command it is necessary inform the
+        category you the command belongs, it's name and description and a
+        meaningful help to be displayed.
 
-        :param category: The category the command belongs to
         :param name: Command's name
         :param description: Command's description
         :param cmd_help: Meaningful help to be displayed
+        :param category: The category the command belongs to
+        :param sub_commands: Sub commands aggregated into the command
         :param tasks: Tasks to be executed when this command is called
         """
-
         self.category = category
         self.name = name
         self.description = description
         self.help = cmd_help
+        self.sub_commands = sub_commands
         self.tasks = []
-        if isinstance(tasks, list):
-            for task in tasks:
-                self.tasks.append(task(self))
-        else:
-            self.tasks.append(tasks(self))
+        self.parent = None
+        if tasks is not None:
+            if isinstance(tasks, list):
+                for task in tasks:
+                    self.tasks.append(task(self))
+            else:
+                self.tasks.append(tasks(self))
         global command_categories
-        if category not in command_categories:
-            command_categories[category] = []
-        command_categories[category].append(self)
+        if category is not None:
+            if category not in command_categories:
+                command_categories[category] = []
+            command_categories[category].append(self)
 
     def get_help(self):
         return self.help
+
+    def run(self, args):
+        has_sub_commands = False
+        subcommand_resolved = False
+        if self.sub_commands:
+            has_sub_commands = True
+            # TODO handle args with size 1
+            unresolved_args = args[1:]        
+            for subcommand in self.sub_commands:
+                if subcommand.name == unresolved_args[0]:
+                    subcommand.run(unresolved_args)
+                    subcommand_resolved = True
+                    break
+        if not has_sub_commands:
+            self.run_tasks(args)
+        else:
+            if not subcommand_resolved:
+                # TODO Print the error here!!!
+                print('Print something meaningfull here!!!')
 
     def run_tasks(self, args):
         cmd_parser = FirenadoArgumentParser(
@@ -147,11 +167,12 @@ class ManagementCommand():
             namespace = cmd_parser.parse_args(args)
             for task in self.tasks:
                 task.run(namespace)
-        except FirenadoArgumentException as exception:
+        except FirenadoArgumentError as error:
             command_help = ""
             for task in self.tasks:
-                if task.get_error_message(cmd_parser, exception):
-                    command_help += '\n'.join([command_help, task.get_error_message(cmd_parser, exception)])
+                error_message = task.get_error_message(cmd_parser, error)
+                if error_message:
+                    command_help += '\n'.join([command_help, error_message])
             print(command_help)
 
 
@@ -177,11 +198,10 @@ class ManagementTask():
         """
         return None
 
-    def get_error_message(self, parser, exception):
+    def get_error_message(self, parser, error):
         return ""
 
     def run(self, namespace=None):
         """
         Task implementation is done here.
         """
-
