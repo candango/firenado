@@ -80,16 +80,16 @@ class CreateProjectTask(ManagementTask):
         return exception.message
         
 
-class StartAppTask(ManagementTask):
-    """ Task that starts an Firenado Tornado Application based 
+class RunApplicationTask(ManagementTask):
+    """Runs a Firenado Tornado Application based
     on the it's project configuration
     """
     def run(self, namespace):
         import tornado.ioloop
         import tornado.httpserver
-        # TODO: Resolve module if doesnt exists
-        if firenado.conf.app['python_path']:
-            sys.path.append(firenado.conf.app['python_path'])
+        # TODO: Resolve module if doesn't exists
+        if firenado.conf.app['pythonpath']:
+            sys.path.append(firenado.conf.app['pythonpath'])
         http_server = tornado.httpserver.HTTPServer(
             firenado.core.TornadoApplication())
         http_server.listen(firenado.conf.app['port'])
