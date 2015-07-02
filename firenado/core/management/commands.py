@@ -21,17 +21,19 @@ from firenado.core.management import ManagementCommand
 
 
 ManagementCommand(
-    'app', 'Application related commands', '', 
+    'app', 'Application related commands', '',
     category='Firenado',
-    sub_commands = [])
-ManagementCommand(
-    'project','Project related commands', '', 
-    category='Firenado', 
-    sub_commands = [
-        ManagementCommand('init', 'Initiates a new Firenado project', '', 
-        tasks=tasks.CreateProjectTask)
+    sub_commands=[
+        ManagementCommand('run', 'Runs a Firenado application', '',
+                          tasks=tasks.RunApplicationTask)
     ])
 ManagementCommand(
-    'repo', 'Repository related commands', '', 
-    category='Firenado',
-    sub_commands = [])
+    'project','Project related commands', '',
+    category='Firenado', 
+    sub_commands=[
+        ManagementCommand('init', 'Initiates a new Firenado project', '',
+                          tasks=tasks.CreateProjectTask)
+    ])
+ManagementCommand(
+    'repo', 'Repository related commands', '', category='Firenado',
+    sub_commands=[])

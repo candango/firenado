@@ -18,7 +18,10 @@
 
 from __future__ import (absolute_import, division,
                         print_function, with_statement)
+
+import firenado.conf
 import inspect
+import importlib
 import os
 from tornado.escape import json_encode
 import tornado.web
@@ -28,20 +31,47 @@ class TornadoApplication(tornado.web.Application):
     """Firenado basic Tornado application.
     """
 
-    def __init__(self, handlers=None, default_host="", transforms=None,
-                 **settings):
+    def __init__(self, default_host="", transforms=None, **settings):
         self.components = {}
+        handlers = []
+        static_handlers = []
 
-        composed_handlers = handlers
+        self.__load_components()
+        for key, component in self.components.iteritems():
+            component_handlers = component.get_handlers()
+            for i in range(0, len(component_handlers)):
+                if issubclass(component_handlers[i][1], TornadoHandler):
+                    if len(component_handlers[i]) < 3:
+                        component_handlers[i] = (
+                            component_handlers[i][0],
+                            component_handlers[i][1],
+                            {'component': component}
+                        )
+                    else:
+                        component_handlers[i][1].component = component
+            handlers = handlers + component_handlers
 
-        tornado.web.Application.__init__(self, composed_handlers, default_host,
-                                         transforms, **settings)
+        tornado.web.Application.__init__(self, handlers=handlers,
+                                         default_host=default_host,
+                                         transforms=transforms, **settings)
+
+    def __load_components(self):
+        """ Loads all enabled components registered into the components
+        conf.
+        """
+        for key, value in firenado.conf.components.iteritems():
+            if value['enabled']:
+                component_module = importlib.import_module(value['module'])
+                component_class = getattr(component_module, value['class'])
+                self.components[key] = component_class(key, self,
+                                                       value['config'])
+                self.components[key].process_config()
 
 
 class TornadoComponent(object):
-    """Firenado applications are organized in components. A component could be
-    the proper application or something that can be distributed as an add-on or
-    a plugin.
+    """ Firenado applications are organized in components. A component could be
+    an application or something that can be distributed as an add-on or a
+    plugin.
     """
 
     def __init__(self, name, application, config={}):
@@ -51,20 +81,26 @@ class TornadoComponent(object):
         self.plugins = dict()
 
     def get_handlers(self):
-        """Return handlers being added by the component to the application.
+        """ Returns handlers being added by the component to the application.
         """
         return []
 
     def get_component_path(self):
-        """Return the component path.
+        """ Returns the component path.
         """
         return os.path.dirname(inspect.getfile(self.__class__))
 
     def get_template_path(self):
-        """Return the path that holds the component's templates.
+        """ Returns the path that holds the component's templates.
         """
         return os.path.join(os.path.dirname(
             inspect.getfile(self.__class__)), 'templates')
+
+    def process_config(self):
+        """ To process your component configuration please overwrite this
+        method reading the data on self.config.
+        """
+        pass
 
 
 class TornadoHandler(tornado.web.RequestHandler):
@@ -162,4 +198,3 @@ class JSONError(tornado.web.HTTPError):
             json_log_message = json_encode(json_log_message)
         super(JSONError, self).__init__(
             status_code, json_log_message, *args, **kwargs)
-
