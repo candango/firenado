@@ -4,6 +4,6 @@ import firenado.core
 class {{component}}Component(firenado.core.TornadoComponent):
 
     def get_handlers(self):
-        return handlers = [
+        return [
             (r'/', {{module}}.handlers.IndexHandler),
         ]
