@@ -82,6 +82,7 @@ components = {}
 # Data section configuration
 data = {}
 data['connectors'] = {}
+data['sources'] = {}
 
 # Management section configuration
 management = {}
