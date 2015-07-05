@@ -163,7 +163,16 @@ def process_data_config_section(data_config):
     """
     global data
     if 'connectors' in data_config:
-        data['connectors'] = data_config['connectors']
+        for connector in data_config['connectors']:
+            connector_class_x = connector['class'].split('.')
+            connector['class'] = connector_class_x[-1]
+            connector['module'] = '.'.join(connector_class_x[:-1][:])
+            data['connectors'][connector['name']] = connector
+            del data['connectors'][connector['name']]['name']
+    if 'sources' in data_config:
+        for source in data_config['sources']:
+            data['sources'][source['name']] = source
+            del data['sources'][source['name']]['name']
 
 
 def process_management_config_section(management_config):
