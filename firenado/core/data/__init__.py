@@ -20,7 +20,7 @@ import functools
 import importlib
 import types
 
-def configure_data_source(data_sources, data_connected):
+def configure_data_sources(data_sources, data_connected):
     """
     Configures data sources to a data connected object.
     :param data_sources: List of data sources to be configured
@@ -34,17 +34,17 @@ def configure_data_source(data_sources, data_connected):
         # TODO Handler unknow connection instance here
         config = firenado.conf.data['sources'][data_sources]
         connection_handler_config = firenado.conf.data['connectors'][
-            config['type']]
+            config['connector']]
         module = importlib.import_module(connection_handler_config['module'])
-        handler_class = getattr(module, connection_handler_config['handler'])
+        handler_class = getattr(module, connection_handler_config['class'])
         data_source_instance = handler_class(data_connected)
         data_source_instance.configure(config)
         data_connected.set_data_source(data_sources, data_source_instance)
         # Testing the connection
         # Without that the error will just happen during the handler execution
-    elif isinstance(data_sources, types.ListType):
+    elif isinstance(data_sources, list):
         for data_source in data_sources:
-            configure_data_source(data_source, data_connected)
+            configure_data_sources(data_source, data_connected)
     #TODO Throw an error here if it is not string or list
         
 
@@ -55,15 +55,14 @@ def configure(data_sources):
     def f_wrapper(method):
         @functools.wraps(method)
         def wrapper(self, *args, **kwargs):
-            configure_data_source(data_sources, self)
+            configure_data_sources(data_sources, self)
             return method(self, *args, **kwargs)
         return wrapper
     return f_wrapper
 
 
 class DataConnectedMixin(object):
-    """
-    Data connected objects has data sources. This mixin prepares an
+    """ Data connected objects has data sources. This mixin prepares an
     object to to have data sources set to it and retrieved from it.
 
     Example:
@@ -79,12 +78,12 @@ class DataConnectedMixin(object):
     def get_data_source(self, id):
         """ Returns a connector by it's id.
         """
-        return self.connectors[id]
+        return self.data_source[id]
 
-    def set_data_source(self, id, connector):
+    def set_data_source(self, id, data_source):
         """ Add a connector to the connectors collection.
         """
-        self.connectors[id] = connector
+        self.data_sources[id] = data_source
 
 
 def get_data_sources(obj, data_sources_attribute):
