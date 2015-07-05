@@ -20,6 +20,7 @@ from __future__ import (absolute_import, division,
                         print_function, with_statement)
 
 import firenado.conf
+from firenado.core import data
 import inspect
 import importlib
 import os
@@ -27,7 +28,7 @@ from tornado.escape import json_encode
 import tornado.web
 
 
-class TornadoApplication(tornado.web.Application):
+class TornadoApplication(tornado.web.Application, data.DataConnectedMixin):
     """Firenado basic Tornado application.
     """
 
@@ -35,6 +36,7 @@ class TornadoApplication(tornado.web.Application):
         self.components = {}
         handlers = []
         static_handlers = []
+        data.configure_data_sources(firenado.conf.app['data']['sources'], self)
 
         self.__load_components()
         for key, component in self.components.iteritems():
@@ -184,13 +186,11 @@ class TornadoHandler(tornado.web.RequestHandler):
             return self.component.get_template_path()
 
 
-#TODO: This is iFlux migration leftover. Need to figure out we should keep
-# that.
+#TODO: This is iFlux migration leftover. Is that necessary?.
 class JSONError(tornado.web.HTTPError):
 
-    data = {}
-
     def __init__(self, status_code, log_message=None, *args, **kwargs):
+        data = {}
         self.data.update(log_message)
         if not isinstance(log_message, basestring):
             json_log_message = self.data

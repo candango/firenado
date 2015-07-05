@@ -7,13 +7,12 @@ July 31, 2015
 ::
 
     We are pleased to announce the release of Firenado 0.1, available
-    from
-    __link__.
-    This was a complete rewrite from the iFlux framwork an here are the
+    from __link__.
+    This was a complete rewrite from the iFlux framework an here are the
     highlights:
 
     New Features:
-    * Yaml based configutation files
+    * Yaml based configuration files
 
 
     Migration changes:
