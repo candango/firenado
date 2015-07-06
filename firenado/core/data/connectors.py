@@ -15,6 +15,7 @@
 # limitations under the License.
 #
 # vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4:
+
 import sys
 
 
@@ -31,8 +32,7 @@ class Connector(object):
         """
         return None
 
-    @staticmethod
-    def parse_config(config):
+    def process_config(self, config):
         """ Parse the configuration data provided by the iflux.conf engine.
         """
         return {}
@@ -53,7 +53,6 @@ class RedisConnector(Connector):
         super(RedisConnector, self).__init__(data_connected)
 
     def configure(self, config):
-        config = self.parse_config(config)
         import redis
         redis_config = dict()
         redis_config.update(config)
@@ -68,8 +67,7 @@ class RedisConnector(Connector):
     def get_connection(self):
         return self.__connection
 
-    @staticmethod
-    def parse_config(config):
+    def process_config(self, config):
         db_config = {
             'connector': 'redis',
             'host': 'localhost',
@@ -131,8 +129,7 @@ class SqlalchemyConnector(Connector):
     def session(self):
         return self.__connection['session']
 
-    @staticmethod
-    def parse_config(config):
+    def process_config(self, config):
         db_config = {
             'type': 'sqlalchemy',
         }
@@ -143,4 +140,3 @@ class SqlalchemyConnector(Connector):
         # TODO: Handler errors here
         db_config['backend'] = db_config['url'].split(':')[0].split('+')[0]
         return db_config
-
