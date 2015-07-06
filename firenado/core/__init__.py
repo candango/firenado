@@ -21,6 +21,7 @@ from __future__ import (absolute_import, division,
 
 import firenado.conf
 from firenado.core import data
+from firenado.core import template
 import inspect
 import importlib
 import os
@@ -184,6 +185,23 @@ class TornadoHandler(tornado.web.RequestHandler):
             return super(TornadoHandler, self).get_template_path()
         else:
             return self.component.get_template_path()
+
+    def create_template_loader(self, template_path):
+        """Returns a new template loader for the given path.
+
+        May be overridden by subclasses.  By default returns a
+        directory-based loader on the given path, using the
+        ``autoescape`` application setting.  If a ``template_loader``
+        application setting is supplied, uses that instead.
+        """
+        settings = self.application.settings
+        kwargs = {}
+        if 'autoescape' in settings:
+            # autoescape=None means "no escaping", so we have to be sure
+            # to only pass this kwarg if the user asked for it.
+            kwargs['autoescape'] = settings['autoescape']
+        return template.ComponentLoader(
+            template_path, component=self.component, **kwargs)
 
 
 #TODO: This is iFlux migration leftover. Is that necessary?.
