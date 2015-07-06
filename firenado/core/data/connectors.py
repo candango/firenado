@@ -100,7 +100,7 @@ class SqlalchemyConnector(Connector):
     def configure(self, config):
         from sqlalchemy import create_engine
         from sqlalchemy.exc import OperationalError
-        from iflux.util.sqlalchemy_util import Session
+        from firenado.util.sqlalchemy_util import Session
 
         self.__connection['engine'] = create_engine(config['url'])
         try:
