@@ -38,6 +38,7 @@ def configure_data_sources(data_sources, data_connected):
         module = importlib.import_module(connection_handler_config['module'])
         handler_class = getattr(module, connection_handler_config['class'])
         data_source_instance = handler_class(data_connected)
+        config = data_source_instance.process_config(config)
         data_source_instance.configure(config)
         data_connected.set_data_source(data_sources, data_source_instance)
         # Testing the connection
