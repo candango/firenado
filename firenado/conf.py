@@ -18,6 +18,8 @@
 
 from __future__ import (absolute_import, division,
                         print_function, with_statement)
+
+import importlib
 import yaml
 import os
 
@@ -87,6 +89,18 @@ data['sources'] = {}
 # Management section configuration
 management = {}
 management['commands'] = {}
+
+# Session section
+session = {}
+session['handlers'] = {}
+
+
+def get_class_from_config(config):
+    """ Returns a class from a config dict bit with the keys
+    module and class on it.
+    """
+    module = importlib.import_module(config['module'])
+    return getattr(module, config['class'])
 
 
 def process_config(config):

@@ -20,6 +20,7 @@ from __future__ import (absolute_import, division,
                         print_function, with_statement)
 
 import firenado.conf
+from firenado.conf import get_class_from_config
 from firenado.core import data
 from firenado.core import template
 import inspect
@@ -64,8 +65,7 @@ class TornadoApplication(tornado.web.Application, data.DataConnectedMixin):
         """
         for key, value in firenado.conf.components.iteritems():
             if value['enabled']:
-                component_module = importlib.import_module(value['module'])
-                component_class = getattr(component_module, value['class'])
+                component_class = get_class_from_config(value)
                 self.components[key] = component_class(key, self,
                                                        value['config'])
                 self.components[key].process_config()
