@@ -20,3 +20,23 @@ management:
   commands:
     - name: firenado
       module: firenado.core.management.commands
+
+session:
+  handlers:
+    - name: file
+      class: firenado.core.session.FileSessionHandler
+    - name: redis
+      class: fireando.core.session.RedisSessionHandler
+  encoders:
+    - name: pickle
+      class: firenado.core.session.PickeSessionEncoder
+
+session:
+  handlers:
+    - name: file
+      class: firenado.core.session.FileSessionHandler
+    - name: redis
+      class: fireando.core.session.RedisSessionHandler
+  encoders:
+    - name: pickle
+      class: firenado.core.session.PickeSessionEncoder

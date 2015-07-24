@@ -62,6 +62,11 @@ if os.path.isfile(APP_CONFIG_FILE):
         HAS_APP_CONFIG_FILE = True
         stack.append(APP_CONFIG_FILE)
 
+# Tmp path variable
+# TODO: Should I care about windows?
+TMP_SYS_PATH = '/tmp'
+TMP_APP_PATH = TMP_SYS_PATH
+
 # Setting firenado's default variables
 
 # Application section
@@ -102,6 +107,18 @@ def get_class_from_config(config):
     module = importlib.import_module(config['module'])
     return getattr(module, config['class'])
 
+# Session section
+session = {}
+session['handlers'] = {}
+
+
+def get_class_from_config(config):
+    """ Returns a class from a config dict bit with the keys
+    module and class on it. 
+    """
+    module = importlib.import_module(config['module'])
+    return getattr(module, config['class'])
+
 
 def process_config(config):
     """ Populates firenado.conf attributes from the loaded configuration
@@ -115,6 +132,8 @@ def process_config(config):
         process_data_config_section(config['data'])
     if 'management' in config:
         process_management_config_section(config['management'])
+    if 'session' in config:
+        process_session_config_section(config['session'])
 
 
 def process_app_config(config):
@@ -197,6 +216,28 @@ def process_management_config_section(management_config):
     global management
     if 'commands' in management_config:
         management['commands'] = management_config['commands']
+
+
+def process_session_config_section(session_config):
+    """ Processes the session section from the configuration dict.
+
+    :param session_config: Session configuration section from a config dict.
+    """
+    global session
+    if 'handlers' in session_config:
+        for handler in session_config['handlers']:
+            handler_class_x = handler['class'].split('.')
+            handler['class'] = handler_class_x[-1]
+            handler['module'] = '.'.join(handler_class_x[:-1][:])
+            session['handlers'][handler['name']] = handler
+            del session['handlers'][handler['name']]['name']
+    if 'encoders' in session_config:
+        for encoder in session_config['encoders']:
+            encoder_class_x = encoder['class'].split('.')
+            encoder['encoder'] = encoder_class_x[-1]
+            encoder['class'] = encoder_class_x[-1]
+            encoder['module'] = '.'.join(encoder_class_x[:-1][:])
+
 
 if HAS_LIB_CONFIG_FILE:
     lib_config = yaml.safe_load(file(LIB_CONFIG_FILE, 'r'))
