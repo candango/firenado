@@ -14,7 +14,7 @@ data:
     - name: redis
       class: firenado.core.data.connectors.RedisConnector
     - name: sqlalchemy
-      class: firenado.core.data.connectors.SqlAlchemyConnector
+      class: firenado.core.data.connectors.SqlalchemyConnector
 
 management:
   commands:
