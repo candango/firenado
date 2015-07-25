@@ -1,7 +1,6 @@
 [![Documentation Status](https://readthedocs.org/projects/firenado/badge/?version=latest)](https://readthedocs.org/projects/firenado/?badge=latest)
 # Firenado Framework
 
-[![Join the chat at https://gitter.im/candango/firenado](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/candango/firenado?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 Web Framework that extends Tornado Web adding new features to the original framework.
 
 ## Introduction
