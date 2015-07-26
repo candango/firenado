@@ -22,15 +22,16 @@ from __future__ import (absolute_import, division,
 import firenado.conf
 from firenado.conf import get_class_from_config
 from firenado.core import data
+from firenado.core import session
 from firenado.core import template
 import inspect
-import importlib
 import os
 from tornado.escape import json_encode
 import tornado.web
 
 
-class TornadoApplication(tornado.web.Application, data.DataConnectedMixin):
+class TornadoApplication(tornado.web.Application, data.DataConnectedMixin,
+                         session.SessionEnginedMixin):
     """Firenado basic Tornado application.
     """
 
@@ -124,6 +125,16 @@ class TornadoHandler(tornado.web.RequestHandler):
         the render or render_string execution.
         """
         self.__template_variables[name] = variable
+
+    @session.read
+    def prepare(self):
+        pass
+        #self.component.run_before_handler(self)
+
+    @session.write
+    def on_finish(self):
+        pass
+        #self.component.run_after_handler(self)
 
     def render_string(self, template_name, **kwargs):
         ignore_component = False
