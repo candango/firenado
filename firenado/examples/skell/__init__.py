@@ -6,4 +6,5 @@ class SkellComponent(firenado.core.TornadoComponent):
     def get_handlers(self):
         return [
             (r'/', skell.handlers.IndexHandler),
+            (r'/session', skell.handlers.SessionHandler),
         ]
