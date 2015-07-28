@@ -344,30 +344,29 @@ class RedisSessionHandler(SessionHandler):
     Session handler that deals with file data stored  in a redis database.
     """
 
-    connection_handler = None
+    data_source = None
 
     def configure(self):
-        self.connection_handler = self.engine.get_session_aware_instance().\
-            get_connection_handler(
-            firenado.conf.session['redis']['connection'])
+        self.data_source = self.engine.get_session_aware_instance().\
+            get_data_source(firenado.conf.session['redis']['data']['source'])
 
     def create_session(self, session_id, data):
         self.write_stored_session(session_id, data)
 
     def read_stored_session(self, session_id):
-        return self.connection_handler.get_connection().get(
+        return self.data_source.get_connection().get(
             self.__get_key(session_id))
 
     def write_stored_session(self, session_id, data):
-        self.connection_handler.get_connection().set(
+        self.data_source.get_connection().set(
             self.__get_key(session_id), data)
 
     def destroy_stored_session(self, session_id):
         key = self.__get_key(session_id)
-        self.connection_handler.get_connection().delete(key)
+        self.data_source.get_connection().delete(key)
 
     def is_session_stored(self, session_id):
-        return self.connection_handler.get_connection().get(
+        return self.data_source.get_connection().get(
             self.__get_key(session_id)) is not None
 
     def __get_key(self, session_id):
@@ -392,4 +391,3 @@ class PickeSessionEncoder(SessionEncoder):
     def decode(self, data):
         import pickle
         return pickle.loads(data)
-
