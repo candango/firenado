@@ -15,6 +15,11 @@ July 31, 2015
     * Yaml based configuration files
 
 
+    Migration from iFlux to Firenado:
+    * Data tools
+    * Modules
+    * Session
+
     Migration changes:
     * Configuration
     * Command line tool
