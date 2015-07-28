@@ -27,7 +27,8 @@ components:
 session:
   type: redis
   enabled: true
+  # Redis session handler configuration
   data:
     source: session
-  # Fire related configuration
+  # File session handler related configuration
   # path: /tmp

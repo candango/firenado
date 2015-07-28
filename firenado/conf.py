@@ -97,19 +97,18 @@ management['commands'] = {}
 
 # Session section
 session = {}
+session['enabled'] = False
+session['encoder'] = 'pickle'
+session['encoders'] = {}
+session['file'] = {}
+session['file']['path'] = ''
 session['handlers'] = {}
-
-
-def get_class_from_config(config):
-    """ Returns a class from a config dict bit with the keys
-    module and class on it.
-    """
-    module = importlib.import_module(config['module'])
-    return getattr(module, config['class'])
-
-# Session section
-session = {}
-session['handlers'] = {}
+session['name'] = 'FIRENADOSESSID'
+session['redis'] = {}
+session['redis']['data'] = {}
+session['redis']['data']['source'] = ''
+session['redis']['prefix'] = 'firenado:session'
+session['type'] = ''
 
 
 def get_class_from_config(config):
@@ -224,6 +223,18 @@ def process_session_config_section(session_config):
     :param session_config: Session configuration section from a config dict.
     """
     global session
+    if 'enabled' in session_config:
+        session['enabled'] = session_config['enabled']
+    if 'type' in session_config:
+        session['type'] = session_config['type']
+        if session['type'] == 'file':
+            if 'path' in session_config:
+                session['file']['path'] = session_config['path']
+        if session['type'] == 'redis':
+            if 'data' in session_config:
+                if 'source' in session_config['data']:
+                    session['redis']['data']['source'] = session_config[
+                        'data']['source']
     if 'handlers' in session_config:
         for handler in session_config['handlers']:
             handler_class_x = handler['class'].split('.')
@@ -237,6 +248,8 @@ def process_session_config_section(session_config):
             encoder['encoder'] = encoder_class_x[-1]
             encoder['class'] = encoder_class_x[-1]
             encoder['module'] = '.'.join(encoder_class_x[:-1][:])
+            session['encoders'][encoder['name']] = encoder
+            del session['encoders'][encoder['name']]['name']
 
 
 if HAS_LIB_CONFIG_FILE:

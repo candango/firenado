@@ -79,7 +79,7 @@ class DataConnectedMixin(object):
     def get_data_source(self, id):
         """ Returns a connector by it's id.
         """
-        return self.data_source[id]
+        return self.data_sources[id]
 
     def set_data_source(self, id, data_source):
         """ Add a connector to the connectors collection.
