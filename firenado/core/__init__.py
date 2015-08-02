@@ -40,7 +40,8 @@ class TornadoApplication(tornado.web.Application, data.DataConnectedMixin,
         handlers = []
         static_handlers = []
         data.configure_data_sources(firenado.conf.app['data']['sources'], self)
-
+        settings['static_path'] = os.path.join(
+            os.path.dirname(__file__), "static")
         self.__load_components()
         for key, component in self.components.iteritems():
             component_handlers = component.get_handlers()
@@ -55,7 +56,12 @@ class TornadoApplication(tornado.web.Application, data.DataConnectedMixin,
                     else:
                         component_handlers[i][1].component = component
             handlers = handlers + component_handlers
-
+        if firenado.conf.app['component']:
+            settings['static_path'] = os.path.join(self.components[
+                firenado.conf.app['component']].get_component_path(), 'static')
+        else:
+            settings['static_path'] = os.path.join(
+                os.path.dirname(__file__), "static")
         tornado.web.Application.__init__(self, handlers=handlers,
                                          default_host=default_host,
                                          transforms=transforms, **settings)
@@ -92,13 +98,15 @@ class TornadoComponent(object):
     def get_component_path(self):
         """ Returns the component path.
         """
-        return os.path.dirname(inspect.getfile(self.__class__))
+        return os.path.abspath(os.path.dirname(
+            inspect.getfile(self.__class__)))
+
 
     def get_template_path(self):
         """ Returns the path that holds the component's templates.
         """
-        return os.path.join(os.path.dirname(
-            inspect.getfile(self.__class__)), 'templates')
+        return os.path.join(os.path.abspath(os.path.dirname(
+            inspect.getfile(self.__class__))), 'templates')
 
     def process_config(self):
         """ To process your component configuration please overwrite this

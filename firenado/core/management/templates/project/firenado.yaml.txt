@@ -1,4 +1,5 @@
 app:
+  component: {{app_name}}
   data:
     sources:
         # Set here references from sources defined on data.sources
