@@ -3,6 +3,9 @@ __pycache__
 
 database.sqlite
 
+# Bower
+bower_components
+
 # C extensions
 *.so
 
