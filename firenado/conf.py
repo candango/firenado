@@ -73,6 +73,7 @@ TMP_APP_PATH = TMP_SYS_PATH
 app = {}
 # Key to to be used on on the session context to store and retrieve the current
 # logged user
+app['component'] = None
 app['current_user_key'] = '__FIRENADO_CURRENT_USER_KEY__'
 app['data'] = {}
 app['data']['sources'] = []
@@ -154,6 +155,8 @@ def process_app_config_section(app_config):
     data.
     """
     global app
+    if 'component' in app_config:
+        app['component'] = app_config['component']
     if 'data' in app_config:
         if 'sources' in app_config['data']:
             app['data']['sources'] = app_config['data']['sources']
