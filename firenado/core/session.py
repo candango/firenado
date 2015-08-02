@@ -154,9 +154,10 @@ class Session(object):
         renewing/creating a new session id. If you want that use 
         session.destroy() """
         self.__data.clear()
+        self.__changed = True
 
     def destroy(self, request_handler):
-        """ Clearint session data and marking the session to be
+        """ Clearing session data and marking the session to be
         renewed at the end of the request. """
         self.clear()
         self.__destroyed = True
@@ -177,6 +178,12 @@ class Session(object):
         self.__lock_if_destroyed()
         """ Returns if session data has some data stored by a given key. """
         return self.__data.has_key(key)
+
+    def delete(self, key):
+        self.__lock_if_destroyed()
+        if key in self.__data:
+            del self.__data[key]
+            self.__changed = True
 
     def is_destroyed(self):
         """ Returns is the session is marked to be destroyed 
