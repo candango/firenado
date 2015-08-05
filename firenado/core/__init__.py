@@ -46,7 +46,12 @@ class TornadoApplication(tornado.web.Application, data.DataConnectedMixin,
         for key, component in self.components.iteritems():
             component_handlers = component.get_handlers()
             for i in range(0, len(component_handlers)):
-                if issubclass(component_handlers[i][1], TornadoHandler):
+                from firenado.core.websocket import TornadoWebSocketHandler
+                if issubclass(
+                    component_handlers[i][1], TornadoHandler
+                ) or issubclass(
+                    component_handlers[i][1], TornadoWebSocketHandler
+                ):
                     if len(component_handlers[i]) < 3:
                         component_handlers[i] = (
                             component_handlers[i][0],
