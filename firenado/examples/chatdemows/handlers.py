@@ -4,8 +4,7 @@ import logging
 import tornado.escape
 
 
-from tornado.concurrent import Future
-from tornado import gen
+
 import uuid
 
 
