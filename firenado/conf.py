@@ -183,7 +183,7 @@ def process_components_config_section(components_config):
             components[component_id]['config'] = {}
         if 'class' in component_config:
             class_config_x = component_config['class'].split('.')
-            components[component_id]['class'] = class_config_x[1]
+            components[component_id]['class'] = class_config_x[-1]
             components[component_id]['module'] = '.'.join(class_config_x[:-1])
         if 'enabled' in component_config:
             components[component_id]['enabled'] = bool(
