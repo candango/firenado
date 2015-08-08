@@ -20,6 +20,9 @@ import firenado.conf
 from firenado.core.management import ManagementTask
 from firenado.util import file as _file
 
+import tornado.ioloop
+import tornado.httpserver
+
 import os
 import sys
 
@@ -86,12 +89,49 @@ class RunApplicationTask(ManagementTask):
     on the it's project configuration
     """
     def run(self, namespace):
-        import tornado.ioloop
-        import tornado.httpserver
+        import signal
+        self.http_server = None
+
+        # TODO get this from firenado.conf
+        self.MAX_WAIT_SECONDS_BEFORE_SHUTDOWN = 3
+
         # TODO: Resolve module if doesn't exists
         if firenado.conf.app['pythonpath']:
             sys.path.append(firenado.conf.app['pythonpath'])
-        http_server = tornado.httpserver.HTTPServer(
-            firenado.core.TornadoApplication())
-        http_server.listen(firenado.conf.app['port'])
+
+        signal.signal(signal.SIGTERM, self.sig_handler)
+        signal.signal(signal.SIGINT, self.sig_handler)
+        signal.signal(signal.SIGTSTP, self.sig_handler)
+        self.application = firenado.core.TornadoApplication()
+        self.http_server = tornado.httpserver.HTTPServer(
+            self.application)
+        self.http_server.listen(firenado.conf.app['port'])
         tornado.ioloop.IOLoop.instance().start()
+
+    def sig_handler(self, sig, frame):
+        import logging
+        logging.warning('Caught signal: %s', sig)
+        tornado.ioloop.IOLoop.instance().add_callback(self.shutdown)
+
+    def shutdown(self):
+        import time
+        import logging
+        logging.info('Stopping http server')
+        for key, component in self.application.components.iteritems():
+            component.shutdown()
+        self.http_server.stop()
+
+        logging.info('Will shutdown in %s seconds ...',
+                     self.MAX_WAIT_SECONDS_BEFORE_SHUTDOWN)
+        io_loop = tornado.ioloop.IOLoop.instance()
+
+        deadline = time.time() + self.MAX_WAIT_SECONDS_BEFORE_SHUTDOWN
+
+        def stop_loop():
+            now = time.time()
+            if now < deadline and (io_loop._callbacks or io_loop._timeouts):
+                io_loop.add_timeout(now + 1, stop_loop)
+            else:
+                io_loop.stop()
+                logging.info('Shutdown')
+        stop_loop()
