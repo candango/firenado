@@ -119,6 +119,11 @@ class TornadoComponent(object):
         """
         pass
 
+    def shutdown(self):
+        """ If you have resources that will hang after the shutdown please
+        method and close/unload those resources.
+        """
+        pass
 
 class TornadoHandler(tornado.web.RequestHandler):
     """ Base request handler to be used on a Firenado application.
