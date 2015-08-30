@@ -59,7 +59,7 @@ class SessionEngine(object):
             session_id = SessionHandler.get_session_id_cookie(request_handler)
             if session_id is None:
                 cookie_created_on_request = True
-                sesssion = self.__renew_session(request_handler)
+                session = self.__renew_session(request_handler)
             else:
                 session.id = session_id
             # TODO: Check if the session is stored

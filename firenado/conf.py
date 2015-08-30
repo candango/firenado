@@ -120,6 +120,12 @@ def get_class_from_config(config):
     return getattr(module, config['class'])
 
 
+def load_yaml_config_file(path):
+    """ Returns the parsed structure from a yaml config file.
+    """
+    return yaml.safe_load(file(path, 'r'))
+
+
 def process_config(config):
     """ Populates firenado.conf attributes from the loaded configuration
     dict. It handles data and management aspects from the configuration.
@@ -256,9 +262,9 @@ def process_session_config_section(session_config):
 
 
 if HAS_LIB_CONFIG_FILE:
-    lib_config = yaml.safe_load(file(LIB_CONFIG_FILE, 'r'))
+    lib_config = load_yaml_config_file(LIB_CONFIG_FILE)
     process_config(lib_config)
 
 if HAS_APP_CONFIG_FILE:
-    app_config = yaml.safe_load(file(APP_CONFIG_FILE, 'r'))
+    app_config = load_yaml_config_file(APP_CONFIG_FILE)
     process_app_config(app_config)
