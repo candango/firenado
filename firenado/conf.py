@@ -22,6 +22,7 @@ from __future__ import (absolute_import, division,
 import importlib
 import yaml
 import os
+import logging
 
 # Setting root path
 ROOT = None
@@ -43,11 +44,11 @@ stack = []
 LIB_CONFIG_FILE = os.path.join(ROOT, 'conf', FIRENADO_CONFIG_FILE)
 
 # Application file
-APP_CONFIG_ROOT_PATH = os.path.join(os.getcwd())
+APP_ROOT_PATH = os.path.join(os.getcwd())
 # If FIRENADO_CURRENT_APP_PATH is not set than return current directory
 # conf dir
 APP_CONFIG_PATH = os.getenv('FIRENADO_CURRENT_APP_CONFIG_PATH',
-                            os.path.join(APP_CONFIG_ROOT_PATH, 'conf'))
+                            os.path.join(APP_ROOT_PATH, 'conf'))
 APP_CONFIG_FILE = os.path.join(APP_CONFIG_PATH, FIRENADO_CONFIG_FILE)
 
 HAS_LIB_CONFIG_FILE = False
@@ -92,6 +93,11 @@ data = {}
 data['connectors'] = {}
 data['sources'] = {}
 
+# Logging default configuration
+log = {}
+log['format'] = None
+log['level'] = logging.NOTSET
+
 # Management section
 management = {}
 management['commands'] = {}
@@ -110,6 +116,27 @@ session['redis']['data'] = {}
 session['redis']['data']['source'] = ''
 session['redis']['prefix'] = 'firenado:session'
 session['type'] = ''
+
+
+def log_level_from_string(str_level):
+    """ Returns the proper log level core based on a given string
+    """
+    levels = {
+        'CRITICAL': logging.CRITICAL,
+        'ERROR': logging.ERROR,
+        'WARNING': logging.WARNING,
+        'INFO': logging.INFO,
+        'DEBUG': logging.DEBUG,
+    }
+    try:
+        return levels[str_level.upper()]
+    except KeyError:
+        pass
+    except AttributeError:
+        if str_level in [logging.DEBUG, logging.INFO, logging.WARNING,
+                         logging.ERROR, logging.CRITICAL]:
+            return str_level
+    return logging.NOTSET
 
 
 def get_class_from_config(config):
@@ -136,6 +163,8 @@ def process_config(config):
         process_components_config_section(config['components'])
     if 'data' in config:
         process_data_config_section(config['data'])
+    if 'log' in config:
+        process_log_config_section(config['log'])
     if 'management' in config:
         process_management_config_section(config['management'])
     if 'session' in config:
@@ -216,6 +245,18 @@ def process_data_config_section(data_config):
             del data['sources'][source['name']]['name']
 
 
+def process_log_config_section(log_config):
+    """ Processes the log section from a configuration dict.
+
+    :param log_config: Log section from a config dict.
+    """
+    global log
+    if 'format' in log_config:
+        log['format'] = log_config['format']
+    if 'level' in log_config:
+        log['level'] = log_config['level']
+
+
 def process_management_config_section(management_config):
     """ Processes the management section from a configuration dict.
 
@@ -260,7 +301,6 @@ def process_session_config_section(session_config):
             session['encoders'][encoder['name']] = encoder
             del session['encoders'][encoder['name']]['name']
 
-
 if HAS_LIB_CONFIG_FILE:
     lib_config = load_yaml_config_file(LIB_CONFIG_FILE)
     process_config(lib_config)
@@ -268,3 +308,7 @@ if HAS_LIB_CONFIG_FILE:
 if HAS_APP_CONFIG_FILE:
     app_config = load_yaml_config_file(APP_CONFIG_FILE)
     process_app_config(app_config)
+
+# Set logging basic configurations
+logging.basicConfig(level=log_level_from_string(log['level']),
+                    format=log['format'])
