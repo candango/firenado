@@ -20,8 +20,8 @@ components:
     enabled: true
   #- id: admin
   #  enabled: true
-  #- id: info
-  #  enabled: true
+  - id: info
+    enabled: true
 
 # Session types could be:
 # file or redis.
