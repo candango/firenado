@@ -16,6 +16,10 @@ data:
     - name: sqlalchemy
       class: firenado.core.data.connectors.SqlalchemyConnector
 
+log:
+  format: '%(levelname)s - %(name)s[%(module)s:%(lineno)d] - %(asctime)s - %(message)s'
+  level: INFO
+
 management:
   commands:
     - name: firenado

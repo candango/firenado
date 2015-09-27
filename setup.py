@@ -25,15 +25,15 @@ import subprocess
 
 
 install_requires = [
-    "tornado>=4.1",
-    "redis>=2.9.1",
-    "sqlalchemy==0.9.4",
+    "pyyaml>=3.11",
+    "redis>=2.10.3",
+    "tornado>=4.2",
 ]
 
 setup(
     name='Firenado',
-    version=firenado.__version__,
-    description='Componentized web framework.',
+    version=".".join(map(str,firenado.__version__)),
+    description='Componentized web framework based on Tornado.',
     license='Apache License V2.0',
     author='Flavio Garcia',
     author_email='piraz@candango.org',
@@ -65,3 +65,4 @@ setup(
         'firenado = firenado.core.management:run_from_command_line',
     ]},
 )
+

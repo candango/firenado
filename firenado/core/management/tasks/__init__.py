@@ -20,11 +20,14 @@ import firenado.conf
 from firenado.core.management import ManagementTask
 from firenado.util import file as _file
 
+import logging
 import tornado.ioloop
 import tornado.httpserver
 
 import os
 import sys
+
+logger = logging.getLogger(__name__)
 
 
 class CreateProjectTask(ManagementTask):
@@ -33,7 +36,6 @@ class CreateProjectTask(ManagementTask):
     """
     def run(self, namespace):
         from tornado import template
-        print namespace
         if len(sys.argv) > 2:
             module = namespace.module
             component = module.replace('.', ' ').title().replace(' ', '')
@@ -109,19 +111,17 @@ class RunApplicationTask(ManagementTask):
         tornado.ioloop.IOLoop.instance().start()
 
     def sig_handler(self, sig, frame):
-        import logging
-        logging.warning('Caught signal: %s', sig)
+        logger.warning('Caught signal: %s', sig)
         tornado.ioloop.IOLoop.instance().add_callback(self.shutdown)
 
     def shutdown(self):
         import time
-        import logging
-        logging.info('Stopping http server')
+        logger.info('Stopping http server')
         for key, component in self.application.components.iteritems():
             component.shutdown()
         self.http_server.stop()
 
-        logging.info('Will shutdown in %s seconds ...',
+        logger.info('Will shutdown in %s seconds ...',
                      self.MAX_WAIT_SECONDS_BEFORE_SHUTDOWN)
         io_loop = tornado.ioloop.IOLoop.instance()
 
@@ -133,5 +133,5 @@ class RunApplicationTask(ManagementTask):
                 io_loop.add_timeout(now + 1, stop_loop)
             else:
                 io_loop.stop()
-                logging.info('Shutdown')
+                logger.info('Shutdown')
         stop_loop()

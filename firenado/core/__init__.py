@@ -28,6 +28,7 @@ import inspect
 import os
 from tornado.escape import json_encode
 import tornado.web
+import logging
 
 
 class TornadoApplication(tornado.web.Application, data.DataConnectedMixin,
@@ -36,6 +37,9 @@ class TornadoApplication(tornado.web.Application, data.DataConnectedMixin,
     """
 
     def __init__(self, default_host="", transforms=None, **settings):
+        logger = logging.getLogger(__name__)
+        logger.debug('Wiring application located at %s.' %
+                     firenado.conf.APP_ROOT_PATH)
         self.components = {}
         handlers = []
         static_handlers = []
@@ -78,9 +82,17 @@ class TornadoApplication(tornado.web.Application, data.DataConnectedMixin,
         for key, value in firenado.conf.components.iteritems():
             if value['enabled']:
                 component_class = get_class_from_config(value)
-                self.components[key] = component_class(key, self,
-                                                       value['config'])
-                self.components[key].process_config()
+                self.components[key] = component_class(key, self)
+                if self.components[key].get_config_file():
+                    comp_config_file = os.path.join(
+                        firenado.conf.APP_CONFIG_PATH,
+                        self.components[key].get_config_file())
+                    if os.path.isfile(comp_config_file):
+                        self.components[key].conf = \
+                            firenado.conf.load_yaml_config_file(
+                                comp_config_file)
+                        self.components[key].process_config()
+                        self.components[key].initialize()
 
 
 class TornadoComponent(object):
@@ -88,11 +100,10 @@ class TornadoComponent(object):
     an application or something that can be distributed as an add-on or a
     plugin.
     """
-
-    def __init__(self, name, application, config={}):
+    def __init__(self, name, application):
         self.name = name
         self.application = application
-        self.config = config
+        self.conf = {}
         self.plugins = dict()
 
     def get_handlers(self):
@@ -106,6 +117,8 @@ class TornadoComponent(object):
         return os.path.abspath(os.path.dirname(
             inspect.getfile(self.__class__)))
 
+    def get_config_file(self):
+        return None
 
     def get_template_path(self):
         """ Returns the path that holds the component's templates.
@@ -113,9 +126,12 @@ class TornadoComponent(object):
         return os.path.join(os.path.abspath(os.path.dirname(
             inspect.getfile(self.__class__))), 'templates')
 
+    def initialize(self):
+        pass
+
     def process_config(self):
         """ To process your component configuration please overwrite this
-        method reading the data on self.config.
+        method reading the data on self.conf.
         """
         pass
 
@@ -129,7 +145,6 @@ class TornadoHandler(tornado.web.RequestHandler):
     """ Base request handler to be used on a Firenado application.
     It provides session and handles component paths.
     """
-
     def __init__(self, application, request, **kwargs):
         self.component = None
         self.__template_variables = dict()
