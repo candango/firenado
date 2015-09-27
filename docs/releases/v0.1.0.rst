@@ -4,22 +4,25 @@ What's new in Firenado 0.1.0
 July 31, 2015
 -------------
 
-::
+We are pleased to announce the release of Firenado 0.1.
+This was a complete rewrite from the iFlux framework an here are the
+highlights:
 
-    We are pleased to announce the release of Firenado 0.1, available
-    from __link__.
-    This was a complete rewrite from the iFlux framework an here are the
-    highlights:
+New Features
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    New Features:
-    * Yaml based configuration files
+* Yaml based configuration files
 
+Migration from iFlux to Firenado
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+* Data tools
+* Modules
+* Session
+* Services
 
-    Migration from iFlux to Firenado:
-    * Data tools
-    * Modules
-    * Session
+Migration changes:
+~~~~~~~~~~~~~~~~~~
 
-    Migration changes:
-    * Configuration
-    * Command line tool
+* Configuration
+* Command line tool
+
