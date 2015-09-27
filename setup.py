@@ -25,9 +25,9 @@ import subprocess
 
 
 install_requires = [
-    "tornado>=4.1",
-    "redis>=2.9.1",
-    "sqlalchemy==0.9.4",
+    "pyyaml>=3.11",
+    "redis>=2.10.3",
+    "tornado>=4.2",
 ]
 
 setup(
@@ -65,3 +65,4 @@ setup(
         'firenado = firenado.core.management:run_from_command_line',
     ]},
 )
+
