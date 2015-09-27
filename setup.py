@@ -32,8 +32,8 @@ install_requires = [
 
 setup(
     name='Firenado',
-    version=firenado.__version__,
-    description='Componentized web framework.',
+    version=".".join(map(str,firenado.__version__)),
+    description='Componentized web framework based on Tornado.',
     license='Apache License V2.0',
     author='Flavio Garcia',
     author_email='piraz@candango.org',
