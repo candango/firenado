@@ -205,3 +205,4 @@ class ManagementTask():
         """
         Task implementation is done here.
         """
+        pass
