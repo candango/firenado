@@ -47,6 +47,10 @@ setup(
         'firenado.util',
     ],
     package_dir={'firenado': 'firenado'},
+    package_data={'firenado': [
+        'conf/*.yaml',
+        'core/management/templates/*/*.txt',
+    ]},
     classifiers=[
         'Development Status :: 1 - Planning',
         'Environment :: Console',
