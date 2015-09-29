@@ -1,7 +1,7 @@
 What's new in Firenado 0.1.0
-=========================
+============================
 
-July 31, 2015
+September 28, 2015
 -------------
 
 We are pleased to announce the release of Firenado 0.1.
