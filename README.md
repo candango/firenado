@@ -1,5 +1,5 @@
-[![Documentation Status](https://readthedocs.org/projects/firenado/badge/?version=latest)](https://readthedocs.org/projects/firenado/?badge=latest)
-# Firenado Framework
+# Firenado Framework # Firenado Framework 
+[![Build Status](https://travis-ci.org/candango/firenado.svg?branch=develop)](https://travis-ci.org/candango/firenado) [![Documentation Status](https://readthedocs.org/projects/firenado/badge/?version=latest)](https://readthedocs.org/projects/firenado/?badge=latest)
 
 Web Framework that extends Tornado Web adding new features to the original framework.
 
