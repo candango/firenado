@@ -26,8 +26,7 @@ import subprocess
 
 install_requires = [
     "pyyaml>=3.11",
-    "redis>=2.10.3",
-    "tornado>=4.2",
+    "tornado>=4.2.1",
 ]
 
 setup(
@@ -37,6 +36,7 @@ setup(
     license='Apache License V2.0',
     author='Flavio Garcia',
     author_email='piraz@candango.org',
+    install_requires=install_requires,
     url='http://www.firenado.io/',
     packages=[
         'firenado',
