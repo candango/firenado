@@ -37,6 +37,7 @@ setup(
     license='Apache License V2.0',
     author='Flavio Garcia',
     author_email='piraz@candango.org',
+    install_requires=install_requires,
     url='http://www.firenado.io/',
     packages=[
         'firenado',
