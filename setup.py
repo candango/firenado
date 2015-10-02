@@ -26,8 +26,7 @@ import subprocess
 
 install_requires = [
     "pyyaml>=3.11",
-    "redis>=2.10.3",
-    "tornado>=4.2",
+    "tornado>=4.2.1",
 ]
 
 setup(
