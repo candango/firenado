@@ -75,6 +75,9 @@ class TornadoApplication(tornado.web.Application, data.DataConnectedMixin,
                                          default_host=default_host,
                                          transforms=transforms, **settings)
 
+    def get_app_component(self):
+        return self.components[firenado.conf.app['component']]
+
     def __load_components(self):
         """ Loads all enabled components registered into the components
         conf.
