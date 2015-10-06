@@ -16,6 +16,9 @@
 #
 # vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4:
 
+from __future__ import (absolute_import, division, print_function,
+                        with_statement)
+
 import os
 from tornado.template import Loader
 
