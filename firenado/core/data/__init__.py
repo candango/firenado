@@ -16,9 +16,13 @@
 #
 # vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4:
 
+from __future__ import (absolute_import, division, print_function,
+                        with_statement)
+
 import functools
 import importlib
 import types
+
 
 def configure_data_sources(data_sources, data_connected):
     """

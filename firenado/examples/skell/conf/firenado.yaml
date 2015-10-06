@@ -20,6 +20,8 @@ components:
     enabled: true
   #- id: admin
   #  enabled: true
+  - id: bower
+    enabled: true
   - id: info
     enabled: true
 
