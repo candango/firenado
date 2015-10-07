@@ -16,8 +16,8 @@
 #
 # vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4:
 
-from __future__ import (absolute_import, division,
-                        print_function, with_statement)
+from __future__ import (absolute_import, division, print_function,
+                        with_statement)
 
 import firenado.conf
 from firenado.conf import get_class_from_config
@@ -143,6 +143,7 @@ class TornadoComponent(object):
         method and close/unload those resources.
         """
         pass
+
 
 class TornadoHandler(tornado.web.RequestHandler):
     """ Base request handler to be used on a Firenado application.
