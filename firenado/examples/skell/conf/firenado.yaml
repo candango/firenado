@@ -20,7 +20,7 @@ components:
     enabled: true
   #- id: admin
   #  enabled: true
-  - id: bower
+  - id: assets
     enabled: true
   - id: info
     enabled: true
