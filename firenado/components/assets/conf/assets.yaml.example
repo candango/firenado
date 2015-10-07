@@ -1,0 +1,6 @@
+bower:
+  dependencies:
+    - name: "bootstrap"
+      version: "~3.3.5"
+      handler: "/assets/bootstrap/(.*)"
+      path: "bootstrap/dist"
