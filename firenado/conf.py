@@ -240,9 +240,10 @@ def process_data_config_section(data_config):
             data['connectors'][connector['name']] = connector
             del data['connectors'][connector['name']]['name']
     if 'sources' in data_config:
-        for source in data_config['sources']:
-            data['sources'][source['name']] = source
-            del data['sources'][source['name']]['name']
+        if data_config['sources']:
+            for source in data_config['sources']:
+                data['sources'][source['name']] = source
+                del data['sources'][source['name']]['name']
 
 
 def process_log_config_section(log_config):

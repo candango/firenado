@@ -6,8 +6,8 @@ components:
   # Basic firenado Admin component
   - id: admin
     class: firenado.components.admin.AdminComponent
-  - id: bower
-    class: firenado.components.bower.BowerComponent
+  - id: assets
+    class: firenado.components.assets.AssetsComponent
   - id: info
     class: firenado.components.firenado.FirenadoComponent
 
