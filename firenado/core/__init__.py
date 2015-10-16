@@ -29,6 +29,7 @@ import os
 from tornado.escape import json_encode
 import tornado.web
 import logging
+from six import iteritems, string_types
 
 
 class TornadoApplication(tornado.web.Application, data.DataConnectedMixin,
@@ -47,7 +48,7 @@ class TornadoApplication(tornado.web.Application, data.DataConnectedMixin,
         settings['static_path'] = os.path.join(
             os.path.dirname(__file__), "static")
         self.__load_components()
-        for key, component in self.components.iteritems():
+        for key, component in iteritems(self.components):
             component_handlers = component.get_handlers()
             for i in range(0, len(component_handlers)):
                 from firenado.core.websocket import TornadoWebSocketHandler
@@ -82,7 +83,7 @@ class TornadoApplication(tornado.web.Application, data.DataConnectedMixin,
         """ Loads all enabled components registered into the components
         conf.
         """
-        for key, value in firenado.conf.components.iteritems():
+        for key, value in iteritems(firenado.conf.components):
             if value['enabled']:
                 component_class = get_class_from_config(value)
                 self.components[key] = component_class(key, self)
@@ -186,7 +187,7 @@ class TornadoHandler(tornado.web.RequestHandler):
             self, 'user_agent') else None
         kwargs['credential'] = self.credential if hasattr(
             self, 'credential') else None
-        for name, variable in self.__template_variables.iteritems():
+        for name, variable in iteritems(self.__template_variables):
             kwargs[name] = variable
         if self.ui:
             return super(TornadoHandler, self).render_string(
@@ -258,7 +259,7 @@ class JSONError(tornado.web.HTTPError):
     def __init__(self, status_code, log_message=None, *args, **kwargs):
         data = {}
         self.data.update(log_message)
-        if not isinstance(log_message, basestring):
+        if not isinstance(log_message, string_types):
             json_log_message = self.data
             json_log_message['code'] = status_code
             json_log_message = json_encode(json_log_message)

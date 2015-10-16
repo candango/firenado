@@ -150,7 +150,7 @@ def get_class_from_config(config):
 def load_yaml_config_file(path):
     """ Returns the parsed structure from a yaml config file.
     """
-    return yaml.safe_load(file(path, 'r'))
+    return yaml.safe_load(open(path, 'r'))
 
 
 def process_config(config):

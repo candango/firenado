@@ -21,7 +21,7 @@ from __future__ import (absolute_import, division, print_function,
 
 import functools
 import importlib
-import types
+from six import string_types, text_type
 
 
 def configure_data_sources(data_sources, data_connected):
@@ -33,7 +33,7 @@ def configure_data_sources(data_sources, data_connected):
     """
     data_connected_class = "%s.%s" % (data_connected.__module__, 
         data_connected.__class__.__name__)
-    if isinstance(data_sources, types.StringTypes):
+    if isinstance(data_sources, (string_types, text_type)):
         import firenado.conf
         # TODO Handler unknow connection instance here
         config = firenado.conf.data['sources'][data_sources]

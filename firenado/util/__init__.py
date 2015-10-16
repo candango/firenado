@@ -19,7 +19,11 @@
 from __future__ import (absolute_import, division,
                         print_function, with_statement)
 
-from itertools import islice, imap, repeat
+from itertools import islice, repeat
+try:
+    import itertools.imap as map
+except ImportError:
+    pass
 import os
 import string
 
@@ -30,5 +34,5 @@ def random_string(length=5):
     If length is not informed the string size will be 5.
     """
     chars = set(string.ascii_lowercase + string.digits)
-    char_gen = (c for c in imap(os.urandom, repeat(1)) if c in chars)
+    char_gen = (c for c in map(os.urandom, repeat(1)) if c in chars)
     return ''.join(islice(char_gen, None, length))

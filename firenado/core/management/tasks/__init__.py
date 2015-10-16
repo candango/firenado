@@ -25,6 +25,7 @@ import tornado.ioloop
 import tornado.httpserver
 
 import os
+from six import iteritems
 import sys
 
 logger = logging.getLogger(__name__)
@@ -117,7 +118,7 @@ class RunApplicationTask(ManagementTask):
     def shutdown(self):
         import time
         logger.info('Stopping http server')
-        for key, component in self.application.components.iteritems():
+        for key, component in iteritems(self.application.components):
             component.shutdown()
         self.http_server.stop()
 
