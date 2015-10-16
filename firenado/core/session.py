@@ -177,7 +177,7 @@ class Session(object):
     def has(self, key):
         self.__lock_if_destroyed()
         """ Returns if session data has some data stored by a given key. """
-        return self.__data.has_key(key)
+        return key in self.__data
 
     def delete(self, key):
         self.__lock_if_destroyed()
