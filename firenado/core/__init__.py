@@ -29,7 +29,7 @@ import os
 from tornado.escape import json_encode
 import tornado.web
 import logging
-from six import iteritems
+from six import iteritems, string_types
 
 
 class TornadoApplication(tornado.web.Application, data.DataConnectedMixin,
@@ -259,7 +259,7 @@ class JSONError(tornado.web.HTTPError):
     def __init__(self, status_code, log_message=None, *args, **kwargs):
         data = {}
         self.data.update(log_message)
-        if not isinstance(log_message, basestring):
+        if not isinstance(log_message, string_types):
             json_log_message = self.data
             json_log_message['code'] = status_code
             json_log_message = json_encode(json_log_message)
