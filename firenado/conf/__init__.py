@@ -16,8 +16,8 @@
 #
 # vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4:
 
-from __future__ import (absolute_import, division,
-                        print_function, with_statement)
+from __future__ import (absolute_import, division, print_function,
+                        with_statement)
 
 import importlib
 import yaml
@@ -31,6 +31,7 @@ if os.path.abspath(__file__).endswith('.py') or \
     ROOT = os.path.dirname(os.path.abspath(__file__))
 else:
     ROOT = os.path.abspath(__file__)
+ROOT = os.path.abspath(os.path.join(ROOT, '..'))
 
 # Getting configuration paths and files from the environment
 FIRENADO_CONFIG_FILE = None
@@ -141,7 +142,7 @@ def log_level_from_string(str_level):
 
 def get_class_from_config(config):
     """ Returns a class from a config dict bit with the keys
-    module and class on it. 
+    module and class on it.
     """
     module = importlib.import_module(config['module'])
     return getattr(module, config['class'])
