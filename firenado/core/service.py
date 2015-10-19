@@ -18,6 +18,7 @@
 
 import functools
 import importlib
+from six import string_types
 
 
 class FirenadoService(object):
@@ -27,7 +28,7 @@ class FirenadoService(object):
     application using the get_data_source method.
     """
 
-    def __init__(self, handler, data_source = None):
+    def __init__(self, handler, data_source=None):
         self.handler = handler
         self.data_source = data_source
         self.configure_service()
@@ -50,7 +51,7 @@ def served_by(service, attribute_name=None):
     def f_wrapper(method):
         @functools.wraps(method)
         def wrapper(self, *args, **kwargs):
-            if isinstance(service, basestring):
+            if isinstance(service, string_types):
                 service_x = service.split('.')
                 service_module = '.'.join(service_x[:-1])
                 service_module = importlib.import_module(
@@ -81,4 +82,3 @@ def served_by(service, attribute_name=None):
 
         return wrapper
     return f_wrapper
-
