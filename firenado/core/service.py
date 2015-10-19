@@ -62,7 +62,7 @@ def served_by(service, attribute_name=None):
                 service_name = service_x[-1]
             else:
                 service_class = service
-                service_name = service.__name_
+                service_name = service.__name__
             service_attribute = ''
             if attribute_name is None:
                 first = True
