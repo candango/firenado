@@ -1,0 +1,22 @@
+What's new in Firenado 0.1.1
+============================
+
+October 23, 2015
+-------------
+
+We are pleased to announce the release of Firenado 0.1.1.
+
+New Features
+~~~~~~~~~~~~
+
+* Python 3 support
+
+
+Migration from iFlux to Firenado
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Bug Fixes:
+~~~~~~~~~~~~~~~~~~
+
+* Firenado requirements are not wired to the setup script. #52
+* When Redis connection fails application exits without warning. #58

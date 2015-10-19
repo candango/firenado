@@ -40,4 +40,3 @@ the `Apache License, Version 2.0
 
 This web site and all documentation is licensed under `Creative
 Commons 3.0 <http://creativecommons.org/licenses/by/3.0/>`_.
-
