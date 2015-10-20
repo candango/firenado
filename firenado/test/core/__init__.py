@@ -56,6 +56,7 @@ class DisabledTestComponent(TornadoComponent):
             (r'/', MainHandler),
         ]
 
+
 class ApplicationComponentTestCase(unittest.TestCase):
     """ Case that tests an Firenado application after being loaded from its
     configuration file.
