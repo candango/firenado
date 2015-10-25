@@ -15,14 +15,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from distutils.core import setup
-from setuptools import setup, find_packages
-from distutils.command.build import build as _build
+from setuptools import setup
 import firenado
-
-import os, sys
-import subprocess
-
 
 install_requires = [
     "pyyaml>=3.11",
@@ -40,11 +34,26 @@ setup(
     url='http://www.firenado.io/',
     packages=[
         'firenado',
+        'firenado.components',
+        'firenado.components.assets',
+        'firenado.components.firenado',
+        'firenado.conf',
         'firenado.core',
+        'firenado.core.data',
         'firenado.core.management',
         'firenado.util',
     ],
     package_dir={'firenado': 'firenado'},
+    package_data={'firenado': [
+        'conf/*.yaml', 'core/management/templates/*/*.txt',
+        'components/*/conf/*.yaml.example',
+        'components/*/templates/*.html',
+        'components/*/static/css/*.css',
+        'components/*/static/js/*.js',
+        'components/*/static/js/locales/*',
+        'components/*/static/js/views/*.ejs',
+
+    ]},
     classifiers=[
         'Development Status :: 1 - Planning',
         'Environment :: Console',
