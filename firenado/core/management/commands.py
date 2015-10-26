@@ -24,8 +24,10 @@ ManagementCommand(
     'app', 'Application related commands', '',
     category='Firenado',
     sub_commands=[
+        ManagementCommand('install', 'Install a Firenado application', '',
+                          tasks=tasks.InstallProjectTask),
         ManagementCommand('run', 'Runs a Firenado application', '',
-                          tasks=tasks.RunApplicationTask)
+                          tasks=tasks.RunApplicationTask),
     ])
 ManagementCommand(
     'project','Project related commands', '',

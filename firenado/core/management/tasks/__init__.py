@@ -17,6 +17,7 @@
 # vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4:
 
 import firenado.conf
+import firenado.core
 from firenado.core.management import ManagementTask
 from firenado.util import file as _file
 
@@ -85,7 +86,22 @@ class CreateProjectTask(ManagementTask):
 
     def get_error_message(self, parser, exception):
         return exception.message
-        
+
+
+class InstallProjectTask(ManagementTask):
+    """ Triggers the install method of all components registered in the
+    application.
+    """
+    def run(self, namespace):
+        # TODO: Resolve module if doesn't exists
+        if firenado.conf.app['pythonpath']:
+            sys.path.append(firenado.conf.app['pythonpath'])
+        # TODO This should consider the type of application being handled by
+        # Firenado.
+        application = firenado.core.TornadoApplication()
+        for key, component in iteritems(application.components):
+            component.install()
+
 
 class RunApplicationTask(ManagementTask):
     """Runs a Firenado Tornado Application based

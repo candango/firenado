@@ -28,7 +28,7 @@ class IndexHandler(firenado.core.TornadoHandler):
 class SessionHandler(firenado.core.TornadoHandler):
 
     def get(self):
-        reset = details=self.get_argument("reset", False, True)
+        reset = self.get_argument("reset", False, True)
         if reset:
             self.session.delete('counter')
             self.redirect('/session')

@@ -40,7 +40,7 @@ class Connector(object):
         return None
 
     def process_config(self, config):
-        """ Parse the configuration data provided by the iflux.conf engine.
+        """ Parse the configuration data provided by the firenado.conf engine.
         """
         return {}
 
@@ -60,7 +60,7 @@ class RedisConnector(Connector):
         super(RedisConnector, self).__init__(data_connected)
 
     def configure(self, config):
-        logger.info("Connecting to redis using the configuration: %s." % config)
+        logger.info("Connecting to redis using the configuration: %s.", config)
         import redis
         redis_config = dict()
         redis_config.update(config)
@@ -70,7 +70,7 @@ class RedisConnector(Connector):
         try:
             self.__connection.ping()
         except redis.ConnectionError as error:
-            logger.error("Error trying to connect to redis: %s" % error)
+            logger.error("Error trying to connect to redis: %s", error)
             sys.exit(errno.ECONNREFUSED)
 
     def get_connection(self):
@@ -112,9 +112,12 @@ class SqlalchemyConnector(Connector):
         from firenado.util.sqlalchemy_util import Session
 
         self.__connection['engine'] = create_engine(config['url'])
+        logger.info("Connecting to the database using the engine: %s.",
+                    self.__connection['engine'])
         try:
             self.__connection['engine'].connect()
         except OperationalError as error:
+            logger.error("Error trying to connect to database: %s", error)
             sys.exit(errno.ECONNREFUSED)
 
         Session.configure(bind=self.__connection['engine'])

@@ -27,3 +27,9 @@ class SkellComponent(firenado.core.TornadoComponent):
             (r'/', skell.handlers.IndexHandler),
             (r'/session', skell.handlers.SessionHandler),
         ]
+
+    def install(self):
+        """ Component installation functional test.
+        This is only printing some output but it could be something more.
+        """
+        print('Skell app doesn\'t need to be installed.')

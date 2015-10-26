@@ -131,6 +131,16 @@ class TornadoComponent(object):
             inspect.getfile(self.__class__))), 'templates')
 
     def initialize(self):
+        """ If you want to add logic while the component is initializing
+        please overwrite this method.
+        """
+        pass
+
+    def install(self):
+        """ Firenado handles an application installation looping thought all
+        components and triggering the install method of them.
+        If
+        """
         pass
 
     def process_config(self):
@@ -141,7 +151,7 @@ class TornadoComponent(object):
 
     def shutdown(self):
         """ If you have resources that will hang after the shutdown please
-        method and close/unload those resources.
+        overwrite this method and close/unload those resources.
         """
         pass
 
