@@ -73,7 +73,8 @@ def show_command_line_usage(parser, usage=False):
         command_template=command_template
     )
     # TODO: This print has to go. Use proper stream instead(stdout or stderr)
-    print(''.join([help_header_message, help_message]))
+    print(''.join([help_header_message.decode(sys.stdout.encoding),
+                   help_message.decode(sys.stdout.encoding)]))
 
 
 def command_exists(command):

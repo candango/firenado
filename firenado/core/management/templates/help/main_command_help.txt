@@ -1,7 +1,7 @@
 Commands are:
-{% for category, commands in command_categories.iteritems() %}
+{% for category in command_categories %}
 {{ category }}:
 
-    {% for command in commands %}{{ command_template.format(command) }}
+    {% for command in command_categories[category] %}{{ command_template.format(command) }}
     {% end %}
 {% end %}
