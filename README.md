@@ -6,7 +6,7 @@
 
 **develop:** [![Build Status develop](https://travis-ci.org/candango/firenado.svg?branch=develop)](https://travis-ci.org/candango/firenado)
 [![Code Health](https://landscape.io/github/candango/firenado/develop/landscape.svg?style=flat)](https://landscape.io/github/candango/firenado/develop)
-[![Documentation Status](https://readthedocs.org/projects/firenado/badge/?version=develop)](http://firenado.readthedocs.org/en/latest/?badge=develop)
+[![Documentation Status](https://readthedocs.org/projects/firenado/badge/?version=develop)](http://firenado.readthedocs.org/en/develop/?badge=develop)
 
 
 ## Introduction
