@@ -16,9 +16,13 @@
 #
 # vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4:
 
+from __future__ import (absolute_import, division, print_function,
+                        with_statement)
+
 import functools
 import importlib
-import types
+from six import string_types, text_type
+
 
 def configure_data_sources(data_sources, data_connected):
     """
@@ -27,9 +31,7 @@ def configure_data_sources(data_sources, data_connected):
     :param data_connected: Data connected object where the data sources will
     be configured.
     """
-    data_connected_class = "%s.%s" % (data_connected.__module__, 
-        data_connected.__class__.__name__)
-    if isinstance(data_sources, types.StringTypes):
+    if isinstance(data_sources, (string_types, text_type)):
         import firenado.conf
         # TODO Handler unknow connection instance here
         config = firenado.conf.data['sources'][data_sources]
@@ -76,15 +78,15 @@ class DataConnectedMixin(object):
         """
         return get_data_sources(self, '__data_sources')
 
-    def get_data_source(self, id):
-        """ Returns a connector by it's id.
+    def get_data_source(self, name):
+        """ Returns a data source by it's name.
         """
-        return self.data_sources[id]
+        return self.data_sources[name]
 
-    def set_data_source(self, id, data_source):
-        """ Add a connector to the connectors collection.
+    def set_data_source(self, name, data_source):
+        """ Add a data source to the data sources collection.
         """
-        self.data_sources[id] = data_source
+        self.data_sources[name] = data_source
 
 
 def get_data_sources(obj, data_sources_attribute):

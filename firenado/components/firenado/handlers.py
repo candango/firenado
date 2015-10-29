@@ -16,14 +16,20 @@
 #
 # vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4:
 
-import chatdemows.handlers
+import firenado
+import firenado.conf
 import firenado.core
+import tornado
 
 
-class ChatdemoWsComponent(firenado.core.TornadoComponent):
+class AppInfoHandler(firenado.core.TornadoHandler):
 
-    def get_handlers(self):
-        return [
-            (r'/', chatdemows.handlers.MainHandler),
-            (r"/chatsocket", chatdemows.handlers.ChatSocketHandler),
-        ]
+    def get(self):
+        self.render(
+            "info.html",
+            tornado_version=tornado.version,
+            firenado=firenado,
+            firenado_version=".".join(map(str,firenado.__version__)),
+            firenado_conf=firenado.conf,
+            handlers=self.application.handlers[0][1],
+        )

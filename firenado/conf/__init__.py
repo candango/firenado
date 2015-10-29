@@ -16,8 +16,8 @@
 #
 # vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4:
 
-from __future__ import (absolute_import, division,
-                        print_function, with_statement)
+from __future__ import (absolute_import, division, print_function,
+                        with_statement)
 
 import importlib
 import yaml
@@ -31,6 +31,7 @@ if os.path.abspath(__file__).endswith('.py') or \
     ROOT = os.path.dirname(os.path.abspath(__file__))
 else:
     ROOT = os.path.abspath(__file__)
+ROOT = os.path.abspath(os.path.join(ROOT, '..'))
 
 # Getting configuration paths and files from the environment
 FIRENADO_CONFIG_FILE = None
@@ -141,7 +142,7 @@ def log_level_from_string(str_level):
 
 def get_class_from_config(config):
     """ Returns a class from a config dict bit with the keys
-    module and class on it. 
+    module and class on it.
     """
     module = importlib.import_module(config['module'])
     return getattr(module, config['class'])
@@ -150,7 +151,7 @@ def get_class_from_config(config):
 def load_yaml_config_file(path):
     """ Returns the parsed structure from a yaml config file.
     """
-    return yaml.safe_load(file(path, 'r'))
+    return yaml.safe_load(open(path, 'r'))
 
 
 def process_config(config):
@@ -240,9 +241,10 @@ def process_data_config_section(data_config):
             data['connectors'][connector['name']] = connector
             del data['connectors'][connector['name']]['name']
     if 'sources' in data_config:
-        for source in data_config['sources']:
-            data['sources'][source['name']] = source
-            del data['sources'][source['name']]['name']
+        if data_config['sources']:
+            for source in data_config['sources']:
+                data['sources'][source['name']] = source
+                del data['sources'][source['name']]['name']
 
 
 def process_log_config_section(log_config):

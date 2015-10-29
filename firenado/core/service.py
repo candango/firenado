@@ -16,18 +16,22 @@
 #
 # vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4:
 
+from __future__ import (absolute_import, division, print_function,
+                        with_statement)
+
 import functools
 import importlib
+from six import string_types
 
 
 class FirenadoService(object):
-    """ Base class to handle services. A Firenado service is usually connected to
-    an Firenado handler. The developer can add extra configuration using the
+    """ Base class to handle services. A Firenado service is usually connected
+    to an Firenado handler. The developer can add extra configuration using the
     configuration_service method and can get a data source from the
     application using the get_data_source method.
     """
 
-    def __init__(self, handler, data_source = None):
+    def __init__(self, handler, data_source=None):
         self.handler = handler
         self.data_source = data_source
         self.configure_service()
@@ -50,16 +54,15 @@ def served_by(service, attribute_name=None):
     def f_wrapper(method):
         @functools.wraps(method)
         def wrapper(self, *args, **kwargs):
-            if isinstance(service, basestring):
+            if isinstance(service, string_types):
                 service_x = service.split('.')
-                service_module = '.'.join(service_x[:-1])
                 service_module = importlib.import_module(
                     '.'.join(service_x[:-1]))
-                service_class =  getattr(service_module, service_x[-1])
+                service_class = getattr(service_module, service_x[-1])
                 service_name = service_x[-1]
             else:
                 service_class = service
-                service_name = service.__name_
+                service_name = service.__name__
             service_attribute = ''
             if attribute_name is None:
                 first = True
@@ -81,4 +84,3 @@ def served_by(service, attribute_name=None):
 
         return wrapper
     return f_wrapper
-

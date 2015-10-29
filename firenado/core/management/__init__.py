@@ -24,6 +24,7 @@ from firenado.util.argparse_util import FirenadoArgumentError
 from firenado.util.argparse_util import FirenadoArgumentParser
 import os
 import sys
+from six import iteritems
 from tornado import template
 
 # Commands will be registered here. This is done by ManagementCommand
@@ -72,14 +73,15 @@ def show_command_line_usage(parser, usage=False):
         command_template=command_template
     )
     # TODO: This print has to go. Use proper stream instead(stdout or stderr)
-    print(''.join([help_header_message, help_message]))
+    print(''.join([help_header_message.decode(sys.stdout.encoding),
+                   help_message.decode(sys.stdout.encoding)]))
 
 
 def command_exists(command):
     """ Check if the given command was registered. In another words if it
     exists.
     """
-    for category, commands in command_categories.iteritems():
+    for category, commands in iteritems(command_categories):
         for existing_command in commands:
             if command == existing_command.name:
                 return True
@@ -89,7 +91,7 @@ def command_exists(command):
 def run_command(command, args):
     """ Run all tasks registered in a command.
     """
-    for category, commands in command_categories.iteritems():
+    for category, commands in iteritems(command_categories):
         for existing_command in commands:
             if command == existing_command.name:
                 existing_command.run(args)

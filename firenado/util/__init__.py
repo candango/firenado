@@ -16,19 +16,21 @@
 #
 # vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4:
 
-from __future__ import (absolute_import, division,
-                        print_function, with_statement)
+from __future__ import (absolute_import, division, print_function,
+                        with_statement)
 
-from itertools import islice, imap, repeat
-import os
+import random
 import string
 
 
+# Used implementations described on:
+# http://stackoverflow.com/questions/2257441/random-string-generation-with-upper-case-letters-and-digits-in-python/23728630#23728630
+# Confirmed here:
+# https://docs.python.org/2/library/random.html#random.SystemRandom
 def random_string(length=5):
     """
     Generates a random string with the size equal to the given length.
     If length is not informed the string size will be 5.
     """
-    chars = set(string.ascii_lowercase + string.digits)
-    char_gen = (c for c in imap(os.urandom, repeat(1)) if c in chars)
-    return ''.join(islice(char_gen, None, length))
+    chars = string.ascii_lowercase + string.digits
+    return ''.join(random.SystemRandom().choice(chars) for _ in range(length))

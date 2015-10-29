@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Firenado Application Info</title>
+
+        <!-- Bootstrap -->
+        <link rel="stylesheet" href="/assets/bootstrap/css/bootstrap.min.css">
+        <link rel="stylesheet" href="/assets/bootstrap/css/bootstrap-theme.min.css">
+    </head>
+    <body>
+        <div class="container">
+            <h1>Application Info</h1>
+
+            <h2>Tornado</h2>
+
+            Version: {{ tornado_version }}
+
+            <h2>Firenado</h2>
+
+            Root Path: {{ firenado_conf.ROOT }}<br>
+            Version: {{ firenado_version }}
+
+            <h3>Data</h3>
+
+            <h4>Connectors</h4>
+
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>Type</th>
+                        <th>Connector</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for type, value in firenado_conf.data['connectors'].items() %}
+                    <tr>
+                        <td>{{ type }}</td>
+                        <td>{{ value['module'] }}.{{ value['class'] }}</td>
+                    </tr>
+                </tbody>
+                {% end %}
+            </table>
+
+            <h4>Sources</h4>
+
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Configuration</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for name, value in firenado_conf.data['sources'].items() %}
+                    <tr>
+                        <td>{{ name }}</td>
+                        <td>{{ value['connector'] }}</td>
+                        <td>{{ value }}</td>
+                    </tr>
+                </tbody>
+                {% end %}
+            </table>
+            <h3>Session</h3>
+            session.enabled: {{ firenado_conf.session['enabled'] }}<br>
+            {% if firenado_conf.session['enabled'] %}
+                session.type: {{ firenado_conf.session['type'] }}<br><br>
+
+            <h4>Session Handlers</h4>
+
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>Type</th>
+                        <th>Module</th>
+                        <th>Handler</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for type, value in firenado_conf.session['handlers'].items() %}
+                    <tr>
+                        <td>{{ type }}</td>
+                        <td>{{ value['module'] }}</td>
+                        <td>{{ value['class'] }}</td>
+                    </tr>
+
+                </tbody>
+                {% end %}
+            </table>
+            {% end %}
+
+            <h2>Handlers</h2>
+
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>Pattern</th>
+                        <th>Handler</th>
+                        <th>kargs</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for handler in handlers %}
+                    <tr>
+                        <td>{{ handler.regex.pattern.replace('$', '') }}</td>
+                        <td>{{ handler.handler_class.__module__ }}.{{ handler.handler_class.__name__ }}</td>
+                        <td>{{ handler.kwargs }}</td>
+                    </tr>
+
+                </tbody>
+                {% end %}
+            </table>
+
+        </div>
+        <!-- Placed at the end of the document so the pages load faster -->
+        <script src="/static_assets/js/jquery-2.1.0.min.js"></script>
+        <!--script src="/static_assets/js/i18next.min.js"></script-->
+        <script src="/assets/bootstrap/js/bootstrap.min.js"></script>
+        <script src="/static_assets/js/can.custom.2.0.5.jquery.js"></script>
+    </body>
+</html>

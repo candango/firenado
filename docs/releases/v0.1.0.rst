@@ -9,12 +9,12 @@ This was a complete rewrite from the iFlux framework an here are the
 highlights:
 
 New Features
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~
 
 * Yaml based configuration files
 
 Migration from iFlux to Firenado
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 * Data tools
 * Modules
 * Session

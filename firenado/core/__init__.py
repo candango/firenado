@@ -16,8 +16,8 @@
 #
 # vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4:
 
-from __future__ import (absolute_import, division,
-                        print_function, with_statement)
+from __future__ import (absolute_import, division, print_function,
+                        with_statement)
 
 import firenado.conf
 from firenado.conf import get_class_from_config
@@ -29,6 +29,7 @@ import os
 from tornado.escape import json_encode
 import tornado.web
 import logging
+from six import iteritems, string_types
 
 
 class TornadoApplication(tornado.web.Application, data.DataConnectedMixin,
@@ -47,7 +48,7 @@ class TornadoApplication(tornado.web.Application, data.DataConnectedMixin,
         settings['static_path'] = os.path.join(
             os.path.dirname(__file__), "static")
         self.__load_components()
-        for key, component in self.components.iteritems():
+        for key, component in iteritems(self.components):
             component_handlers = component.get_handlers()
             for i in range(0, len(component_handlers)):
                 from firenado.core.websocket import TornadoWebSocketHandler
@@ -75,11 +76,14 @@ class TornadoApplication(tornado.web.Application, data.DataConnectedMixin,
                                          default_host=default_host,
                                          transforms=transforms, **settings)
 
+    def get_app_component(self):
+        return self.components[firenado.conf.app['component']]
+
     def __load_components(self):
         """ Loads all enabled components registered into the components
         conf.
         """
-        for key, value in firenado.conf.components.iteritems():
+        for key, value in iteritems(firenado.conf.components):
             if value['enabled']:
                 component_class = get_class_from_config(value)
                 self.components[key] = component_class(key, self)
@@ -127,6 +131,16 @@ class TornadoComponent(object):
             inspect.getfile(self.__class__))), 'templates')
 
     def initialize(self):
+        """ If you want to add logic while the component is initializing
+        please overwrite this method.
+        """
+        pass
+
+    def install(self):
+        """ Firenado handles an application installation looping thought all
+        components and triggering the install method of them.
+        If
+        """
         pass
 
     def process_config(self):
@@ -137,9 +151,10 @@ class TornadoComponent(object):
 
     def shutdown(self):
         """ If you have resources that will hang after the shutdown please
-        method and close/unload those resources.
+        overwrite this method and close/unload those resources.
         """
         pass
+
 
 class TornadoHandler(tornado.web.RequestHandler):
     """ Base request handler to be used on a Firenado application.
@@ -182,7 +197,7 @@ class TornadoHandler(tornado.web.RequestHandler):
             self, 'user_agent') else None
         kwargs['credential'] = self.credential if hasattr(
             self, 'credential') else None
-        for name, variable in self.__template_variables.iteritems():
+        for name, variable in iteritems(self.__template_variables):
             kwargs[name] = variable
         if self.ui:
             return super(TornadoHandler, self).render_string(
@@ -254,7 +269,7 @@ class JSONError(tornado.web.HTTPError):
     def __init__(self, status_code, log_message=None, *args, **kwargs):
         data = {}
         self.data.update(log_message)
-        if not isinstance(log_message, basestring):
+        if not isinstance(log_message, string_types):
             json_log_message = self.data
             json_log_message['code'] = status_code
             json_log_message = json_encode(json_log_message)

@@ -1,0 +1,32 @@
+What's new in Firenado 0.1.1
+============================
+
+October 30, 2015
+-------------
+
+We are pleased to announce the release of Firenado 0.1.1. Now we start to
+support Python 3 and have fixed some bugs fixed.
+
+The project CI is being tracked by travis and tests are being added to the
+project.
+
+Here are the highlights:
+
+New Features
+~~~~~~~~~~~~
+
+* Python 3 support
+* Added installation capabilities to the framework.
+
+
+Migration from iFlux to Firenado
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* Security (It will be decided if this module still be needed on 0.1.2).
+
+Bug Fixes:
+~~~~~~~~~~~~~~~~~~
+
+* Firenado requirements are not wired to the setup script. `#52 <https://github.com/candango/firenado/issues/52>`_
+* When Redis connection fails application exits without warning. `#58 <https://github.com/candango/firenado/issues/58>`_
+* Deadlock with the string generation on the util package. `#64 <https://github.com/candango/firenado/issues/64>`_

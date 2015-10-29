@@ -1,12 +1,15 @@
 #
 # Firenado Framework configuration
 #
+
 components:
-    # Basic firenado Admin component
-    - id: admin
-      class: firenado.components.admin.AdminComponent
-    - id: info
-      class: firenado.components.firenado.FirenadoComponent
+  # Basic firenado Admin component
+  - id: admin
+    class: firenado.components.admin.AdminComponent
+  - id: assets
+    class: firenado.components.assets.AssetsComponent
+  - id: info
+    class: firenado.components.firenado.FirenadoComponent
 
 data:
   connectors:

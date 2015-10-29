@@ -1,0 +1,13 @@
+# https://travis-ci.org/candango/firenado
+language: python
+python:
+  - "2.7"
+  - "3.2"
+  - "3.3"
+  - "3.4"
+install:
+  - "pip install -r requirements.txt"
+  - "pip install -r requirements_tests.txt"
+script:
+  - "nosetests firenado.test.core"
+  - "nosetests firenado.test.core.service"
