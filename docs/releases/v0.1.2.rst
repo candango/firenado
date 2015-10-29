@@ -1,0 +1,25 @@
+What's new in Firenado 0.1.2
+============================
+
+October 28, 2015
+-------------
+
+Release description here.
+
+Here are the highlights:
+
+New Features
+~~~~~~~~~~~~
+
+* New Features here
+
+
+Migration from iFlux to Firenado
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* I think that should go
+
+Bug Fixes:
+~~~~~~~~~~~~~~~~~~
+
+* Bug fixes here
