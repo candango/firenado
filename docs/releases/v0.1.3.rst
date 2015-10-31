@@ -1,0 +1,19 @@
+What's new in Firenado 0.1.3
+============================
+
+December 28, 2015
+-------------
+
+Release description here.
+
+Here are the highlights:
+
+New Features
+~~~~~~~~~~~~
+
+* Features go here.
+
+Bug Fixes:
+~~~~~~~~~~~~~~~~~~
+
+* Bug fixes go here.
