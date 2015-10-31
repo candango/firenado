@@ -25,13 +25,14 @@ install_requires = [
 
 setup(
     name='Firenado',
-    version=".".join(map(str,firenado.__version__)),
-    description='Componentized web framework based on Tornado.',
+    version='.'.join(map(str,firenado.__version__)),
+    description='Firenado is a python web framework based on '
+            'Tornado web framework/server.',
     license='Apache License V2.0',
     author='Flavio Garcia',
     author_email='piraz@candango.org',
     install_requires=install_requires,
-    url='http://www.firenado.io/',
+    url='https://github.com/candango/firenado',
     packages=[
         'firenado',
         'firenado.components',

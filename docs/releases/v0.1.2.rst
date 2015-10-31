@@ -1,0 +1,20 @@
+What's new in Firenado 0.1.2
+============================
+
+October 30, 2015
+-------------
+
+Hotfix release to solve a severe bug that was preventing firenado command to
+run.
+
+Here are the highlights:
+
+New Features
+~~~~~~~~~~~~
+
+* Added root path to the assets component. `#77 <https://github.com/candango/firenado/issues/77>`_
+
+Bug Fixes:
+~~~~~~~~~~~~~~~~~~
+
+* Firenado doesn't run because core.management.tasks was not shipped on 0.1.1. `#76 <https://github.com/candango/firenado/issues/76>`_

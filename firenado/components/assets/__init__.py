@@ -23,9 +23,22 @@ import os
 
 class AssetsComponent(firenado.core.TornadoComponent):
 
+    def __init__(self, name, application):
+        firenado.core.TornadoComponent.__init__(self, name, application)
+        self.assets_root = None
+
     def get_handlers(self):
         handlers = []
+        self.assets_root = self.application.get_app_component(
+            ).get_component_path()
         if self.conf:
+            if 'root' in self.conf:
+                if os.path.isabs(self.conf['root']):
+                    self.assets_root = self.conf['root']
+                else:
+                    self.assets_root = os.path.abspath(
+                        os.path.join(self.assets_root, self.conf['root'])
+                    )
             if 'bower' in self.conf:
                 handlers = handlers + self.get_bower_handlers(
                     self.conf['bower'])
@@ -39,8 +52,7 @@ class AssetsComponent(firenado.core.TornadoComponent):
                     r"%s" % dependency['handler'],
                     tornado.web.StaticFileHandler,
                     {"path": os.path.join(
-                        self.application.get_app_component(
-                        ).get_component_path(),
+                        self.assets_root,
                         'bower_components',
                         dependency['path'])})
                 bower_handlers.append(handler)
