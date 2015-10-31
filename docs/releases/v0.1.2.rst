@@ -12,7 +12,7 @@ Here are the highlights:
 New Features
 ~~~~~~~~~~~~
 
-* New Features here
+* Added root path to the assets component. `#77 <https://github.com/candango/firenado/issues/77>`_
 
 Bug Fixes:
 ~~~~~~~~~~~~~~~~~~
