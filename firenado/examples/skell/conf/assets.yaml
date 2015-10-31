@@ -1,3 +1,4 @@
+#root: .
 bower:
   dependencies:
     - name: "bootstrap"
