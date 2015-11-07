@@ -24,12 +24,13 @@ import unittest
 import firenado.conf
 import six
 
-reload = None
-if six.PY2:
-    reload = reload
-elif six.PY34:
-    import importlib
-    reload = importlib.reload
+if six.PY3:
+    if six.PY34:
+        import importlib
+        reload = importlib.reload
+    else:
+        import imp
+        reload = imp.reload
 
 
 class ApplicationComponentTestCase(unittest.TestCase):
