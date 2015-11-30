@@ -121,7 +121,8 @@ class RunApplicationTask(ManagementTask):
         signal.signal(signal.SIGTERM, self.sig_handler)
         signal.signal(signal.SIGINT, self.sig_handler)
         signal.signal(signal.SIGTSTP, self.sig_handler)
-        self.application = firenado.core.TornadoApplication()
+        self.application = firenado.core.TornadoApplication(
+            debug=firenado.conf.app['debug'])
         self.http_server = tornado.httpserver.HTTPServer(
             self.application)
         self.http_server.listen(firenado.conf.app['port'])

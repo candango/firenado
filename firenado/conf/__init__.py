@@ -83,6 +83,7 @@ app['component'] = None
 app['current_user_key'] = '__FIRENADO_CURRENT_USER_KEY__'
 app['data'] = {}
 app['data']['sources'] = []
+app['debug'] = False
 app['pythonpath'] = None
 app['port'] = 8888
 app['login'] = {}
@@ -200,6 +201,8 @@ def process_app_config_section(app_config):
     if 'data' in app_config:
         if 'sources' in app_config['data']:
             app['data']['sources'] = app_config['data']['sources']
+    if 'debug' in app_config:
+        app['debug'] = app_config['debug']
     if 'pythonpath' in app_config:
         app['pythonpath'] = app_config['pythonpath']
     if 'port' in app_config:
