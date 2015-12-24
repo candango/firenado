@@ -18,6 +18,9 @@ components:
   - id: skell
     class: skell.SkellComponent
     enabled: true
+  - id: internal
+    class: skell.components.internal.SkellInternalComponent
+    enabled: true
   #- id: admin
   #  enabled: true
   - id: assets
