@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright 2015 Flavio Garcia
+# Copyright 2015-2016 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -43,6 +43,7 @@ class TornadoApplication(tornado.web.Application, data.DataConnectedMixin,
                      firenado.conf.APP_ROOT_PATH)
         self.components = {}
         handlers = []
+        ui_modules = []
         static_handlers = []
         data.configure_data_sources(firenado.conf.app['data']['sources'], self)
         settings['static_path'] = os.path.join(
@@ -66,12 +67,17 @@ class TornadoApplication(tornado.web.Application, data.DataConnectedMixin,
                     else:
                         component_handlers[i][1].component = component
             handlers = handlers + component_handlers
+            # Adding component ui modules to the application ui modules list
+            if component.get_ui_modules():
+                ui_modules.append(component.get_ui_modules())
         if firenado.conf.app['component']:
             settings['static_path'] = os.path.join(self.components[
                 firenado.conf.app['component']].get_component_path(), 'static')
         else:
             settings['static_path'] = os.path.join(
                 os.path.dirname(__file__), "static")
+        if len(ui_modules) > 0:
+            settings['ui_modules'] = ui_modules
         tornado.web.Application.__init__(self, handlers=handlers,
                                          default_host=default_host,
                                          transforms=transforms, **settings)
