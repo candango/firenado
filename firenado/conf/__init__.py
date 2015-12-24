@@ -38,7 +38,7 @@ FIRENADO_CONFIG_FILE = None
 try:
     FIRENADO_CONFIG_FILE = os.environ['FIRENADO_CONFIG_FILE']
 except KeyError:
-    FIRENADO_CONFIG_FILE = 'firenado.yaml'
+    FIRENADO_CONFIG_FILE = 'firenado'
 
 stack = []
 
@@ -55,14 +55,18 @@ APP_CONFIG_FILE = os.path.join(APP_CONFIG_PATH, FIRENADO_CONFIG_FILE)
 HAS_LIB_CONFIG_FILE = False
 HAS_APP_CONFIG_FILE = False
 
-if os.path.isfile(LIB_CONFIG_FILE):
-    HAS_LIB_CONFIG_FILE = True
-    stack.append(LIB_CONFIG_FILE)
-
-if os.path.isfile(APP_CONFIG_FILE):
-    if APP_CONFIG_FILE != LIB_CONFIG_FILE:
-        HAS_APP_CONFIG_FILE = True
-        stack.append(APP_CONFIG_FILE)
+config_file_extensions = ['yml', 'yaml']
+for extension in config_file_extensions:
+    if not HAS_LIB_CONFIG_FILE:
+        if os.path.isfile('%s.%s' % (LIB_CONFIG_FILE, extension)):
+            HAS_LIB_CONFIG_FILE = True
+            LIB_CONFIG_FILE = '%s.%s' % (LIB_CONFIG_FILE, extension)
+            stack.append(LIB_CONFIG_FILE)
+    if not HAS_APP_CONFIG_FILE:
+        if os.path.isfile('%s.%s' % (APP_CONFIG_FILE, extension)):
+            HAS_APP_CONFIG_FILE = True
+            APP_CONFIG_FILE = '%s.%s' % (APP_CONFIG_FILE, extension)
+            stack.append(APP_CONFIG_FILE)
 
 # Tmp path variable
 # TODO: Should I care about windows?
@@ -79,6 +83,7 @@ app['component'] = None
 app['current_user_key'] = '__FIRENADO_CURRENT_USER_KEY__'
 app['data'] = {}
 app['data']['sources'] = []
+app['debug'] = False
 app['pythonpath'] = None
 app['port'] = 8888
 app['login'] = {}
@@ -196,6 +201,8 @@ def process_app_config_section(app_config):
     if 'data' in app_config:
         if 'sources' in app_config['data']:
             app['data']['sources'] = app_config['data']['sources']
+    if 'debug' in app_config:
+        app['debug'] = app_config['debug']
     if 'pythonpath' in app_config:
         app['pythonpath'] = app_config['pythonpath']
     if 'port' in app_config:

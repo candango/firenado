@@ -112,8 +112,16 @@ class TornadoComponent(object):
 
     def get_handlers(self):
         """ Returns handlers being added by the component to the application.
+        :return: A list of handlers the component provides.
         """
         return []
+
+    def get_ui_modules(self):
+        """ Returns uimodules the component provides to the application.
+        It could be just a module, a list or a dictionary of modules.
+        :return: Uimodules the component provides.
+        """
+        return None
 
     def get_component_path(self):
         """ Returns the component path.
