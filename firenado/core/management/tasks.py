@@ -63,9 +63,9 @@ class CreateProjectTask(ManagementTask):
             project_conf_directory = os.path.join(project_directory, 'conf')
             os.mkdir(project_conf_directory)
             project_conf_file = os.path.join(project_conf_directory,
-                                             'firenado.yaml')
+                                             'firenado.yml')
             _file.touch(project_conf_file)
-            project_init_content = loader.load("firenado.yaml.txt").generate(
+            project_init_content = loader.load("firenado.yml.txt").generate(
                 app_name=project_name, module=module, component=component)
             _file.write(project_conf_file, project_init_content)
         else:
