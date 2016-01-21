@@ -1,10 +1,11 @@
 app:
-  component: {{app_name}}
+  component: '{{app_name}}'
   data:
     sources:
         # Set here references from sources defined on data.sources
-        - session
-  #pythonpath: ..
+        - 'session'
+  #pythonpath: '..'
+  #type: 'tornado'
   port: 8888
 
 data:
