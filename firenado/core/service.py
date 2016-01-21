@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright 2015 Flavio Garcia
+# Copyright 2015-2016 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -26,13 +26,14 @@ from six import string_types
 
 class FirenadoService(object):
     """ Base class to handle services. A Firenado service is usually connected
-    to an Firenado handler. The developer can add extra configuration using the
-    configuration_service method and can get a data source from the
-    application using the get_data_source method.
+    to a handler or a service.
+    The developer can add extra configuration using the configuration_service
+    method and can get a data source from the data connected instance using
+    either get_data_sources or get_data_source methods.
     """
 
-    def __init__(self, handler, data_source=None):
-        self.handler = handler
+    def __init__(self, consumer, data_source=None):
+        self.consumer = consumer
         self.data_source = data_source
         self.configure_service()
 
@@ -44,11 +45,22 @@ class FirenadoService(object):
     def get_data_source(self, name):
         """ Returns a data source by its given name.
         """
-        return self.handler.application.data_sources[name]
+        return self.get_data_sources()[name]
+
+    def get_data_sources(self):
+        """ Will recurse over services until find a consumer that is holding
+        a data connected instance.
+
+        :return: The data connected data sources
+        """
+        invert_op = getattr(self, "get_data_connected", None)
+        if callable(invert_op):
+            return self.consumer.get_data_connected().data_sources
+        return self.consumer.get_data_sources()
 
 
 def served_by(service, attribute_name=None):
-    """ Decorator that connects a service to a handler.
+    """ Decorator that connects a service to a service consumer.
     """
 
     def f_wrapper(method):

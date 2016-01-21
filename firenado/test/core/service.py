@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright 2015 Flavio Garcia
+# Copyright 2015-2016 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -47,7 +47,7 @@ class ServedByInstance:
         pass
 
 
-class ApplicationComponentTestCase(unittest.TestCase):
+class ServiceTestCase(unittest.TestCase):
 
     def setUp(self):
         """ Setting up an object that has firenado.core.service.served_by
