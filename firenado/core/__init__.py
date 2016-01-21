@@ -27,9 +27,19 @@ from firenado.core import template
 import inspect
 import os
 from tornado.escape import json_encode
+import tornado.httpserver
 import tornado.web
 import logging
 from six import iteritems, string_types
+import sys
+
+logger = logging.getLogger(__name__)
+
+
+class FirenadoLauncher(object):
+
+    def launch(self):
+        return None
 
 
 class TornadoApplication(tornado.web.Application, data.DataConnectedMixin,
@@ -38,7 +48,6 @@ class TornadoApplication(tornado.web.Application, data.DataConnectedMixin,
     """
 
     def __init__(self, default_host="", transforms=None, **settings):
-        logger = logging.getLogger(__name__)
         logger.debug('Wiring application located at %s.' %
                      firenado.conf.APP_ROOT_PATH)
         self.components = {}
@@ -103,6 +112,56 @@ class TornadoApplication(tornado.web.Application, data.DataConnectedMixin,
                                 comp_config_file)
                         self.components[key].process_config()
                         self.components[key].initialize()
+
+
+class TornadoLauncher(FirenadoLauncher):
+
+    def __init__(self):
+        self.http_server = None
+        # TODO get this from firenado.conf
+        self.MAX_WAIT_SECONDS_BEFORE_SHUTDOWN = 3
+
+    def launch(self):
+        import signal
+
+        # TODO: Resolve module if doesn't exists
+        if firenado.conf.app['pythonpath']:
+            sys.path.append(firenado.conf.app['pythonpath'])
+
+        signal.signal(signal.SIGTERM, self.sig_handler)
+        signal.signal(signal.SIGINT, self.sig_handler)
+        signal.signal(signal.SIGTSTP, self.sig_handler)
+        self.application = TornadoApplication(debug=firenado.conf.app['debug'])
+        self.http_server = tornado.httpserver.HTTPServer(
+            self.application)
+        self.http_server.listen(firenado.conf.app['port'])
+        tornado.ioloop.IOLoop.instance().start()
+
+    def sig_handler(self, sig, frame):
+        logger.warning('Caught signal: %s', sig)
+        tornado.ioloop.IOLoop.instance().add_callback(self.shutdown)
+
+    def shutdown(self):
+        import time
+        logger.info('Stopping http server')
+        for key, component in iteritems(self.application.components):
+            component.shutdown()
+        self.http_server.stop()
+
+        logger.info('Will shutdown in %s seconds ...',
+                     self.MAX_WAIT_SECONDS_BEFORE_SHUTDOWN)
+        io_loop = tornado.ioloop.IOLoop.instance()
+
+        deadline = time.time() + self.MAX_WAIT_SECONDS_BEFORE_SHUTDOWN
+
+        def stop_loop():
+            now = time.time()
+            if now < deadline and (io_loop._callbacks or io_loop._timeouts):
+                io_loop.add_timeout(now + 1, stop_loop)
+            else:
+                io_loop.stop()
+                logger.info('Shutdown')
+        stop_loop()
 
 
 class TornadoComponent(object):
@@ -237,6 +296,9 @@ class TornadoHandler(tornado.web.RequestHandler):
             self.write(response)
         else:
             raise error
+
+    def get_data_connected(self):
+        return self.application
 
     def get_firenado_template_path(self):
         """Override to customize the firenado template path for each handler.

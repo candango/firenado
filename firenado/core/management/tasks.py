@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright 2015 Flavio Garcia
+# Copyright 2015-2016 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,8 +22,6 @@ from firenado.core.management import ManagementTask
 from firenado.util import file as _file
 
 import logging
-import tornado.ioloop
-import tornado.httpserver
 
 import os
 from six import iteritems
@@ -108,48 +106,6 @@ class RunApplicationTask(ManagementTask):
     on the it's project configuration
     """
     def run(self, namespace):
-        import signal
-        self.http_server = None
-
-        # TODO get this from firenado.conf
-        self.MAX_WAIT_SECONDS_BEFORE_SHUTDOWN = 3
-
-        # TODO: Resolve module if doesn't exists
-        if firenado.conf.app['pythonpath']:
-            sys.path.append(firenado.conf.app['pythonpath'])
-
-        signal.signal(signal.SIGTERM, self.sig_handler)
-        signal.signal(signal.SIGINT, self.sig_handler)
-        signal.signal(signal.SIGTSTP, self.sig_handler)
-        self.application = firenado.core.TornadoApplication(
-            debug=firenado.conf.app['debug'])
-        self.http_server = tornado.httpserver.HTTPServer(
-            self.application)
-        self.http_server.listen(firenado.conf.app['port'])
-        tornado.ioloop.IOLoop.instance().start()
-
-    def sig_handler(self, sig, frame):
-        logger.warning('Caught signal: %s', sig)
-        tornado.ioloop.IOLoop.instance().add_callback(self.shutdown)
-
-    def shutdown(self):
-        import time
-        logger.info('Stopping http server')
-        for key, component in iteritems(self.application.components):
-            component.shutdown()
-        self.http_server.stop()
-
-        logger.info('Will shutdown in %s seconds ...',
-                     self.MAX_WAIT_SECONDS_BEFORE_SHUTDOWN)
-        io_loop = tornado.ioloop.IOLoop.instance()
-
-        deadline = time.time() + self.MAX_WAIT_SECONDS_BEFORE_SHUTDOWN
-
-        def stop_loop():
-            now = time.time()
-            if now < deadline and (io_loop._callbacks or io_loop._timeouts):
-                io_loop.add_timeout(now + 1, stop_loop)
-            else:
-                io_loop.stop()
-                logger.info('Shutdown')
-        stop_loop()
+        app_type = firenado.conf.app['types'][firenado.conf.app['type']]
+        launcher = firenado.conf.get_class_from_config(app_type['launcher'])()
+        launcher.launch()
