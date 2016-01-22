@@ -102,10 +102,11 @@ class InstallProjectTask(ManagementTask):
 
 
 class RunApplicationTask(ManagementTask):
-    """Runs a Firenado Tornado Application based
+    """ Runs a Firenado Tornado Application based
     on the it's project configuration
     """
     def run(self, namespace):
+        #TODO throw a custom error when type is not found
         app_type = firenado.conf.app['types'][firenado.conf.app['type']]
         launcher = firenado.conf.get_class_from_config(app_type['launcher'])()
         launcher.launch()

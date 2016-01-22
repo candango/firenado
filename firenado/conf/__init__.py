@@ -227,12 +227,12 @@ def process_app_config_section(app_config):
     if 'port' in app_config:
         app['port'] = app_config['port']
     if 'type' in app_config:
-        app['types'] = app_config['type']
+        app['type'] = app_config['type']
     if 'types' in app_config:
         for app_type in app_config['types']:
             app_type['launcher'] = get_config_from_package(
                     app_type['launcher'])
-            app['types'][type['name']] = app_type
+            app['types'][app_type['name']] = app_type
 
 
 def process_components_config_section(components_config):
