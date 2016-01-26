@@ -90,6 +90,7 @@ app['login'] = {}
 app['login']['urls'] = {}
 app['login']['urls']['default'] = '/login'
 app['is_on_dir'] = False
+app['socket'] = None
 app['type'] = 'tornado'
 app['types'] = {}
 app['types']['tornado'] = {}
@@ -226,6 +227,8 @@ def process_app_config_section(app_config):
         app['pythonpath'] = app_config['pythonpath']
     if 'port' in app_config:
         app['port'] = app_config['port']
+    if 'socket' in app_config:
+        app['socket'] = app_config['socket']
     if 'type' in app_config:
         app['type'] = app_config['type']
     if 'types' in app_config:

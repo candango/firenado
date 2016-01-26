@@ -134,7 +134,12 @@ class TornadoLauncher(FirenadoLauncher):
         self.application = TornadoApplication(debug=firenado.conf.app['debug'])
         self.http_server = tornado.httpserver.HTTPServer(
             self.application)
-        self.http_server.listen(firenado.conf.app['port'])
+        if firenado.conf.app['socket']:
+            from tornado.netutil import bind_unix_socket
+            socket = bind_unix_socket(firenado.conf.app['socket'])
+            self.http_server.add_socket(socket)
+        else:
+            self.http_server.listen(firenado.conf.app['port'])
         tornado.ioloop.IOLoop.instance().start()
 
     def sig_handler(self, sig, frame):
