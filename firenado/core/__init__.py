@@ -103,15 +103,36 @@ class TornadoApplication(tornado.web.Application, data.DataConnectedMixin,
                 component_class = get_class_from_config(value)
                 self.components[key] = component_class(key, self)
                 if self.components[key].get_config_file():
-                    comp_config_file = os.path.join(
-                        firenado.conf.APP_CONFIG_PATH,
-                        self.components[key].get_config_file())
-                    if os.path.isfile(comp_config_file):
+                    from firenado.util.file import file_has_extension
+                    filename = self.components[key].get_config_file()
+                    comp_config_file = None
+                    if file_has_extension(filename):
+                        if os.path.isfile(os.path.join(
+                                firenado.conf.APP_CONFIG_PATH, filename)):
+                            comp_config_file = os.path.join(
+                                firenado.conf.APP_CONFIG_PATH, filename)
+                    else:
+                        config_file_extensions = ['yml', 'yaml']
+                        for extension in config_file_extensions:
+                            candidate_filename = os.path.join(
+                                    firenado.conf.APP_CONFIG_PATH,
+                                    '%s.%s' % (filename, extension))
+                            if os.path.isfile(candidate_filename):
+                                comp_config_file = candidate_filename
+                                break
+                    if comp_config_file is not None:
                         self.components[key].conf = \
                             firenado.conf.load_yaml_config_file(
                                 comp_config_file)
                         self.components[key].process_config()
                         self.components[key].initialize()
+                    else:
+                        logger.warn('Failed to find the file for the '
+                                    'component %s at %s. Component filename '
+                                    'returned is %s.' % (
+                                        key, firenado.conf.APP_CONFIG_PATH,
+                                        self.components[key].get_config_file())
+                                    )
 
 
 class TornadoLauncher(FirenadoLauncher):
@@ -199,7 +220,13 @@ class TornadoComponent(object):
         return os.path.abspath(os.path.dirname(
             inspect.getfile(self.__class__)))
 
+    def get_config_filename(self):
+        return None
+
     def get_config_file(self):
+        filename = self.get_config_filename()
+        if filename is not None:
+            return filename
         return None
 
     def get_template_path(self):
