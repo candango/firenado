@@ -16,24 +16,14 @@
 #
 # vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4:
 
-import skell.handlers
 import firenado.core
-from skell import uimodules
+from skell.components.internal import uimodules
 
 
-class SkellComponent(firenado.core.TornadoComponent):
-
-    def get_handlers(self):
-        return [
-            (r'/', skell.handlers.IndexHandler),
-            (r'/session', skell.handlers.SessionHandler),
-        ]
+class SkellInternalComponent(firenado.core.TornadoComponent):
+    """ This component just adds another ui modules package to the application
+    ui modules stack.
+    """
 
     def get_ui_modules(self):
         return uimodules
-
-    def install(self):
-        """ Component installation functional test.
-        This is only printing some output but it could be something more.
-        """
-        print('Skell app doesn\'t need to be installed.')

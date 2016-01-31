@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>{{message}}</h1>
+    {% module Header1(message) %}
+    {% module Header2(message) %}
     {{message}}
 {% end %}

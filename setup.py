@@ -47,7 +47,7 @@ setup(
     ],
     package_dir={'firenado': 'firenado'},
     package_data={'firenado': [
-        'conf/*.yaml', 'core/management/templates/*/*.txt',
+        'conf/*.yml', 'core/management/templates/*/*.txt',
         'components/*/conf/*.yaml.example',
         'components/*/templates/*.html',
         'components/*/static/css/*.css',

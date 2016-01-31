@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright 2015 Flavio Garcia
+# Copyright 2015-2016 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@ FIRENADO_CONFIG_FILE = None
 try:
     FIRENADO_CONFIG_FILE = os.environ['FIRENADO_CONFIG_FILE']
 except KeyError:
-    FIRENADO_CONFIG_FILE = 'firenado.yaml'
+    FIRENADO_CONFIG_FILE = 'firenado'
 
 stack = []
 
@@ -55,14 +55,18 @@ APP_CONFIG_FILE = os.path.join(APP_CONFIG_PATH, FIRENADO_CONFIG_FILE)
 HAS_LIB_CONFIG_FILE = False
 HAS_APP_CONFIG_FILE = False
 
-if os.path.isfile(LIB_CONFIG_FILE):
-    HAS_LIB_CONFIG_FILE = True
-    stack.append(LIB_CONFIG_FILE)
-
-if os.path.isfile(APP_CONFIG_FILE):
-    if APP_CONFIG_FILE != LIB_CONFIG_FILE:
-        HAS_APP_CONFIG_FILE = True
-        stack.append(APP_CONFIG_FILE)
+config_file_extensions = ['yml', 'yaml']
+for extension in config_file_extensions:
+    if not HAS_LIB_CONFIG_FILE:
+        if os.path.isfile('%s.%s' % (LIB_CONFIG_FILE, extension)):
+            HAS_LIB_CONFIG_FILE = True
+            LIB_CONFIG_FILE = '%s.%s' % (LIB_CONFIG_FILE, extension)
+            stack.append(LIB_CONFIG_FILE)
+    if not HAS_APP_CONFIG_FILE:
+        if os.path.isfile('%s.%s' % (APP_CONFIG_FILE, extension)):
+            HAS_APP_CONFIG_FILE = True
+            APP_CONFIG_FILE = '%s.%s' % (APP_CONFIG_FILE, extension)
+            stack.append(APP_CONFIG_FILE)
 
 # Tmp path variable
 # TODO: Should I care about windows?
@@ -79,12 +83,21 @@ app['component'] = None
 app['current_user_key'] = '__FIRENADO_CURRENT_USER_KEY__'
 app['data'] = {}
 app['data']['sources'] = []
+app['debug'] = False
 app['pythonpath'] = None
 app['port'] = 8888
 app['login'] = {}
 app['login']['urls'] = {}
 app['login']['urls']['default'] = '/login'
 app['is_on_dir'] = False
+app['socket'] = None
+app['type'] = 'tornado'
+app['types'] = {}
+app['types']['tornado'] = {}
+app['types']['tornado']['name'] = 'tornado'
+app['types']['tornado']['launcher'] = {}
+app['types']['tornado']['launcher']['class'] = 'TornadoLauncher'
+app['types']['tornado']['launcher']['module'] = 'firenado.core'
 
 # Component section
 components = {}
@@ -140,6 +153,19 @@ def log_level_from_string(str_level):
     return logging.NOTSET
 
 
+def get_config_from_package(package):
+    """ Breaks a package string in module and class.
+
+    :param package: A package string
+    :return: A config dict with class and module
+    """
+    package_x = package.split('.')
+    package_conf = {}
+    package_conf['class'] = package_x[-1]
+    package_conf['module'] = '.'.join(package_x[:-1][:])
+    return package_conf
+
+
 def get_class_from_config(config):
     """ Returns a class from a config dict bit with the keys
     module and class on it.
@@ -190,16 +216,26 @@ def process_app_config_section(app_config):
     :param app_config: App section from a config dict
     data.
     """
-    global app
     if 'component' in app_config:
         app['component'] = app_config['component']
     if 'data' in app_config:
         if 'sources' in app_config['data']:
             app['data']['sources'] = app_config['data']['sources']
+    if 'debug' in app_config:
+        app['debug'] = app_config['debug']
     if 'pythonpath' in app_config:
         app['pythonpath'] = app_config['pythonpath']
     if 'port' in app_config:
         app['port'] = app_config['port']
+    if 'socket' in app_config:
+        app['socket'] = app_config['socket']
+    if 'type' in app_config:
+        app['type'] = app_config['type']
+    if 'types' in app_config:
+        for app_type in app_config['types']:
+            app_type['launcher'] = get_config_from_package(
+                    app_type['launcher'])
+            app['types'][app_type['name']] = app_type
 
 
 def process_components_config_section(components_config):
@@ -207,7 +243,6 @@ def process_components_config_section(components_config):
 
     :param components_config: Data section from a config dict.
     """
-    global components
     for component_config in components_config:
         if 'id' not in component_config:
             raise Exception('The component %s was defined without an id.' %
@@ -232,14 +267,10 @@ def process_data_config_section(data_config):
 
     :param data_config: Data configuration section from a config dict.
     """
-    global data
     if 'connectors' in data_config:
         for connector in data_config['connectors']:
-            connector_class_x = connector['class'].split('.')
-            connector['class'] = connector_class_x[-1]
-            connector['module'] = '.'.join(connector_class_x[:-1][:])
-            data['connectors'][connector['name']] = connector
-            del data['connectors'][connector['name']]['name']
+            data['connectors'][connector['name']] = get_config_from_package(
+                    connector['class'])
     if 'sources' in data_config:
         if data_config['sources']:
             for source in data_config['sources']:
@@ -252,7 +283,6 @@ def process_log_config_section(log_config):
 
     :param log_config: Log section from a config dict.
     """
-    global log
     if 'format' in log_config:
         log['format'] = log_config['format']
     if 'level' in log_config:
@@ -264,7 +294,6 @@ def process_management_config_section(management_config):
 
     :param management_config: Management section from a config dict.
     """
-    global management
     if 'commands' in management_config:
         management['commands'] = management_config['commands']
 
@@ -274,7 +303,6 @@ def process_session_config_section(session_config):
 
     :param session_config: Session configuration section from a config dict.
     """
-    global session
     if 'enabled' in session_config:
         session['enabled'] = session_config['enabled']
     if 'type' in session_config:

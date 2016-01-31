@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright 2015 Flavio Garcia
+# Copyright 2015-2016 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,8 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-#
-# vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4:
 
 from __future__ import (absolute_import, division, print_function,
                         with_statement)
@@ -27,9 +25,19 @@ from firenado.core import template
 import inspect
 import os
 from tornado.escape import json_encode
+import tornado.httpserver
 import tornado.web
 import logging
 from six import iteritems, string_types
+import sys
+
+logger = logging.getLogger(__name__)
+
+
+class FirenadoLauncher(object):
+
+    def launch(self):
+        return None
 
 
 class TornadoApplication(tornado.web.Application, data.DataConnectedMixin,
@@ -38,11 +46,11 @@ class TornadoApplication(tornado.web.Application, data.DataConnectedMixin,
     """
 
     def __init__(self, default_host="", transforms=None, **settings):
-        logger = logging.getLogger(__name__)
         logger.debug('Wiring application located at %s.' %
                      firenado.conf.APP_ROOT_PATH)
         self.components = {}
         handlers = []
+        ui_modules = []
         static_handlers = []
         data.configure_data_sources(firenado.conf.app['data']['sources'], self)
         settings['static_path'] = os.path.join(
@@ -66,12 +74,17 @@ class TornadoApplication(tornado.web.Application, data.DataConnectedMixin,
                     else:
                         component_handlers[i][1].component = component
             handlers = handlers + component_handlers
+            # Adding component ui modules to the application ui modules list
+            if component.get_ui_modules():
+                ui_modules.append(component.get_ui_modules())
         if firenado.conf.app['component']:
             settings['static_path'] = os.path.join(self.components[
                 firenado.conf.app['component']].get_component_path(), 'static')
         else:
             settings['static_path'] = os.path.join(
                 os.path.dirname(__file__), "static")
+        if len(ui_modules) > 0:
+            settings['ui_modules'] = ui_modules
         tornado.web.Application.__init__(self, handlers=handlers,
                                          default_host=default_host,
                                          transforms=transforms, **settings)
@@ -88,15 +101,91 @@ class TornadoApplication(tornado.web.Application, data.DataConnectedMixin,
                 component_class = get_class_from_config(value)
                 self.components[key] = component_class(key, self)
                 if self.components[key].get_config_file():
-                    comp_config_file = os.path.join(
-                        firenado.conf.APP_CONFIG_PATH,
-                        self.components[key].get_config_file())
-                    if os.path.isfile(comp_config_file):
+                    from firenado.util.file import file_has_extension
+                    filename = self.components[key].get_config_file()
+                    comp_config_file = None
+                    if file_has_extension(filename):
+                        if os.path.isfile(os.path.join(
+                                firenado.conf.APP_CONFIG_PATH, filename)):
+                            comp_config_file = os.path.join(
+                                firenado.conf.APP_CONFIG_PATH, filename)
+                    else:
+                        config_file_extensions = ['yml', 'yaml']
+                        for extension in config_file_extensions:
+                            candidate_filename = os.path.join(
+                                    firenado.conf.APP_CONFIG_PATH,
+                                    '%s.%s' % (filename, extension))
+                            if os.path.isfile(candidate_filename):
+                                comp_config_file = candidate_filename
+                                break
+                    if comp_config_file is not None:
                         self.components[key].conf = \
                             firenado.conf.load_yaml_config_file(
                                 comp_config_file)
                         self.components[key].process_config()
                         self.components[key].initialize()
+                    else:
+                        logger.warn('Failed to find the file for the '
+                                    'component %s at %s. Component filename '
+                                    'returned is %s.' % (
+                                        key, firenado.conf.APP_CONFIG_PATH,
+                                        self.components[key].get_config_file())
+                                    )
+
+
+class TornadoLauncher(FirenadoLauncher):
+
+    def __init__(self):
+        self.http_server = None
+        # TODO get this from firenado.conf
+        self.MAX_WAIT_SECONDS_BEFORE_SHUTDOWN = 3
+
+    def launch(self):
+        import signal
+
+        # TODO: Resolve module if doesn't exists
+        if firenado.conf.app['pythonpath']:
+            sys.path.append(firenado.conf.app['pythonpath'])
+
+        signal.signal(signal.SIGTERM, self.sig_handler)
+        signal.signal(signal.SIGINT, self.sig_handler)
+        signal.signal(signal.SIGTSTP, self.sig_handler)
+        self.application = TornadoApplication(debug=firenado.conf.app['debug'])
+        self.http_server = tornado.httpserver.HTTPServer(
+            self.application)
+        if firenado.conf.app['socket']:
+            from tornado.netutil import bind_unix_socket
+            socket = bind_unix_socket(firenado.conf.app['socket'])
+            self.http_server.add_socket(socket)
+        else:
+            self.http_server.listen(firenado.conf.app['port'])
+        tornado.ioloop.IOLoop.instance().start()
+
+    def sig_handler(self, sig, frame):
+        logger.warning('Caught signal: %s', sig)
+        tornado.ioloop.IOLoop.instance().add_callback(self.shutdown)
+
+    def shutdown(self):
+        import time
+        logger.info('Stopping http server')
+        for key, component in iteritems(self.application.components):
+            component.shutdown()
+        self.http_server.stop()
+
+        logger.info('Will shutdown in %s seconds ...',
+                     self.MAX_WAIT_SECONDS_BEFORE_SHUTDOWN)
+        io_loop = tornado.ioloop.IOLoop.instance()
+
+        deadline = time.time() + self.MAX_WAIT_SECONDS_BEFORE_SHUTDOWN
+
+        def stop_loop():
+            now = time.time()
+            if now < deadline and (io_loop._callbacks or io_loop._timeouts):
+                io_loop.add_timeout(now + 1, stop_loop)
+            else:
+                io_loop.stop()
+                logger.info('Shutdown')
+        stop_loop()
 
 
 class TornadoComponent(object):
@@ -112,8 +201,16 @@ class TornadoComponent(object):
 
     def get_handlers(self):
         """ Returns handlers being added by the component to the application.
+        :return: A list of handlers the component provides.
         """
         return []
+
+    def get_ui_modules(self):
+        """ Returns uimodules the component provides to the application.
+        It could be just a module, a list or a dictionary of modules.
+        :return: Uimodules the component provides.
+        """
+        return None
 
     def get_component_path(self):
         """ Returns the component path.
@@ -121,7 +218,13 @@ class TornadoComponent(object):
         return os.path.abspath(os.path.dirname(
             inspect.getfile(self.__class__)))
 
+    def get_config_filename(self):
+        return None
+
     def get_config_file(self):
+        filename = self.get_config_filename()
+        if filename is not None:
+            return filename
         return None
 
     def get_template_path(self):
@@ -223,6 +326,9 @@ class TornadoHandler(tornado.web.RequestHandler):
             self.write(response)
         else:
             raise error
+
+    def get_data_connected(self):
+        return self.application
 
     def get_firenado_template_path(self):
         """Override to customize the firenado template path for each handler.

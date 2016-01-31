@@ -16,24 +16,17 @@
 #
 # vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4:
 
-import skell.handlers
-import firenado.core
-from skell import uimodules
+import tornado.web
 
 
-class SkellComponent(firenado.core.TornadoComponent):
+class Header2(tornado.web.UIModule):
 
-    def get_handlers(self):
-        return [
-            (r'/', skell.handlers.IndexHandler),
-            (r'/session', skell.handlers.SessionHandler),
-        ]
+    def render(self, header):
+        """ On this ui module example it is tested a second ui module package
+        insertion to the application ui modules stack and, rendering a template
+        from another component while rendering the ui module.
 
-    def get_ui_modules(self):
-        return uimodules
-
-    def install(self):
-        """ Component installation functional test.
-        This is only printing some output but it could be something more.
+        :param header: The header string to be rendered by the module.
+        :return: A header string
         """
-        print('Skell app doesn\'t need to be installed.')
+        return self.render_string('skell:header2.html', header=header)
