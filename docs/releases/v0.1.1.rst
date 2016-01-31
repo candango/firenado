@@ -27,6 +27,9 @@ Migration from iFlux to Firenado
 Bug Fixes:
 ~~~~~~~~~~~~~~~~~~
 
-* Firenado requirements are not wired to the setup script. `#52 <https://github.com/candango/firenado/issues/52>`_
-* When Redis connection fails application exits without warning. `#58 <https://github.com/candango/firenado/issues/58>`_
-* Deadlock with the string generation on the util package. `#64 <https://github.com/candango/firenado/issues/64>`_
+* Firenado requirements are not wired to the setup script. `#52
+<https://github.com/candango/firenado/issues/52>`_
+* When Redis connection fails application exits without warning. `#58
+<https://github.com/candango/firenado/issues/58>`_
+* Deadlock with the string generation on the util package. `#64
+<https://github.com/candango/firenado/issues/64>`_

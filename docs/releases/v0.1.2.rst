@@ -17,4 +17,6 @@ New Features
 Bug Fixes:
 ~~~~~~~~~~~~~~~~~~
 
-* Firenado doesn't run because core.management.tasks was not shipped on 0.1.1. `#76 <https://github.com/candango/firenado/issues/76>`_
+* Firenado doesn't run because core.management.tasks was not shipped on 0.1.1.
+
+`#76 <https://github.com/candango/firenado/issues/76>`_
