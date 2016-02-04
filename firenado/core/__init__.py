@@ -123,7 +123,6 @@ class TornadoApplication(tornado.web.Application, data.DataConnectedMixin,
                             firenado.conf.load_yaml_config_file(
                                 comp_config_file)
                         self.components[key].process_config()
-                        self.components[key].initialize()
                     else:
                         logger.warn('Failed to find the file for the '
                                     'component %s at %s. Component filename '
@@ -131,6 +130,7 @@ class TornadoApplication(tornado.web.Application, data.DataConnectedMixin,
                                         key, firenado.conf.APP_CONFIG_PATH,
                                         self.components[key].get_config_file())
                                     )
+                self.components[key].initialize()
 
 
 class TornadoLauncher(FirenadoLauncher):
