@@ -6,6 +6,7 @@ app:
         #- session
   pythonpath: ..
   port: 8888
+  static_path: 'a_static_path'
 
 data:
   sources:

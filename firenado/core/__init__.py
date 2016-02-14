@@ -51,10 +51,7 @@ class TornadoApplication(tornado.web.Application, data.DataConnectedMixin,
         self.components = {}
         handlers = []
         ui_modules = []
-        static_handlers = []
         data.configure_data_sources(firenado.conf.app['data']['sources'], self)
-        settings['static_path'] = os.path.join(
-            os.path.dirname(__file__), "static")
         self.__load_components()
         for key, component in iteritems(self.components):
             component_handlers = component.get_handlers()
@@ -78,11 +75,22 @@ class TornadoApplication(tornado.web.Application, data.DataConnectedMixin,
             if component.get_ui_modules():
                 ui_modules.append(component.get_ui_modules())
         if firenado.conf.app['component']:
-            settings['static_path'] = os.path.join(self.components[
-                firenado.conf.app['component']].get_component_path(), 'static')
+            if firenado.conf.app['static_path']:
+                if os.path.isabs(firenado.conf.app['static_path']):
+                    settings['static_path'] = firenado.conf.app['static_path']
+                else:
+                    settings['static_path'] = os.path.join(
+                            self.components[firenado.conf.app[
+                                'component']].get_component_path(),
+                            firenado.conf.app['static_path'])
+            else:
+                settings['static_path'] = os.path.join(
+                        self.components[
+                            firenado.conf.app[
+                                'component']].get_component_path(), 'static')
         else:
             settings['static_path'] = os.path.join(
-                os.path.dirname(__file__), "static")
+                    os.path.dirname(__file__), "static")
         if len(ui_modules) > 0:
             settings['ui_modules'] = ui_modules
         tornado.web.Application.__init__(self, handlers=handlers,
@@ -123,7 +131,6 @@ class TornadoApplication(tornado.web.Application, data.DataConnectedMixin,
                             firenado.conf.load_yaml_config_file(
                                 comp_config_file)
                         self.components[key].process_config()
-                        self.components[key].initialize()
                     else:
                         logger.warn('Failed to find the file for the '
                                     'component %s at %s. Component filename '
@@ -131,6 +138,7 @@ class TornadoApplication(tornado.web.Application, data.DataConnectedMixin,
                                         key, firenado.conf.APP_CONFIG_PATH,
                                         self.components[key].get_config_file())
                                     )
+                self.components[key].initialize()
 
 
 class TornadoLauncher(FirenadoLauncher):

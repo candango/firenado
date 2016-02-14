@@ -46,7 +46,7 @@ LIB_CONFIG_FILE = os.path.join(ROOT, 'conf', FIRENADO_CONFIG_FILE)
 
 # Application file
 APP_ROOT_PATH = os.path.join(os.getcwd())
-# If FIRENADO_CURRENT_APP_PATH is not set than return current directory
+# If FIRENADO_CURRENT_APP_CONFIG_PATH is not set than return current directory
 # conf dir
 APP_CONFIG_PATH = os.getenv('FIRENADO_CURRENT_APP_CONFIG_PATH',
                             os.path.join(APP_ROOT_PATH, 'conf'))
@@ -91,6 +91,7 @@ app['login']['urls'] = {}
 app['login']['urls']['default'] = '/login'
 app['is_on_dir'] = False
 app['socket'] = None
+app['static_path'] = None
 app['type'] = 'tornado'
 app['types'] = {}
 app['types']['tornado'] = {}
@@ -229,6 +230,8 @@ def process_app_config_section(app_config):
         app['port'] = app_config['port']
     if 'socket' in app_config:
         app['socket'] = app_config['socket']
+    if 'static_path' in app_config:
+        app['static_path'] = app_config['static_path']
     if 'type' in app_config:
         app['type'] = app_config['type']
     if 'types' in app_config:

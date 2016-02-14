@@ -42,7 +42,6 @@ setup(
         'firenado.core',
         'firenado.core.data',
         'firenado.core.management',
-        'firenado.core.management.tasks',
         'firenado.util',
     ],
     package_dir={'firenado': 'firenado'},
