@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright 2015 Flavio Garcia
+# Copyright 2015-2016 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,18 +13,18 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-#
-# vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4:
 
 from __future__ import (absolute_import, division, print_function,
                         with_statement)
 
 import os
+# FIXME: Load conf changing the directory to the application path.
 test_dirname, filename = os.path.split(os.path.abspath(__file__))
 test_resources_dirname = os.path.join(test_dirname, '..', 'resources', 'core')
 os.environ["FIRENADO_CURRENT_APP_CONFIG_PATH"] = \
     os.path.join(test_resources_dirname, 'conf')
 
+import firenado.conf
 from firenado.core import TornadoApplication, TornadoHandler, TornadoComponent
 import unittest
 
@@ -74,5 +74,11 @@ class ApplicationComponentTestCase(unittest.TestCase):
         """
         self.assertTrue('test' in self.application.components)
         self.assertTrue(isinstance(self.application.components['test'],
-                                   TestComponent))
+                                   firenado.test.core.TestComponent))
         self.assertFalse('disabled' in self.application.components)
+
+    def test_static_path(self):
+        """ Checks the static_path was placed in the application settings.
+        """
+        static_path_x = self.application.settings['static_path'].split("/")
+        self.assertEquals(firenado.conf.app['static_path'], static_path_x[-1])
