@@ -118,16 +118,3 @@ class ServiceTestCase(unittest.TestCase):
         self.assertTrue(len(data_sources) == 2)
         self.assertEquals(data_sources['datasource1'], "DataSource1")
         self.assertEquals(data_sources['datasource2'], "DataSource2")
-
-    def test_get_data_source_from_service(self):
-        data_sources = self.served_by_instance.get_service_data_sources()
-        self.assertTrue(len(data_sources) == 2)
-        self.assertEquals(data_sources['datasource1'], "DataSource1")
-        self.assertEquals(data_sources['datasource2'], "DataSource2")
-
-    def test_get_data_source_from_service_recursively(self):
-        data_sources = self.served_by_instance.\
-            get_service_data_sources_recursively()
-        self.assertTrue(len(data_sources) == 2)
-        self.assertEquals(data_sources['datasource1'], "DataSource1")
-        self.assertEquals(data_sources['datasource2'], "DataSource2")
