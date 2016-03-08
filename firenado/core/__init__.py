@@ -18,18 +18,21 @@ from __future__ import (absolute_import, division, print_function,
                         with_statement)
 
 import firenado.conf
-from firenado.conf import get_class_from_config
+from firenado.config import get_class_from_config, load_yaml_config_file
 from firenado.core import data
 from firenado.core import session
 from firenado.core import template
+
 import inspect
+import logging
 import os
-from tornado.escape import json_encode
+import sys
+
+from six import iteritems, string_types
+
 import tornado.httpserver
 import tornado.web
-import logging
-from six import iteritems, string_types
-import sys
+from tornado.escape import json_encode
 
 logger = logging.getLogger(__name__)
 
@@ -127,9 +130,8 @@ class TornadoApplication(tornado.web.Application, data.DataConnectedMixin,
                                 comp_config_file = candidate_filename
                                 break
                     if comp_config_file is not None:
-                        self.components[key].conf = \
-                            firenado.conf.load_yaml_config_file(
-                                comp_config_file)
+                        self.components[key].conf = load_yaml_config_file(
+                            comp_config_file)
                         self.components[key].process_config()
                     else:
                         logger.warn('Failed to find the file for the '

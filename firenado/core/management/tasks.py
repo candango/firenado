@@ -107,6 +107,7 @@ class RunApplicationTask(ManagementTask):
     """
     def run(self, namespace):
         #TODO throw a custom error when type is not found
+        from ...config import get_class_from_config
         app_type = firenado.conf.app['types'][firenado.conf.app['type']]
-        launcher = firenado.conf.get_class_from_config(app_type['launcher'])()
+        launcher = get_class_from_config(app_type['launcher'])()
         launcher.launch()
