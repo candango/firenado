@@ -30,9 +30,9 @@ management:
 session:
   handlers:
     - name: file
-      class: firenado.core.session.FileSessionHandler
+      class: firenado.session.FileSessionHandler
     - name: redis
-      class: firenado.core.session.RedisSessionHandler
+      class: firenado.session.RedisSessionHandler
   encoders:
     - name: pickle
-      class: firenado.core.session.PickeSessionEncoder
+      class: firenado.session.PickeSessionEncoder

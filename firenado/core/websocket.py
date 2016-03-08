@@ -19,10 +19,11 @@
 from __future__ import (absolute_import, division,
                         print_function, with_statement)
 
-from firenado.tornado import JSONError
-from firenado.core import session
-from firenado.core import template
 import tornado.websocket
+
+from firenado import session
+from firenado.core import template
+from firenado.tornado import JSONError
 
 
 # TODO: We need to create a class to avoid those methods repetition here.

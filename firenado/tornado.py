@@ -17,22 +17,21 @@
 from __future__ import (absolute_import, division, print_function,
                         with_statement)
 
-import firenado.conf
-from firenado.config import get_class_from_config, load_yaml_config_file
-from firenado.core import data
-from firenado.core import session
-from firenado.core import template
-
 import inspect
 import logging
-import os
 import sys
 
-from six import iteritems, string_types
-
+import os
 import tornado.httpserver
 import tornado.web
+from six import iteritems, string_types
 from tornado.escape import json_encode
+
+import firenado.conf
+from firenado import session
+from firenado.config import get_class_from_config, load_yaml_config_file
+from firenado.core import data
+from firenado.core import template
 
 logger = logging.getLogger(__name__)
 
