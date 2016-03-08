@@ -13,11 +13,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-#
-# vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4:
 
 import firenado.conf
-import firenado.core
 from firenado.core.management import ManagementTask
 from firenado.util import file as _file
 
@@ -96,7 +93,8 @@ class InstallProjectTask(ManagementTask):
             sys.path.append(firenado.conf.app['pythonpath'])
         # TODO This should consider the type of application being handled by
         # Firenado.
-        application = firenado.core.TornadoApplication()
+        from firenado.tornado import TornadoApplication
+        application = TornadoApplication()
         for key, component in iteritems(application.components):
             component.install()
 
@@ -107,7 +105,7 @@ class RunApplicationTask(ManagementTask):
     """
     def run(self, namespace):
         #TODO throw a custom error when type is not found
-        from ...config import get_class_from_config
+        from firenado.config import get_class_from_config
         app_type = firenado.conf.app['types'][firenado.conf.app['type']]
         launcher = get_class_from_config(app_type['launcher'])()
         launcher.launch()

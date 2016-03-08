@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright 2015 Flavio Garcia
+# Copyright 2015-2016 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,15 +14,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import firenado.core
+import firenado.tornado
 import tornado.web
 import os
 
 
-class AssetsComponent(firenado.core.TornadoComponent):
+class AssetsComponent(firenado.tornado.TornadoComponent):
 
     def __init__(self, name, application):
-        firenado.core.TornadoComponent.__init__(self, name, application)
+        firenado.tornado.TornadoComponent.__init__(self, name, application)
         self.assets_root = None
 
     def get_handlers(self):
