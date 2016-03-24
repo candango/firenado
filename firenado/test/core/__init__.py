@@ -25,7 +25,7 @@ os.environ["FIRENADO_CURRENT_APP_CONFIG_PATH"] = \
     os.path.join(test_resources_dirname, 'conf')
 
 import firenado.conf
-from firenado.core import TornadoApplication, TornadoHandler, TornadoComponent
+from firenado.tornadoweb import TornadoApplication, TornadoHandler, TornadoComponent
 import unittest
 
 

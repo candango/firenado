@@ -14,16 +14,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import firenado.tornado
+import firenado.tornadoweb
 
 
-class IndexHandler(firenado.tornado.TornadoHandler):
+class IndexHandler(firenado.tornadoweb.TornadoHandler):
 
     def get(self):
         self.render("index.html", message="Hello world!!!")
 
 
-class SessionHandler(firenado.tornado.TornadoHandler):
+class SessionHandler(firenado.tornadoweb.TornadoHandler):
 
     def get(self):
         reset = self.get_argument("reset", False, True)
@@ -37,3 +37,8 @@ class SessionHandler(firenado.tornado.TornadoHandler):
         counter += 1
         self.session.set('counter', counter)
         self.render("session.html", session_value=counter)
+
+class LoginHandler(firenado.tornadoweb.TornadoHandler):
+
+    def get(self):
+        pass

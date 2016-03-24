@@ -16,11 +16,11 @@
 
 import firenado
 import firenado.conf
-import firenado.tornado
+import firenado.tornadoweb
 import tornado
 
 
-class AppInfoHandler(firenado.tornado.TornadoHandler):
+class AppInfoHandler(firenado.tornadoweb.TornadoHandler):
 
     def get(self):
         self.render(

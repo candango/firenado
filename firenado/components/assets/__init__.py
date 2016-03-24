@@ -14,15 +14,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import firenado.tornado
+import firenado.tornadoweb
 import tornado.web
 import os
 
 
-class AssetsComponent(firenado.tornado.TornadoComponent):
+class AssetsComponent(firenado.tornadoweb.TornadoComponent):
 
     def __init__(self, name, application):
-        firenado.tornado.TornadoComponent.__init__(self, name, application)
+        firenado.tornadoweb.TornadoComponent.__init__(self, name, application)
         self.assets_root = None
 
     def get_handlers(self):

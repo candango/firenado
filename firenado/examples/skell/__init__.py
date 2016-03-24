@@ -15,16 +15,17 @@
 # limitations under the License.
 
 import skell.handlers
-import firenado.tornado
+import firenado.tornadoweb
 from skell import uimodules
 
 
-class SkellComponent(firenado.tornado.TornadoComponent):
+class SkellComponent(firenado.tornadoweb.TornadoComponent):
 
     def get_handlers(self):
         return [
             (r'/', skell.handlers.IndexHandler),
             (r'/session', skell.handlers.SessionHandler),
+            (r'/login', skell.handlers.SessionHandler),
         ]
 
     def get_ui_modules(self):

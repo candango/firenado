@@ -14,13 +14,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import firenado.tornado
+import firenado.tornadoweb
 import tornado.escape
 from tornado import gen
 import uuid
 
 
-class MainHandler(firenado.tornado.TornadoHandler):
+class MainHandler(firenado.tornadoweb.TornadoHandler):
 
     def get(self):
         print self.component.message_buffer
@@ -28,7 +28,7 @@ class MainHandler(firenado.tornado.TornadoHandler):
                     messages=self.component.message_buffer.cache)
 
 
-class MessageNewHandler(firenado.tornado.TornadoHandler):
+class MessageNewHandler(firenado.tornadoweb.TornadoHandler):
 
     def post(self):
         message = {
@@ -46,7 +46,7 @@ class MessageNewHandler(firenado.tornado.TornadoHandler):
         self.component.message_buffer.new_messages([message])
 
 
-class MessageUpdatesHandler(firenado.tornado.TornadoHandler):
+class MessageUpdatesHandler(firenado.tornadoweb.TornadoHandler):
 
     @gen.coroutine
     def post(self):

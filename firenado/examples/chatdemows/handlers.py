@@ -14,14 +14,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import firenado.tornado
+import firenado.tornadoweb
 import firenado.core.websocket
 import logging
 import tornado.escape
 import uuid
 
 
-class MainHandler(firenado.tornado.TornadoHandler):
+class MainHandler(firenado.tornadoweb.TornadoHandler):
 
     def get(self):
         self.render("index.html", messages=ChatSocketHandler.cache)

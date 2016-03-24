@@ -96,7 +96,7 @@ app['types']['tornado'] = {}
 app['types']['tornado']['name'] = 'tornado'
 app['types']['tornado']['launcher'] = {}
 app['types']['tornado']['launcher']['class'] = 'TornadoLauncher'
-app['types']['tornado']['launcher']['module'] = 'firenado.tornado'
+app['types']['tornado']['launcher']['module'] = 'firenado.tornadoweb'
 
 # Component section
 components = {}

@@ -93,7 +93,7 @@ class InstallProjectTask(ManagementTask):
             sys.path.append(firenado.conf.app['pythonpath'])
         # TODO This should consider the type of application being handled by
         # Firenado.
-        from firenado.tornado import TornadoApplication
+        from firenado.tornadoweb import TornadoApplication
         application = TornadoApplication()
         for key, component in iteritems(application.components):
             component.install()

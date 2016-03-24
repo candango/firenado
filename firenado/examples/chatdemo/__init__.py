@@ -15,7 +15,7 @@
 # limitations under the License.
 
 import chatdemo.handlers
-import firenado.tornado
+import firenado.tornadoweb
 import logging
 from tornado.concurrent import Future
 
@@ -60,7 +60,7 @@ class MessageBuffer(object):
             self.cache = self.cache[-self.cache_size:]
 
 
-class ChatdemoComponent(firenado.tornado.TornadoComponent):
+class ChatdemoComponent(firenado.tornadoweb.TornadoComponent):
 
     def __init__(self, name, application, config={}):
         self.message_buffer = MessageBuffer()

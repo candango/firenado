@@ -15,10 +15,10 @@
 # limitations under the License.
 
 import chatdemows.handlers
-import firenado.tornado
+import firenado.tornadoweb
 
 
-class ChatdemoWsComponent(firenado.tornado.TornadoComponent):
+class ChatdemoWsComponent(firenado.tornadoweb.TornadoComponent):
 
     def get_handlers(self):
         return [
