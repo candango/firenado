@@ -17,9 +17,10 @@
 from __future__ import (absolute_import, division, print_function,
                         with_statement)
 
-from firenado.core.data import DataConnectedMixin
-from firenado.core.service import served_by, FirenadoService
 import unittest
+
+from firenado.core.data import DataConnectedMixin
+from firenado.service import served_by, FirenadoService
 
 
 class MockDataConnected(DataConnectedMixin):
@@ -55,7 +56,7 @@ class ServedByInstance(object):
         """
         pass
 
-    @served_by('firenado.test.core.service.MockTestService')
+    @served_by('firenado.test.service.MockTestService')
     def do_served_by_string(self):
         """
         This method will be decorated with served_by with the class as string

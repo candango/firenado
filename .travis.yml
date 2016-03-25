@@ -10,6 +10,6 @@ install:
   - "pip install -r requirements_tests.txt"
 script:
   - "nosetests firenado.test.conf"
-  - "nosetests firenado.test.core.service"
+  - "nosetests firenado.test.service"
   - "nosetests firenado.test.tornadoweb"
   - "nosetests firenado.test.util.file"
