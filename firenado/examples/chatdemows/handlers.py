@@ -15,7 +15,6 @@
 # limitations under the License.
 
 import firenado.tornadoweb
-import firenado.core.websocket
 import logging
 import tornado.escape
 import uuid
@@ -27,7 +26,7 @@ class MainHandler(firenado.tornadoweb.TornadoHandler):
         self.render("index.html", messages=ChatSocketHandler.cache)
 
 
-class ChatSocketHandler(firenado.core.websocket.TornadoWebSocketHandler):
+class ChatSocketHandler(firenado.tornadoweb.TornadoWebSocketHandler):
 
     waiters = set()
     cache = []
