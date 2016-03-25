@@ -17,7 +17,7 @@
 from __future__ import (absolute_import, division, print_function,
                         with_statement)
 
-import firenado.config as config
+import firenado.config as _config
 import logging
 import os
 import sys
@@ -131,13 +131,13 @@ session['redis']['prefix'] = 'firenado:session'
 session['type'] = ''
 
 if HAS_LIB_CONFIG_FILE:
-    lib_config = config.load_yaml_config_file(LIB_CONFIG_FILE)
-    config.process_config(sys.modules[__name__], lib_config)
+    lib_config = _config.load_yaml_config_file(LIB_CONFIG_FILE)
+    _config.process_config(sys.modules[__name__], lib_config)
 
 if HAS_APP_CONFIG_FILE:
-    app_config = config.load_yaml_config_file(APP_CONFIG_FILE)
-    config.process_app_config(sys.modules[__name__], app_config)
+    app_config = _config.load_yaml_config_file(APP_CONFIG_FILE)
+    _config.process_app_config(sys.modules[__name__], app_config)
 
 # Set logging basic configurations
-logging.basicConfig(level=config.log_level_from_string(log['level']),
+logging.basicConfig(level=_config.log_level_from_string(log['level']),
                     format=log['format'])
