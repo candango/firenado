@@ -42,8 +42,8 @@ class CreateProjectTask(ManagementTask):
             #TODO: If doesn't exists create project
             #TODO: If exists throw an error
             loader = template.Loader(os.path.join(firenado.conf.ROOT,
-                                                  'core', 'management',
-                                                  'templates', 'project'))
+                                                  'management', 'templates',
+                                                  'project'))
             project_init_content = loader.load("__init__.py.txt").generate(
                 project_name=project_name, module=module, component=component)
             # Generating application firenado component and handlers
