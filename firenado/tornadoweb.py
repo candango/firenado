@@ -31,7 +31,7 @@ from tornado.escape import json_encode
 import firenado.conf
 from firenado import session
 from firenado.config import get_class_from_config, load_yaml_config_file
-from firenado.core import data
+from firenado import data
 from tornado.template import Loader
 
 
