@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright 2015 Flavio Garcia
+# Copyright 2015-2016 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,23 +13,20 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-#
-# vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4:
 
-import firenado.core
-import firenado.core.websocket
+import firenado.tornadoweb
 import logging
 import tornado.escape
 import uuid
 
 
-class MainHandler(firenado.core.TornadoHandler):
+class MainHandler(firenado.tornadoweb.TornadoHandler):
 
     def get(self):
-        self.render("index.html", messages = ChatSocketHandler.cache)
+        self.render("index.html", messages=ChatSocketHandler.cache)
 
 
-class ChatSocketHandler(firenado.core.websocket.TornadoWebSocketHandler):
+class ChatSocketHandler(firenado.tornadoweb.TornadoWebSocketHandler):
 
     waiters = set()
     cache = []

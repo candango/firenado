@@ -17,16 +17,14 @@
 from __future__ import (absolute_import, division, print_function,
                         with_statement)
 
-import os
-# FIXME: Load conf changing the directory to the application path.
-test_dirname, filename = os.path.split(os.path.abspath(__file__))
-test_resources_dirname = os.path.join(test_dirname, '..', 'resources', 'core')
-os.environ["FIRENADO_CURRENT_APP_CONFIG_PATH"] = \
-    os.path.join(test_resources_dirname, 'conf')
-
 import firenado.conf
-from firenado.core import TornadoApplication, TornadoHandler, TornadoComponent
+from firenado.tornadoweb import TornadoApplication
+from firenado.tornadoweb import TornadoHandler
+from firenado.tornadoweb import TornadoComponent
 import unittest
+from firenado.test import chdir_app
+
+chdir_app('tornadoweb')
 
 
 class MainHandler(TornadoHandler):
@@ -72,9 +70,10 @@ class ApplicationComponentTestCase(unittest.TestCase):
         """ Checks if test component was loaded correctly by the application
         __init__ method.
         """
+        import firenado.test
         self.assertTrue('test' in self.application.components)
         self.assertTrue(isinstance(self.application.components['test'],
-                                   firenado.test.core.TestComponent))
+                                   firenado.test.tornadoweb.TestComponent))
         self.assertFalse('disabled' in self.application.components)
 
     def test_static_path(self):

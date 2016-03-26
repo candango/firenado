@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright 2015 Flavio Garcia
+# Copyright 2015-2016 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,8 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-#
-# vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4:
 
 from __future__ import (absolute_import, division,
                         print_function, with_statement)
@@ -57,7 +55,7 @@ def get_command_header(parser, usage=False):
     """ Return the command line header
     """
     loader = template.Loader(os.path.join(
-                firenado.conf.ROOT, 'core', 'management', 'templates', 'help'))
+                firenado.conf.ROOT, 'management', 'templates', 'help'))
     return loader.load("header.txt").generate(parser=parser, usage=usage)
 
 
@@ -66,7 +64,7 @@ def show_command_line_usage(parser, usage=False):
     """
     help_header_message = get_command_header(parser, usage)
     loader = template.Loader(os.path.join(
-        firenado.conf.ROOT, 'core', 'management', 'templates', 'help'))
+        firenado.conf.ROOT, 'management', 'templates', 'help'))
     command_template = "  {0.name:15}{0.description:40}"
     help_message = loader.load("main_command_help.txt").generate(
         command_categories=command_categories,

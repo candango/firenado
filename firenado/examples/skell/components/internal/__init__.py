@@ -13,14 +13,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-#
-# vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4:
 
-import firenado.core
+import firenado.tornadoweb
 from skell.components.internal import uimodules
 
 
-class SkellInternalComponent(firenado.core.TornadoComponent):
+class SkellInternalComponent(firenado.tornadoweb.TornadoComponent):
     """ This component just adds another ui modules package to the application
     ui modules stack.
     """
