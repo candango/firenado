@@ -14,15 +14,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import firenado.conf
-from firenado.core.management import ManagementTask
-from firenado.util import file as _file
-
 import logging
+import sys
 
 import os
 from six import iteritems
-import sys
+
+import firenado.conf
+from firenado.management import ManagementTask
+from firenado.util import file as _file
 
 logger = logging.getLogger(__name__)
 

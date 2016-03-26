@@ -25,7 +25,7 @@ log:
 management:
   commands:
     - name: firenado
-      module: firenado.core.management.commands
+      module: firenado.management.commands
 
 session:
   handlers:
