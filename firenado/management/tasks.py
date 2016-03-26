@@ -35,30 +35,31 @@ class CreateProjectTask(ManagementTask):
         from tornado import template
         if len(sys.argv) > 2:
             module = namespace.module
-            component = module.replace('.', ' ').title().replace(' ', '')
-            project_name = module.replace('.', '_').lower()
+            component = module.replace(".", " ").title().replace(" ", "")
+            project_name = module.replace(".", "_").lower()
             project_directory = _file.create_module(module, os.getcwd())
             #TODO: Check if project exists
             #TODO: If doesn't exists create project
             #TODO: If exists throw an error
             loader = template.Loader(os.path.join(firenado.conf.ROOT,
-                                                  'management', 'templates',
-                                                  'project'))
-            project_init_content = loader.load("__init__.py.txt").generate(
+                                                  "management", "templates",
+                                                  "project"))
+            project_init_content = loader.load("application.py.txt").generate(
                 project_name=project_name, module=module, component=component)
             # Generating application firenado component and handlers
-            _file.write(os.path.join(project_directory, '__init__.py'),
+            _file.write(os.path.join(project_directory, "__init__.py"), "")
+            _file.write(os.path.join(project_directory, "application.py"),
                         project_init_content)
-            handlers_file_name = os.path.join(project_directory, 'handlers.py')
+            handlers_file_name = os.path.join(project_directory, "handlers.py")
             _file.touch(handlers_file_name)
             project_handlers_content = loader.load("handlers.py.txt").generate(
-                handlers=['Index'])
+                handlers=["Index"])
             _file.write(handlers_file_name, project_handlers_content)
             # Generating configuration
-            project_conf_directory = os.path.join(project_directory, 'conf')
+            project_conf_directory = os.path.join(project_directory, "conf")
             os.mkdir(project_conf_directory)
             project_conf_file = os.path.join(project_conf_directory,
-                                             'firenado.yml')
+                                             "firenado.yml")
             _file.touch(project_conf_file)
             project_init_content = loader.load("firenado.yml.txt").generate(
                 app_name=project_name, module=module, component=component)
@@ -67,7 +68,7 @@ class CreateProjectTask(ManagementTask):
             #TODO: This thing has to go. The parameter validation should be
             #TODO: executed by the argument parser.
             loader = template.Loader(os.path.join(
-                firenado.conf.ROOT, 'core', 'management', 'templates', 'help'))
+                firenado.conf.ROOT, "management", "templates", "help"))
             help_message = loader.load("init_command_help.txt").generate()
 
     def add_arguments(self, parser):
@@ -77,7 +78,7 @@ class CreateProjectTask(ManagementTask):
         :param parser: The current parser validating the command holding this
         task.
         """
-        parser.add_argument('module', help="The project module")
+        parser.add_argument("module", help="The project module")
 
     def get_error_message(self, parser, exception):
         return exception.message
