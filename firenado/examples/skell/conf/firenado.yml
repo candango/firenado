@@ -16,10 +16,10 @@ data:
       # db: 0
 components:
   - id: skell
-    class: skell.SkellComponent
+    class: skell.application.SkellComponent
     enabled: true
   - id: internal
-    class: skell.components.internal.SkellInternalComponent
+    class: skell.components.internal.component.SkellInternalComponent
     enabled: true
   #- id: admin
   #  enabled: true

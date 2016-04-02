@@ -14,22 +14,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import tornado.web
+import firenado.tornadoweb
+from skell.components.internal import uimodules
 
 
-class Header1(tornado.web.UIModule):
+class SkellInternalComponent(firenado.tornadoweb.TornadoComponent):
+    """ This component just adds another ui modules package to the application
+    ui modules stack.
+    """
 
-    def render(self, header):
-        return self.render_string('header1.html', header=header)
-
-
-class LoginErrorMessage(tornado.web.UIModule):
-
-    def render(self, key):
-
-        if self.handler.session.has('login_errors'):
-            errors = self.handler.session.get('login_errors')
-            if key in errors:
-                template = "skell:uimodules/login_error_message.html"
-                return self.render_string(template, message=errors[key])
-        return ""
+    def get_ui_modules(self):
+        return uimodules
