@@ -39,6 +39,7 @@ setup(
         'firenado.components.assets',
         'firenado.components.firenado',
         'firenado.conf',
+        'firenado.management',
         'firenado.util',
     ],
     package_dir={'firenado': 'firenado'},
