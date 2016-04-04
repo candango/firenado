@@ -221,6 +221,8 @@ def process_session_config_section(config, session_config):
     :param session_config: Session configuration section from a config data
     dict.
     """
+    # Setting session type as file by default
+    config.session['type'] = 'file'
     if 'enabled' in session_config:
         config.session['enabled'] = session_config['enabled']
     if 'type' in session_config:
