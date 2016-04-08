@@ -31,6 +31,9 @@ class SessionEngine(object):
     """
 
     def __init__(self, session_aware_instance):
+        self.session_aware_instance = None
+        self.session_handler = None
+
         # TODO: By the way session could be disabled. How do we 
         # handle that?
         # TODO: check if session type exists. Maybe disable it if type is not
@@ -310,7 +313,7 @@ class FileSessionHandler(SessionHandler):
             # TODO: Need to think about this. I don't know if this is a
             # good behaviour. Maybe just crash the app here
             # or disable the session with a good warning.
-            self.path = firenado.conf.APP_TMP_PATH
+            self.path = firenado.conf.TMP_APP_PATH
 
     def create_session(self, session_id, data):
         # TODO: What could possibly go wrong here? Let's handle it!
