@@ -38,7 +38,27 @@ class SessionHandler(firenado.tornadoweb.TornadoHandler):
         self.session.set('counter', counter)
         self.render("session.html", session_value=counter)
 
+
 class LoginHandler(firenado.tornadoweb.TornadoHandler):
 
     def get(self):
-        pass
+        errors = {}
+        if self.session.has('login_errors'):
+            errors = self.session.get('login_errors')
+        self.render("login.html", errors=errors)
+
+    def post(self):
+        username = self.get_argument('username')
+        password = self.get_argument('password')
+        errors = {}
+
+        if username == '':
+            errors['username'] = 'Please inform the username'
+        if password == '':
+            errors['password'] = 'Please inform the password'
+
+        self.session.delete('login_errors')
+
+        if errors:
+            self.session.set('login_errors', errors)
+            self.redirect('login')

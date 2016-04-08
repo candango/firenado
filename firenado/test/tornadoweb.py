@@ -24,8 +24,6 @@ from firenado.tornadoweb import TornadoComponent
 import unittest
 from firenado.test import chdir_app
 
-chdir_app('tornadoweb')
-
 
 class MainHandler(TornadoHandler):
     """ Basic handler rendering an index.html template
@@ -64,6 +62,7 @@ class ApplicationComponentTestCase(unittest.TestCase):
         """ Application configuration file will be read and components will be
         loaded.
         """
+        chdir_app('tornadoweb')
         self.application = TornadoApplication()
 
     def test_component_loaded(self):

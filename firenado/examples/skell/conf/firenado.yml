@@ -14,12 +14,13 @@ data:
       # host: localhost
       # port: 6379
       # db: 0
+
 components:
   - id: skell
-    class: skell.SkellComponent
+    class: skell.application.SkellComponent
     enabled: true
   - id: internal
-    class: skell.components.internal.SkellInternalComponent
+    class: skell.components.internal.component.SkellInternalComponent
     enabled: true
   #- id: admin
   #  enabled: true
@@ -27,6 +28,9 @@ components:
     enabled: true
   - id: info
     enabled: true
+
+log:
+  level: DEBUG
 
 # Session types could be:
 # file or redis.

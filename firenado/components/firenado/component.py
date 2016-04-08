@@ -14,22 +14,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import tornado.web
+import firenado.tornadoweb
+from firenado.components.firenado.handlers import AppInfoHandler
 
 
-class Header1(tornado.web.UIModule):
+class FirenadoComponent(firenado.tornadoweb.TornadoComponent):
 
-    def render(self, header):
-        return self.render_string('header1.html', header=header)
-
-
-class LoginErrorMessage(tornado.web.UIModule):
-
-    def render(self, key):
-
-        if self.handler.session.has('login_errors'):
-            errors = self.handler.session.get('login_errors')
-            if key in errors:
-                template = "skell:uimodules/login_error_message.html"
-                return self.render_string(template, message=errors[key])
-        return ""
+    def get_handlers(self):
+        return [
+            (r'/firenado/app/info', AppInfoHandler),
+        ]

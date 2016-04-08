@@ -31,23 +31,27 @@ class SessionEngine(object):
     """
 
     def __init__(self, session_aware_instance):
+        self.session_aware_instance = None
+        self.session_handler = None
+
         # TODO: By the way session could be disabled. How do we 
         # handle that?
         # TODO: check if session type exists. Maybe disable it if type is not
         # defined. We need to inform the error here
-        session_handler_class = get_class_from_config(
-            firenado.conf.session['handlers'][firenado.conf.session['type']]
-        )
-        self.session_aware_instance = session_aware_instance
-        self.session_handler = session_handler_class(self)
-        self.session_handler.set_settings({})
-        self.session_handler.configure()
-        encoder_class = get_class_from_config(
-            firenado.conf.session['encoders'][
-                firenado.conf.session['encoder']
-            ]
-        )
-        self.session_encoder = encoder_class()
+        if firenado.conf.session['enabled']:
+            session_handler_class = get_class_from_config(
+                firenado.conf.session['handlers'][firenado.conf.session['type']]
+            )
+            self.session_aware_instance = session_aware_instance
+            self.session_handler = session_handler_class(self)
+            self.session_handler.set_settings({})
+            self.session_handler.configure()
+            encoder_class = get_class_from_config(
+                firenado.conf.session['encoders'][
+                    firenado.conf.session['encoder']
+                ]
+            )
+            self.session_encoder = encoder_class()
 
     def get_session(self, request_handler):
         """Returns a valid session object. This session is handler by the
@@ -309,7 +313,7 @@ class FileSessionHandler(SessionHandler):
             # TODO: Need to think about this. I don't know if this is a
             # good behaviour. Maybe just crash the app here
             # or disable the session with a good warning.
-            self.path = firenado.conf.APP_TMP_PATH
+            self.path = firenado.conf.TMP_APP_PATH
 
     def create_session(self, session_id, data):
         # TODO: What could possibly go wrong here? Let's handle it!

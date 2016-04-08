@@ -7,9 +7,9 @@ components:
   - id: admin
     class: firenado.components.admin.AdminComponent
   - id: assets
-    class: firenado.components.assets.AssetsComponent
+    class: firenado.components.assets.component.AssetsComponent
   - id: info
-    class: firenado.components.firenado.FirenadoComponent
+    class: firenado.components.firenado.component.FirenadoComponent
 
 data:
   connectors:

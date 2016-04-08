@@ -59,3 +59,17 @@ class ApplicationComponentTestCase(unittest.TestCase):
         chdir_app('yml', 'conf')
         self.assertEquals('yml_static_path', firenado.conf.app['static_path'])
 
+    def test_session_type_file(self):
+        """ Checks if the session is enabled and the type is file
+        """
+        chdir_app('file', 'session')
+        self.assertEquals(firenado.conf.session['enabled'], True)
+        self.assertEquals(firenado.conf.session['type'], 'file')
+
+
+    def test_session_type_redis(self):
+        """ Checks if the session is enabled and the type is redis
+        """
+        chdir_app('redis', 'session')
+        self.assertEquals(firenado.conf.session['enabled'], True)
+        self.assertEquals(firenado.conf.session['type'], 'redis')

@@ -19,7 +19,7 @@ from __future__ import (absolute_import, division, print_function,
 
 import unittest
 
-from firenado.core.data import DataConnectedMixin
+from firenado.data import DataConnectedMixin
 from firenado.service import served_by, FirenadoService
 
 
