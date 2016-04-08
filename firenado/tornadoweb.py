@@ -383,6 +383,8 @@ class FirenadoComponentLoader(Loader):
     """ A template loader that loads from a single root directory.
     """
     def __init__(self, root_directory, component=None, **kwargs):
+        # TODO: Check if we should alter/use the root_directory value
+        # here or on the resolve_path method.
         self.component = component
         super(FirenadoComponentLoader, self).__init__(root_directory, **kwargs)
 
@@ -395,14 +397,19 @@ class FirenadoComponentLoader(Loader):
         :param parent_path: The template parent path
         :return: Tornado resolve_path result.
         """
+        logger.debug("Resolving template %s." % name)
+        name_resolved = name
         if ':' in name:
             nameX = name.split(':')
             component_name = nameX[0]
-            name = os.path.join(
+            name_resolved = os.path.join(
                 self.component.application.components[
                     component_name].get_template_path(), nameX[-1])
+        if name != name_resolved:
+            logger.debug("Template %s resolved at %s." % (name, name_resolved))
+
         return super(FirenadoComponentLoader,
-                     self).resolve_path(name, parent_path)
+                     self).resolve_path(name_resolved, parent_path)
 
 
 # TODO: We need to create a class to avoid those methods repetition here.
