@@ -1,7 +1,6 @@
 #!/usr/bin/env python
-# vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4:
 #
-# Copyright 2013-2014 Flavio Garcia
+# Copyright 2015-2016 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.

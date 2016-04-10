@@ -24,8 +24,8 @@ Migration from iFlux to Firenado
 
 * Security (It will be decided if this module still be needed on 0.1.2).
 
-Bug Fixes:
-~~~~~~~~~~~~~~~~~~
+Bug Fixes
+~~~~~~~~~
 
 * Firenado requirements are not wired to the setup script. `#52 <https://github.com/candango/firenado/issues/52>`_
 * When Redis connection fails application exits without warning. `#58 <https://github.com/candango/firenado/issues/58>`_
