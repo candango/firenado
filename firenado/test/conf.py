@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright 2015 Flavio Garcia
+# Copyright 2015-2016 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,24 +13,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-#
-# vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4:
 
 from __future__ import (absolute_import, division, print_function,
                         with_statement)
 
-from firenado.core import TornadoApplication, TornadoHandler, TornadoComponent
 import unittest
 import firenado.conf
-import six
-
-if six.PY3:
-    if six.PY34:
-        import importlib
-        reload = importlib.reload
-    else:
-        import imp
-        reload = imp.reload
+import firenado.util.file as _file
+from firenado.test import chdir_app
 
 
 class ApplicationComponentTestCase(unittest.TestCase):
@@ -39,7 +29,47 @@ class ApplicationComponentTestCase(unittest.TestCase):
     """
 
     def test_only_framework_stack(self):
-
-        reload(firenado.conf)
+        """ Tests is only the framework config stack was loaded.
+        No app config is provided.
+        """
         self.assertEquals(firenado.conf.stack[0],
                           firenado.conf.LIB_CONFIG_FILE)
+
+    def test_app_stack(self):
+        """ Application config is provided. Test if the app config file was
+        loaded.
+        """
+        chdir_app('yml', 'conf')
+        self.assertEquals(firenado.conf.stack[0],
+                          firenado.conf.LIB_CONFIG_FILE)
+        self.assertEquals(firenado.conf.stack[1],
+                          firenado.conf.APP_CONFIG_FILE)
+
+    def test_yml_loaded(self):
+        """ On an application with a yml and yaml config files the yml should
+        be loaded.
+        """
+        chdir_app('yml', 'conf')
+        self.assertEquals('yml', _file.get_file_extension(
+                firenado.conf.APP_CONFIG_FILE))
+
+    def test_static_path(self):
+        """ If static path is defined than app configuration should get it.
+        """
+        chdir_app('yml', 'conf')
+        self.assertEquals('yml_static_path', firenado.conf.app['static_path'])
+
+    def test_session_type_file(self):
+        """ Checks if the session is enabled and the type is file
+        """
+        chdir_app('file', 'session')
+        self.assertEquals(firenado.conf.session['enabled'], True)
+        self.assertEquals(firenado.conf.session['type'], 'file')
+
+
+    def test_session_type_redis(self):
+        """ Checks if the session is enabled and the type is redis
+        """
+        chdir_app('redis', 'session')
+        self.assertEquals(firenado.conf.session['enabled'], True)
+        self.assertEquals(firenado.conf.session['type'], 'redis')

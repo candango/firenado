@@ -1,0 +1,32 @@
+What's new in Firenado 0.1.4
+============================
+
+April 9, 2016
+-------------
+
+We are pleased to announce the release of Firenado 0.1.4.
+
+On this release the focus was to get the framework refactored to be more
+"Pythonic".
+
+This version fixes couple bugs and introduce a way to set the application
+static_path via configuration.
+
+Here are the highlights:
+
+Refactoring
+~~~~~~~~~~~
+
+* Package refactoring to move code from __init__.py's `#109 <https://github.com/candango/firenado/issues/109>`_
+
+New Features
+~~~~~~~~~~~~
+
+* Added static_path to the config file `#104 <https://github.com/candango/firenado/issues/104>`_
+
+Bug Fixes:
+~~~~~~~~~~~~~~~~~~
+
+* A disabled session still needs a session type `#91 <https://github.com/candango/firenado/issues/91>`_
+* The service by decorator is broken `#107 <https://github.com/candango/firenado/issues/107>`_
+* The initialize method runs just if the component has a file defined `#103 <https://github.com/candango/firenado/issues/103>`_

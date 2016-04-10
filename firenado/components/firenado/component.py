@@ -14,20 +14,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import firenado
-import firenado.conf
 import firenado.tornadoweb
-import tornado
+from firenado.components.firenado.handlers import AppInfoHandler
 
 
-class AppInfoHandler(firenado.tornadoweb.TornadoHandler):
+class FirenadoComponent(firenado.tornadoweb.TornadoComponent):
 
-    def get(self):
-        self.render(
-            "info.html",
-            tornado_version=tornado.version,
-            firenado=firenado,
-            firenado_version=".".join(map(str,firenado.__version__)),
-            firenado_conf=firenado.conf,
-            handlers=self.application.handlers[0][1],
-        )
+    def get_handlers(self):
+        return [
+            (r'/firenado/app/info', AppInfoHandler),
+        ]

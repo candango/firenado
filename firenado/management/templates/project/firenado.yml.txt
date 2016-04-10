@@ -1,10 +1,11 @@
 app:
-  component: skell
+  component: '{{app_name}}'
   data:
     sources:
         # Set here references from sources defined on data.sources
-        - session
-  pythonpath: ..
+        - 'session'
+  #pythonpath: '..'
+  #type: 'tornado'
   port: 8888
 
 data:
@@ -14,23 +15,14 @@ data:
       # host: localhost
       # port: 6379
       # db: 0
-
 components:
-  - id: skell
-    class: skell.application.SkellComponent
-    enabled: true
-  - id: internal
-    class: skell.components.internal.component.SkellInternalComponent
+  - id: {{app_name}}
+    class: {{module}}.application.{{component}}Component
     enabled: true
   #- id: admin
   #  enabled: true
-  - id: assets
-    enabled: true
-  - id: info
-    enabled: true
-
-log:
-  level: DEBUG
+  #- id: info
+  #  enabled: true
 
 # Session types could be:
 # file or redis.

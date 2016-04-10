@@ -1,0 +1,9 @@
+import {{module}}.handlers
+import firenado.tornadoweb
+
+class {{component}}Component(firenado.tornadoweb.TornadoComponent):
+
+    def get_handlers(self):
+        return [
+            (r'/', {{module}}.handlers.IndexHandler),
+        ]

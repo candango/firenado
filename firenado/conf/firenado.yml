@@ -7,16 +7,16 @@ components:
   - id: admin
     class: firenado.components.admin.AdminComponent
   - id: assets
-    class: firenado.components.assets.AssetsComponent
+    class: firenado.components.assets.component.AssetsComponent
   - id: info
-    class: firenado.components.firenado.FirenadoComponent
+    class: firenado.components.firenado.component.FirenadoComponent
 
 data:
   connectors:
     - name: redis
-      class: firenado.core.data.connectors.RedisConnector
+      class: firenado.data.RedisConnector
     - name: sqlalchemy
-      class: firenado.core.data.connectors.SqlalchemyConnector
+      class: firenado.data.SqlalchemyConnector
 
 log:
   format: '%(levelname)s - %(name)s[%(module)s:%(lineno)d] - %(asctime)s - %(message)s'
@@ -25,14 +25,14 @@ log:
 management:
   commands:
     - name: firenado
-      module: firenado.core.management.commands
+      module: firenado.management.commands
 
 session:
   handlers:
     - name: file
-      class: firenado.core.session.FileSessionHandler
+      class: firenado.session.FileSessionHandler
     - name: redis
-      class: firenado.core.session.RedisSessionHandler
+      class: firenado.session.RedisSessionHandler
   encoders:
     - name: pickle
-      class: firenado.core.session.PickeSessionEncoder
+      class: firenado.session.PickeSessionEncoder

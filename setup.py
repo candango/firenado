@@ -39,15 +39,12 @@ setup(
         'firenado.components.assets',
         'firenado.components.firenado',
         'firenado.conf',
-        'firenado.core',
-        'firenado.core.data',
-        'firenado.core.management',
-        'firenado.core.management.tasks',
+        'firenado.management',
         'firenado.util',
     ],
     package_dir={'firenado': 'firenado'},
     package_data={'firenado': [
-        'conf/*.yml', 'core/management/templates/*/*.txt',
+        'conf/*.yml', 'management/templates/*/*.txt',
         'components/*/conf/*.yaml.example',
         'components/*/templates/*.html',
         'components/*/static/css/*.css',
@@ -77,7 +74,7 @@ setup(
     ],
     scripts=['firenado/bin/firenado-cli.py'],
     entry_points={'console_scripts': [
-        'firenado = firenado.core.management:run_from_command_line',
+        'firenado = firenado.management:run_from_command_line',
     ]},
 )
 

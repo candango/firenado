@@ -13,8 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-#
-# vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4:
 
 import tornado.web
 
@@ -23,3 +21,15 @@ class Header1(tornado.web.UIModule):
 
     def render(self, header):
         return self.render_string('header1.html', header=header)
+
+
+class LoginErrorMessage(tornado.web.UIModule):
+
+    def render(self, key):
+
+        if self.handler.session.has('login_errors'):
+            errors = self.handler.session.get('login_errors')
+            if key in errors:
+                template = "skell:uimodules/login_error_message.html"
+                return self.render_string(template, message=errors[key])
+        return ""

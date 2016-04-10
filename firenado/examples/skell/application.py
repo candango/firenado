@@ -14,20 +14,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import firenado
-import firenado.conf
+import skell.handlers
 import firenado.tornadoweb
-import tornado
+from skell import uimodules
 
 
-class AppInfoHandler(firenado.tornadoweb.TornadoHandler):
+class SkellComponent(firenado.tornadoweb.TornadoComponent):
 
-    def get(self):
-        self.render(
-            "info.html",
-            tornado_version=tornado.version,
-            firenado=firenado,
-            firenado_version=".".join(map(str,firenado.__version__)),
-            firenado_conf=firenado.conf,
-            handlers=self.application.handlers[0][1],
-        )
+    def get_handlers(self):
+        return [
+            (r'/', skell.handlers.IndexHandler),
+            (r'/session', skell.handlers.SessionHandler),
+            (r'/login', skell.handlers.LoginHandler),
+        ]
+
+    def get_ui_modules(self):
+        return uimodules
+
+    def install(self):
+        """ Component installation functional test.
+        This is only printing some output but it could be something more.
+        """
+        print('Skell app doesn\'t need to be installed.')
