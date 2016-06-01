@@ -17,7 +17,7 @@ data:
 
 components:
   - id: skell
-    class: skell.application.SkellComponent
+    class: skell.app.SkellComponent
     enabled: true
   - id: internal
     class: skell.components.internal.component.SkellInternalComponent

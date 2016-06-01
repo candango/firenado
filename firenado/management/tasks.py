@@ -44,11 +44,11 @@ class CreateProjectTask(ManagementTask):
             loader = template.Loader(os.path.join(firenado.conf.ROOT,
                                                   "management", "templates",
                                                   "project"))
-            project_init_content = loader.load("application.py.txt").generate(
+            project_init_content = loader.load("app.py.txt").generate(
                 project_name=project_name, module=module, component=component)
             # Generating application firenado component and handlers
             _file.write(os.path.join(project_directory, "__init__.py"), "")
-            _file.write(os.path.join(project_directory, "application.py"),
+            _file.write(os.path.join(project_directory, "app.py"),
                         project_init_content)
             handlers_file_name = os.path.join(project_directory, "handlers.py")
             _file.touch(handlers_file_name)

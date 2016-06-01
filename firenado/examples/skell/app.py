@@ -35,4 +35,4 @@ class SkellComponent(firenado.tornadoweb.TornadoComponent):
         """ Component installation functional test.
         This is only printing some output but it could be something more.
         """
-        print('Skell app doesn\'t need to be installed.')
+        print("Skell app doesn't need to be installed.")
