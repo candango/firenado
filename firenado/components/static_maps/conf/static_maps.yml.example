@@ -1,0 +1,5 @@
+#root: .
+maps:
+  - name: "bootstrap"
+    handler: "/assets/bootstrap/(.*)"
+    path: "bootstrap/dist"
