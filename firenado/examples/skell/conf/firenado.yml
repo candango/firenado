@@ -4,7 +4,7 @@ app:
     sources:
         # Set here references from sources defined on data.sources
         - session
-  pythonpath: ..
+  #pythonpath: ..
   port: 8888
 
 data:
@@ -24,7 +24,7 @@ components:
     enabled: true
   #- id: admin
   #  enabled: true
-  - id: assets
+  - id: static_maps
     enabled: true
   - id: info
     enabled: true

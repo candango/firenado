@@ -1,5 +1,9 @@
-#root: .
 maps:
-  - name: "bootstrap"
-    handler: "/assets/bootstrap/(.*)"
-    path: "bootstrap/dist"
+  - name: bower_components
+    #root: .
+    items:
+    - name: "bootstrap"
+      handler: "/assets/bootstrap/(.*)"
+      path: "dist"
+      map_on_path: true
+      item_on_path: true
