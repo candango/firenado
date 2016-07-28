@@ -7,9 +7,9 @@ components:
   - id: admin
     class: firenado.components.admin.AdminComponent
   - id: static_maps
-    class: firenado.components.static_maps.component.StaticMapsComponent
+    class: firenado.components.StaticMapsComponent
   - id: info
-    class: firenado.components.firenado.component.FirenadoComponent
+    class: firenado.components.FirenadoComponent
 
 data:
   connectors:
