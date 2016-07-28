@@ -6,10 +6,10 @@ components:
   # Basic firenado Admin component
   - id: admin
     class: firenado.components.admin.AdminComponent
-  - id: assets
-    class: firenado.components.assets.component.AssetsComponent
+  - id: static_maps
+    class: firenado.components.StaticMapsComponent
   - id: info
-    class: firenado.components.firenado.component.FirenadoComponent
+    class: firenado.components.FirenadoComponent
 
 data:
   connectors:

@@ -24,8 +24,8 @@ New Features
 
 * Added static_path to the config file `#104 <https://github.com/candango/firenado/issues/104>`_
 
-Bug Fixes:
-~~~~~~~~~~~~~~~~~~
+Bug Fixes
+~~~~~~~~~
 
 * A disabled session still needs a session type `#91 <https://github.com/candango/firenado/issues/91>`_
 * The service by decorator is broken `#107 <https://github.com/candango/firenado/issues/107>`_
