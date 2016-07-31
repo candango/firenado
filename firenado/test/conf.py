@@ -45,6 +45,18 @@ class ApplicationComponentTestCase(unittest.TestCase):
         self.assertEquals(firenado.conf.stack[1],
                           firenado.conf.APP_CONFIG_FILE)
 
+    def test_app_port(self):
+        """ Checks if the app port is set correctly.
+        """
+        # Loading file from test/resources/session/file/conf/firenado.yml
+        chdir_app('file', 'session')
+        self.assertTrue(firenado.conf.app['socket'] is None)
+        self.assertEquals(firenado.conf.app['port'], 8887)
+
+    def test_app_pythonpath(self):
+        chdir_app('file', 'session')
+        self.assertEquals(firenado.conf.app['pythonpath'], "..")
+
     def test_yml_loaded(self):
         """ On an application with a yml and yaml config files the yml should
         be loaded.
@@ -64,7 +76,7 @@ class ApplicationComponentTestCase(unittest.TestCase):
         """
         chdir_app('file', 'session')
         self.assertEquals(firenado.conf.session['enabled'], True)
-        self.assertEquals(firenado.conf.session['type'], 'file')
+        self.assertEquals(firenado.conf.session['type'], "file")
 
 
     def test_session_type_redis(self):

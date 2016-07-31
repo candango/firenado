@@ -15,8 +15,12 @@
 # limitations under the License.
 
 import firenado.tornadoweb
+import logging
 import tornado.web
 import os
+
+
+logger = logging.getLogger(__name__)
 
 
 class StaticMapsComponent(firenado.tornadoweb.TornadoComponent):
@@ -32,42 +36,47 @@ class StaticMapsComponent(firenado.tornadoweb.TornadoComponent):
             ).get_component_path()
         if self.conf:
             if 'maps' in self.conf:
-                for map in self.conf['maps']:
-                    print("Mapping %s items." % map['name'])
-                    self.static_maps[map['name']] = {}
-                    self.static_maps[map['name']]['root'] = self.static_root
-                    if 'root' in map:
-                        if os.path.isabs(map['root']):
-                            self.static_maps[map['name']]['root'] = map['root']
+                for map_item in self.conf['maps']:
+                    logger.debug("Mapping %s handlers." % map_item['name'])
+                    self.static_maps[map_item['name']] = {}
+                    self.static_maps[
+                        map_item['name']]['root'] = self.static_root
+                    if 'root' in map_item:
+                        if os.path.isabs(map_item['root']):
+                            self.static_maps[
+                                map_item['name']]['root'] = map_item['root']
                         else:
                             self.static_maps[
-                                map['name']]['root'] = os.path.abspath(
-                                os.path.join(self.static_root, map['root']))
-                    if 'items' in map:
-                        handlers = handlers + self.get_static_handlers(map)
+                                map_item['name']]['root'] = os.path.abspath(
+                                os.path.join(self.static_root,
+                                             map_item['root']))
+                    if 'handlers' in map_item:
+                        handlers = handlers + self.get_static_handlers(
+                            map_item)
         return handlers
 
-    def get_static_handlers(self, map):
+    def get_static_handlers(self, map_item):
         static_handlers = []
-        for item in map['items']:
-            item_path = ""
-            if 'path' in item:
-                item_path = item['path']
-            if 'item_on_path' in item:
-                if item['item_on_path']:
-                    item_path = os.path.join(item['name'], item_path)
-            if 'map_on_path' in item:
-                if item['map_on_path']:
-                    item_path = os.path.join(map['name'], item_path)
-                    print(item_path)
-            print("Item  %s items." % map['name'])
-            handler = (
-                r"%s" % item['handler'],
+        for handler in map_item['handlers']:
+            handler_path = ""
+            if 'path' in handler:
+                handler_path = handler['path']
+            if 'name_on_path' in handler:
+                if handler['name_on_path']:
+                    handler_path = os.path.join(handler['name'], handler_path)
+            if 'map_on_path' in handler:
+                if handler['map_on_path']:
+                    handler_path = os.path.join(map_item['name'], handler_path)
+            logger.debug(
+                "Mapping handler %s on directory %s on the map %s." % (
+                    handler['handler'], handler_path, map_item['name']))
+            static_handler = (
+                r"%s" % handler['handler'],
                 tornado.web.StaticFileHandler,
                 {"path": os.path.join(
-                    self.static_maps[map['name']]['root'],
-                    item_path)})
-            static_handlers.append(handler)
+                    self.static_maps[map_item['name']]['root'],
+                    handler_path)})
+            static_handlers.append(static_handler)
         return static_handlers
 
     def get_config_file(self):
