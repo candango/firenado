@@ -24,6 +24,9 @@ logger = logging.getLogger(__name__)
 
 
 class StaticMapsComponent(firenado.tornadoweb.TornadoComponent):
+    """ The static maps component helps to map static handlers using a config
+    file.
+    """
 
     def __init__(self, name, application):
         firenado.tornadoweb.TornadoComponent.__init__(self, name, application)
@@ -31,6 +34,11 @@ class StaticMapsComponent(firenado.tornadoweb.TornadoComponent):
         self.static_maps = {}
 
     def get_handlers(self):
+        """ Returns the handlers defined on the static_maps.yml file located
+        at the app config directory.
+
+        Returns: An array of static handlers to be added to the app.
+        """
         handlers = []
         self.static_root = self.application.get_app_component(
             ).get_component_path()
