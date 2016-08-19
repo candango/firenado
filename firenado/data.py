@@ -109,7 +109,7 @@ class Connector(object):
         self.__data_connected = data_connected
 
     def get_connection(self):
-        """ Returns the configured and connected database conection.
+        """ Returns the configured and connected database connection.
         """
         return None
 
@@ -185,7 +185,16 @@ class SqlalchemyConnector(Connector):
         from sqlalchemy.exc import OperationalError
         from firenado.util.sqlalchemy_util import Session
 
-        self.__connection['engine'] = create_engine(config['url'])
+        create_engine_params = []
+        if 'backend' in config:
+            if config['backend'] == 'mysql':
+                # Setting connection default connection timeout for mysql
+                # backends as suggested on http://bit.ly/2bvOLxs
+                # TODO: ignore this if pool_recycle is defined on config
+                create_engine_params['pool_recycle'] = 3600
+
+        self.__connection['engine'] = create_engine(config['url'],
+                                                    **create_engine_params)
         logger.info("Connecting to the database using the engine: %s.",
                     self.__connection['engine'])
         try:
@@ -201,6 +210,26 @@ class SqlalchemyConnector(Connector):
         # will just happen during the handler execution
 
     def get_connection(self):
+        if self.__connection['backend'] == "mysql":
+            try:
+                result = self.__connection['session'].execute(
+                    "select now() as testtime;")
+                for row in result:
+                    pass
+            except Exception as error:
+                from sqlalchemy.exc import OperationalError
+                logger.warning(error.message)
+                self.__connection['session'].close()
+                self.__connection['engine'].dispose()
+                try:
+                    self.__connection['engine'].connect()
+                except OperationalError as op_error:
+                    logger.error(
+                        "Error trying to connect to database: %s", op_error)
+                    sys.exit(errno.ECONNREFUSED)
+                from firenado.util.sqlalchemy_util import Session
+                Session.configure(bind=self.__connection['engine'])
+                self.__connection['session'] = Session()
         return self.__connection
 
     @property
