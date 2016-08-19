@@ -14,13 +14,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from setuptools import setup
+from setuptools import setup, find_packages
 from pip.req import parse_requirements
 import firenado
 
 # Solution from http://bit.ly/29Yl8VN
-requirements = parse_requirements('./requirements.txt', session=False)
-install_requires = [str(ir.req) for ir in requirements]
+def resolve_requires(requirements_file):
+    requirements = parse_requirements("./%s" % requirements_file,
+            session=False)
+    return [str(ir.req) for ir in requirements]
 
 setup(
     name='Firenado',
@@ -32,28 +34,24 @@ setup(
     author_email='piraz[at]candango.org',
     maintainer='Flavio Garcia',
     maintainer_email='piraz[at]candango.org',
-    install_requires=install_requires,
+    install_requires=resolve_requires("requirements.txt"),
+    extras_require = {
+        'redis': resolve_requires("requirements-redis.txt"),
+        'sqlalchemy': resolve_requires("requirements-sqlalchemy.txt"),
+    },
     url='https://github.com/candango/firenado',
-    packages=[
-        'firenado',
-        'firenado.components',
-        'firenado.components.assets',
-        'firenado.components.firenado',
-        'firenado.conf',
-        'firenado.management',
-        'firenado.util',
-    ],
+    packages= find_packages(),
     package_dir={'firenado': 'firenado'},
     package_data={'firenado': [
-        'requirements*.txt', 'conf/*.yml', 'management/templates/*/*.txt',
+        'conf/*.yml', 'management/templates/*/*.txt',
         'components/*/conf/*.yaml.example',
         'components/*/templates/*.html',
         'components/*/static/css/*.css',
         'components/*/static/js/*.js',
         'components/*/static/js/locales/*',
         'components/*/static/js/views/*.ejs',
-
     ]},
+    include_package_data=True,
     classifiers=[
         'Development Status :: 1 - Planning',
         'Environment :: Console',
