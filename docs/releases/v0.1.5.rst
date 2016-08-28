@@ -20,15 +20,18 @@ Here are the highlights:
 Refactory
 ~~~~~~~~~~~~
 
-* Depreciate python 2.6 and 3.2 `#118 <https://github.com/candango/firenado/issues/118>`_
+* Depreciate python 2.6 and 3.2. `#118 <https://github.com/candango/firenado/issues/118>`_
+* Change application file from application.py to app.py. `#120 <https://github.com/candango/firenado/issues/120>`_
 
 New Features
 ~~~~~~~~~~~~
 
-* Add optional requirements to setup.py `#119 <https://github.com/candango/firenado/issues/119>`_
+* Create the static maps component. `#57 <https://github.com/candango/firenado/issues/57>`_
+* Add optional requirements to setup.py. `#119 <https://github.com/candango/firenado/issues/119>`_
 
 
 Bug Fixes
 ~~~~~~~~~
 
-* Fix managment command help `#13 <https://github.com/candango/firenado/issues/13>`_
+* Fix managment command help. `#13 <https://github.com/candango/firenado/issues/13>`_
+* Six is not being installed by setup.py. `#121 <https://github.com/candango/firenado/issues/121>`_
