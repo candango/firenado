@@ -14,11 +14,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import firenado.conf
 from firenado.management import ManagementCommand
 from firenado.management import tasks
+from tornado import template
+import os
 
+loader = template.Loader(os.path.join(firenado.conf.ROOT,
+                                      "management", "templates", "help"))
 ManagementCommand(
-    'app', 'Application related commands', '',
+    'app', 'Application related commands', loader.load("app_command_help.txt"),
     category='Firenado',
     sub_commands=[
         ManagementCommand('install', 'Install a Firenado application', '',
