@@ -51,18 +51,18 @@ def run_from_command_line():
         show_command_line_usage(parser, True)
 
 
-def get_command_header(parser, usage=False):
+def get_command_header(parser, usage_message="", usage=False):
     """ Return the command line header
     """
     loader = template.Loader(os.path.join(
                 firenado.conf.ROOT, 'management', 'templates', 'help'))
-    return loader.load("header.txt").generate(parser=parser, usage=usage)
+    return loader.load("header.txt").generate(parser=parser, usage_message=usage_message, usage=usage)
 
 
 def show_command_line_usage(parser, usage=False):
     """ Show the command line help
     """
-    help_header_message = get_command_header(parser, usage)
+    help_header_message = get_command_header(parser, "command", usage)
     loader = template.Loader(os.path.join(
         firenado.conf.ROOT, 'management', 'templates', 'help'))
     command_template = "  {0.name:15}{0.description:40}"
@@ -95,7 +95,7 @@ def run_command(command, args):
                 existing_command.run(args)
 
 
-class ManagementCommand():
+class ManagementCommand(object):
     """ Defines a management command. Commands are classified by categories and
     the Firenado category is the default one. Those commands are shipped with
     the framework.
@@ -140,7 +140,7 @@ class ManagementCommand():
 
     def run(self, args):
         has_sub_commands = False
-        subcommand_resolved = False
+        subcommands_resolved = False
         if self.sub_commands:
             has_sub_commands = True
             # TODO handle args with size 1
@@ -149,14 +149,20 @@ class ManagementCommand():
                 for subcommand in self.sub_commands:
                     if subcommand.name == unresolved_args[0]:
                         subcommand.run(unresolved_args)
-                        subcommand_resolved = True
+                        subcommands_resolved = True
                         break
         if not has_sub_commands:
             self.run_tasks(args)
         else:
-            if not subcommand_resolved:
-                # TODO Print the error here!!!
-                raise FirenadoArgumentError("CARACAS VÉI")
+            if not subcommands_resolved:
+                from tornado.template import Template
+                msg_help = self.get_help()
+                parser = FirenadoArgumentParser(
+                        prog=os.path.split(
+                            sys.argv[0])[1], usage='%(prog)s [options]',)
+                if isinstance(msg_help, Template):
+                    msg_help = msg_help.generate(parser=parser)
+                print(get_command_header(parser, msg_help, True))
 
     def run_tasks(self, args):
         cmd_parser = FirenadoArgumentParser(
@@ -177,7 +183,7 @@ class ManagementCommand():
             print(command_help)
 
 
-class ManagementTask():
+class ManagementTask(object):
     """
     Defines a management tasks. Tasks are the concrete actions executed by a
     command.
@@ -200,7 +206,6 @@ class ManagementTask():
         return None
 
     def get_error_message(self, parser, error):
-        print(error)
         return error.message
 
     def run(self, namespace=None):

@@ -1,0 +1,5 @@
+project <sub-command>
+
+Sub-commands are:
+
+      init           Initialize a new Firenado project (provide a module)
