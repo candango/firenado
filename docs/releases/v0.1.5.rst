@@ -1,17 +1,34 @@
 What's new in Firenado 0.1.5
 ============================
 
-June 30, 2016
--------------
+August 31, 2016
+---------------
 
-Release description here.
+We are pleased to announce the release of Firenado 0.1.5.
+
+On this release the build was improved in order to provide extra requirements.
+
+Right now it is possible to install redis and sqlalchemy.
+
+ TODO: Provide methods
+
+TODO: Finish release anoucement.
+
 
 Here are the highlights:
+
+Refactory
+~~~~~~~~~~~~
+
+* Depreciate python 2.6
+and 3.2 `#118 <https://github.com/candango/firenado/issues/118>`_
 
 New Features
 ~~~~~~~~~~~~
 
-* Features go here.
+* Add optional requirements to
+setup.py `#119 <https://github.com/candango/firenado/issues/119>`_
+
 
 Bug Fixes
 ~~~~~~~~~
