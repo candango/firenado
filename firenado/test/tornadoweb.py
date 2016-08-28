@@ -72,7 +72,7 @@ class ApplicationComponentTestCase(unittest.TestCase):
         import firenado.test
         self.assertTrue('test' in self.application.components)
         self.assertTrue(isinstance(self.application.components['test'],
-                                   TestComponent))
+                                   firenado.test.tornadoweb.TestComponent))
         self.assertFalse('disabled' in self.application.components)
 
     def test_static_path(self):
