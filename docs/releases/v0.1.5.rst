@@ -20,17 +20,15 @@ Here are the highlights:
 Refactory
 ~~~~~~~~~~~~
 
-* Depreciate python 2.6
-and 3.2 `#118 <https://github.com/candango/firenado/issues/118>`_
+* Depreciate python 2.6 and 3.2 `#118 <https://github.com/candango/firenado/issues/118>`_
 
 New Features
 ~~~~~~~~~~~~
 
-* Add optional requirements to
-setup.py `#119 <https://github.com/candango/firenado/issues/119>`_
+* Add optional requirements to setup.py `#119 <https://github.com/candango/firenado/issues/119>`_
 
 
 Bug Fixes
 ~~~~~~~~~
 
-* Bug fixes go here.
+* Fix managment command help `#13 <https://github.com/candango/firenado/issues/13>`_
