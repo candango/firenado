@@ -26,18 +26,15 @@ ManagementCommand(
     'app', 'Application related commands', loader.load("app_command_help.txt"),
     category='Firenado',
     sub_commands=[
-        ManagementCommand('install', 'Install a Firenado application', '',
+        ManagementCommand('install', 'Install a Firenado application', "",
                           tasks=tasks.InstallProjectTask),
         ManagementCommand('run', 'Runs a Firenado application', '',
                           tasks=tasks.RunApplicationTask),
     ])
 ManagementCommand(
-    'project','Project related commands', '',
-    category='Firenado', 
+    'project','Project related commands',
+    loader.load("project_command_help.txt"), category='Firenado',
     sub_commands=[
         ManagementCommand('init', 'Initiates a new Firenado project', '',
                           tasks=tasks.CreateProjectTask)
     ])
-ManagementCommand(
-    'repo', 'Repository related commands', '', category='Firenado',
-    sub_commands=[])
