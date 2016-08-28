@@ -95,7 +95,7 @@ def run_command(command, args):
                 existing_command.run(args)
 
 
-class ManagementCommand():
+class ManagementCommand(object):
     """ Defines a management command. Commands are classified by categories and
     the Firenado category is the default one. Those commands are shipped with
     the framework.
@@ -183,7 +183,7 @@ class ManagementCommand():
             print(command_help)
 
 
-class ManagementTask():
+class ManagementTask(object):
     """
     Defines a management tasks. Tasks are the concrete actions executed by a
     command.
