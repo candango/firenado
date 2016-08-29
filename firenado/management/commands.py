@@ -32,7 +32,7 @@ ManagementCommand(
                           tasks=tasks.RunApplicationTask),
     ])
 ManagementCommand(
-    'project','Project related commands',
+    'project', 'Project related commands',
     loader.load("project_command_help.txt"), category='Firenado',
     sub_commands=[
         ManagementCommand('init', 'Initiates a new Firenado project', '',

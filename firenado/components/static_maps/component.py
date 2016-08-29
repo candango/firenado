@@ -41,7 +41,7 @@ class StaticMapsComponent(firenado.tornadoweb.TornadoComponent):
         """
         handlers = []
         self.static_root = self.application.get_app_component(
-            ).get_component_path()
+        ).get_component_path()
         if self.conf:
             if 'maps' in self.conf:
                 for map_item in self.conf['maps']:

@@ -27,7 +27,7 @@ class AppInfoHandler(firenado.tornadoweb.TornadoHandler):
             "info.html",
             tornado_version=tornado.version,
             firenado=firenado,
-            firenado_version=".".join(map(str,firenado.__version__)),
+            firenado_version=".".join(map(str, firenado.__version__)),
             firenado_conf=firenado.conf,
             handlers=self.application.handlers[0][1],
         )

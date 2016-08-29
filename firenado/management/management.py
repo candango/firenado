@@ -53,10 +53,17 @@ def run_from_command_line():
 
 def get_command_header(parser, usage_message="", usage=False):
     """ Return the command line header
+
+    :param parser:
+    :param usage_message:
+    :param usage:
+    :return: The command header
     """
     loader = template.Loader(os.path.join(
-                firenado.conf.ROOT, 'management', 'templates', 'help'))
-    return loader.load("header.txt").generate(parser=parser, usage_message=usage_message, usage=usage)
+        firenado.conf.ROOT, 'management', 'templates', 'help'))
+    return loader.load("header.txt").generate(parser=parser,
+                                              usage_message=usage_message,
+                                              usage=usage)
 
 
 def show_command_line_usage(parser, usage=False):
@@ -129,7 +136,6 @@ class ManagementCommand(object):
                     self.tasks.append(task(self))
             else:
                 self.tasks.append(tasks(self))
-        global command_categories
         if category is not None:
             if category not in command_categories:
                 command_categories[category] = []

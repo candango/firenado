@@ -133,7 +133,9 @@ def authenticated(method):
         return f_wrapper
 
 
-def permissions(roles=[]):
+def permissions(roles=None):
+    if roles is None:
+        roles = []
 
     def f_wrapper(method):
         @functools.wraps(method)
