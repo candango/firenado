@@ -1,14 +1,15 @@
 What's new in Firenado 0.1.5
 ============================
 
-August 31, 2016
+August 30, 2016
 ---------------
 
-We are pleased to announce the release of Firenado 0.1.5.
+We are pleased to announce the release of Firenado 0.1.5.0.
 
 On this release the build was improved in order to provide extra requirements.
 
-Right now it is possible to install redis and sqlalchemy.
+Right now it is possible to install redis and sqlalchemy using extra
+requirements with pip or on the requirements file.
 
  TODO: Provide methods
 

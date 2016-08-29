@@ -186,8 +186,7 @@ class SqlalchemyConnector(Connector):
         from firenado.util.sqlalchemy_util import Session
 
         # We will set the isolation level to READ UNCOMMITTED by default
-        # so we can prevent the "cache" effect sqlalchemy has withou this
-        # option.
+        # to avoid the "cache" effect sqlalchemy has without this option.
         # Solution from: http://bit.ly/2bDq0Nv
         # TODO: Get the isolation level from data source config
         engine_params = {
