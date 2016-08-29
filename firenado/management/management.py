@@ -136,7 +136,6 @@ class ManagementCommand(object):
                     self.tasks.append(task(self))
             else:
                 self.tasks.append(tasks(self))
-        global command_categories
         if category is not None:
             if category not in command_categories:
                 command_categories[category] = []
