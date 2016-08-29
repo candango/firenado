@@ -42,7 +42,7 @@ class SessionHandler(firenado.tornadoweb.TornadoHandler):
 class LoginHandler(firenado.tornadoweb.TornadoHandler):
 
     USERNAME = "test"
-    PASSWORD = "test"  # dodgy:disable=password
+    PASSWORD = "test"  # noqa
 
     def get(self):
         errors = {}

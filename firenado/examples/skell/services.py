@@ -21,7 +21,7 @@ class LoginService(service.FirenadoService):
 
     def __init__(self, handler, data_source=None):
         self.USERNAME = "test"
-        self.PASSWORD = "test"  # dodgy:disable=password
+        self.PASSWORD = "test"  # noqa
         service.FirenadoService.__init__(self, handler, data_source)
 
     def user_is_valid(self, username, password):
