@@ -35,3 +35,4 @@ Bug Fixes
 
 * Fix managment command help. `#13 <https://github.com/candango/firenado/issues/13>`_
 * Six is not being installed by setup.py. `#121 <https://github.com/candango/firenado/issues/121>`_
+* Sqlalchemy connection is missed when database service restarts or the connection is renewed. `#127 <https://github.com/candango/firenado/issues/127>`_
