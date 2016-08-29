@@ -185,7 +185,7 @@ class SqlalchemyConnector(Connector):
         from sqlalchemy.exc import OperationalError
         from firenado.util.sqlalchemy_util import Session
 
-        create_engine_params = []
+        create_engine_params = {}
         if 'backend' in config:
             if config['backend'] == 'mysql':
                 # Setting connection default connection timeout for mysql
