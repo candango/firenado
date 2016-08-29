@@ -53,7 +53,7 @@ setup(
     ]},
     include_package_data=True,
     classifiers=[
-        'Development Status :: 1 - Planning',
+        'Development Status :: 3 - Alpha',
         'Environment :: Console',
         'Environment :: Web Environment',
         'License :: OSI Approved :: Apache Software License',
@@ -76,4 +76,3 @@ setup(
         'firenado = firenado.management:run_from_command_line',
     ]},
 )
-
