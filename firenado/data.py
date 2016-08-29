@@ -197,40 +197,40 @@ class SqlalchemyConnector(Connector):
                                                     **create_engine_params)
         logger.info("Connecting to the database using the engine: %s.",
                     self.__connection['engine'])
-        try:
-            self.__connection['engine'].connect()
-        except OperationalError as error:
-            logger.error("Error trying to connect to database: %s", error)
-            sys.exit(errno.ECONNREFUSED)
-
-        Session.configure(bind=self.__connection['engine'])
-        self.__connection['session'] = Session()
+        self.connect_engine()
+        self.configure_session()
         self.__connection['backend'] = config['backend']
         # TODO: Test the session right here. Without that the error
         # will just happen during the handler execution
 
     def get_connection(self):
-        if self.__connection['backend'] == "mysql":
-            try:
-                result = self.__connection['session'].execute(
-                    "select now() as testtime;")
-                for row in result:
-                    pass
-            except Exception as error:
-                from sqlalchemy.exc import OperationalError
-                logger.warning(error.message)
-                self.__connection['session'].close()
-                self.__connection['engine'].dispose()
-                try:
-                    self.__connection['engine'].connect()
-                except OperationalError as op_error:
-                    logger.error(
-                        "Error trying to connect to database: %s", op_error)
-                    sys.exit(errno.ECONNREFUSED)
-                from firenado.util.sqlalchemy_util import Session
-                Session.configure(bind=self.__connection['engine'])
-                self.__connection['session'] = Session()
+        # TODO: keep an eye on this:
+        # http://docs.sqlalchemy.org/en/latest/core/pooling.html
+        from sqlalchemy import select
+        try:
+            self.__connection['session'].scalar(select([1]))
+        except Exception as error:
+            from sqlalchemy.exc import OperationalError
+            logger.warning(error.message)
+            self.__connection['session'].close()
+            self.__connection['engine'].dispose()
+            self.connect_engine()
+            self.configure_session()
         return self.__connection
+
+    def connect_engine(self):
+        from sqlalchemy.exc import OperationalError
+        try:
+            self.__connection['engine'].connect()
+        except OperationalError as op_error:
+            logger.error(
+                "Error trying to connect to database: %s", op_error)
+            sys.exit(errno.ECONNREFUSED)
+
+    def configure_session(self):
+        from firenado.util.sqlalchemy_util import Session
+        Session.configure(bind=self.__connection['engine'])
+        self.__connection['session'] = Session()
 
     @property
     def backend(self):

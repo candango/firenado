@@ -148,7 +148,7 @@ class Session(object):
     def __init__(self, engine, data=None, sess_id=None):
         self.__engine = engine
         self.id = sess_id
-        self.__data = {} if data in None else data
+        self.__data = {} if data is None else data
         self.__destroyed = False
         self.__changed = False
 
