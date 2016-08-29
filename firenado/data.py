@@ -185,16 +185,24 @@ class SqlalchemyConnector(Connector):
         from sqlalchemy.exc import OperationalError
         from firenado.util.sqlalchemy_util import Session
 
-        create_engine_params = {}
+        # We will set the isolation level to READ UNCOMMITTED by default
+        # so we can prevent the "cache" effect sqlalchemy has withou this
+        # option.
+        # Solution from: http://bit.ly/2bDq0Nv
+        # TODO: Get the isolation level from data source config
+        engine_params = {
+            'isolation_level': "READ UNCOMMITTED"
+        }
+
         if 'backend' in config:
             if config['backend'] == 'mysql':
                 # Setting connection default connection timeout for mysql
                 # backends as suggested on http://bit.ly/2bvOLxs
                 # TODO: ignore this if pool_recycle is defined on config
-                create_engine_params['pool_recycle'] = 3600
+                engine_params['pool_recycle'] = 3600
 
         self.__connection['engine'] = create_engine(config['url'],
-                                                    **create_engine_params)
+                                                    **engine_params)
         logger.info("Connecting to the database using the engine: %s.",
                     self.__connection['engine'])
         self.connect_engine()
