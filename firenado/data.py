@@ -182,8 +182,6 @@ class SqlalchemyConnector(Connector):
 
     def configure(self, config):
         from sqlalchemy import create_engine
-        from sqlalchemy.exc import OperationalError
-        from firenado.util.sqlalchemy_util import Session
 
         # We will set the isolation level to READ UNCOMMITTED by default
         # to avoid the "cache" effect sqlalchemy has without this option.
