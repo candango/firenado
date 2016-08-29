@@ -53,7 +53,7 @@ def configure_data_sources(data_sources, data_connected):
     elif isinstance(data_sources, list):
         for data_source in data_sources:
             configure_data_sources(data_source, data_connected)
-    #TODO Throw an error here if it is not string or list
+    # TODO Throw an error here if it is not string or list
 
 
 def configure(data_sources):

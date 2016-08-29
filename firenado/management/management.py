@@ -53,10 +53,17 @@ def run_from_command_line():
 
 def get_command_header(parser, usage_message="", usage=False):
     """ Return the command line header
+
+    :param parser:
+    :param usage_message:
+    :param usage:
+    :return: The command header
     """
     loader = template.Loader(os.path.join(
-                firenado.conf.ROOT, 'management', 'templates', 'help'))
-    return loader.load("header.txt").generate(parser=parser, usage_message=usage_message, usage=usage)
+        firenado.conf.ROOT, 'management', 'templates', 'help'))
+    return loader.load("header.txt").generate(parser=parser,
+                                              usage_message=usage_message,
+                                              usage=usage)
 
 
 def show_command_line_usage(parser, usage=False):

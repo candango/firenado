@@ -139,7 +139,7 @@ def process_app_config_section(config, app_config):
     if 'types' in app_config:
         for app_type in app_config['types']:
             app_type['launcher'] = get_config_from_package(
-                    app_type['launcher'])
+                app_type['launcher'])
             config.app['types'][app_type['name']] = app_type
 
 
