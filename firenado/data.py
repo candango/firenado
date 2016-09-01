@@ -190,7 +190,6 @@ class SqlalchemyConnector(Connector):
         engine_params = {
             'isolation_level': "READ UNCOMMITTED"
         }
-
         if 'backend' in config:
             if config['backend'] == 'mysql':
                 # Setting connection default connection timeout for mysql
@@ -212,15 +211,20 @@ class SqlalchemyConnector(Connector):
         # TODO: keep an eye on this:
         # http://docs.sqlalchemy.org/en/latest/core/pooling.html
         from sqlalchemy import select
+        from sqlalchemy.exc import OperationalError
+        conn = self.__connection['engine'].connect()
         try:
-            self.__connection['session'].scalar(select([1]))
-        except Exception as error:
-            from sqlalchemy.exc import OperationalError
-            logger.warning(error.message)
-            self.__connection['session'].close()
+            conn.scalar(select([1]))
+            conn.close()
+        except OperationalError as op_error:
+            logger.warning(op_error)
+            logger.warning("Firenado will try to reestablish data source "
+                           "connection.")
+            conn.close()
             self.__connection['engine'].dispose()
             self.connect_engine()
             self.configure_session()
+            logger.warning("Data source connection reestablished.")
         return self.__connection
 
     def connect_engine(self):
