@@ -1,7 +1,7 @@
 What's new in Firenado 0.1.5
 ============================
 
-August 30, 2016
+September 01, 2016
 ---------------
 
 We are pleased to announce the release of Firenado 0.1.5.0.
@@ -11,10 +11,8 @@ On this release the build was improved in order to provide extra requirements.
 Right now it is possible to install redis and sqlalchemy using extra
 requirements with pip or on the requirements file.
 
- TODO: Provide methods
-
-TODO: Finish release anoucement.
-
+Python 2.6 and 3.2 are not supported on this version to comply with Tornado
+4.4.1.
 
 Here are the highlights:
 
