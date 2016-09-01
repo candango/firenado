@@ -42,15 +42,6 @@ setup(
     url='https://github.com/candango/firenado',
     packages= find_packages(),
     package_dir={'firenado': 'firenado'},
-    package_data={'firenado': [
-        'conf/*.yml', 'management/templates/*/*.txt',
-        'components/*/conf/*.yaml.example',
-        'components/*/templates/*.html',
-        'components/*/static/css/*.css',
-        'components/*/static/js/*.js',
-        'components/*/static/js/locales/*',
-        'components/*/static/js/views/*.ejs',
-    ]},
     include_package_data=True,
     classifiers=[
         'Development Status :: 3 - Alpha',
