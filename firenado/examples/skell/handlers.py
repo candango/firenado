@@ -29,7 +29,7 @@ class SessionHandler(firenado.tornadoweb.TornadoHandler):
         reset = self.get_argument("reset", False, True)
         if reset:
             self.session.delete('counter')
-            self.redirect('/session')
+            self.redirect("/session")
             return None
         counter = 0
         if self.session.has('counter'):
@@ -40,6 +40,9 @@ class SessionHandler(firenado.tornadoweb.TornadoHandler):
 
 
 class LoginHandler(firenado.tornadoweb.TornadoHandler):
+
+    USERNAME = "test"
+    PASSWORD = "test"  # noqa
 
     def get(self):
         errors = {}
@@ -52,13 +55,13 @@ class LoginHandler(firenado.tornadoweb.TornadoHandler):
         password = self.get_argument('password')
         errors = {}
 
-        if username == '':
-            errors['username'] = 'Please inform the username'
-        if password == '':
-            errors['password'] = 'Please inform the password'
+        if username == "":
+            errors['username'] = "Please inform the username"
+        if password == "":
+            errors['password'] = "Please inform the password"
 
         self.session.delete('login_errors')
 
         if errors:
             self.session.set('login_errors', errors)
-            self.redirect('login')
+            self.redirect("login")

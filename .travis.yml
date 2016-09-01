@@ -2,14 +2,12 @@
 language: python
 python:
   - "2.7"
-  - "3.2"
   - "3.3"
   - "3.4"
 install:
   - "pip install -r requirements.txt"
-  - "pip install -r requirements_tests.txt"
+  - "pip install -r requirements-redis.txt"
+  - "pip install -r requirements-sqlalchemy.txt"
+  - "pip install -r requirements-test.txt"
 script:
-  - "nosetests firenado.test.conf"
-  - "nosetests firenado.test.service"
-  - "nosetests firenado.test.tornadoweb"
-  - "nosetests firenado.test.util.file"
+  - "nosetests -v --all-modules firenado/test"

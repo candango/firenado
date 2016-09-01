@@ -70,5 +70,5 @@ class ChatdemoComponent(firenado.tornadoweb.TornadoComponent):
         return [
             (r'/', chatdemo.handlers.MainHandler),
             (r"/a/message/new", chatdemo.handlers.MessageNewHandler),
-            (r"/a/message/updates",chatdemo.handlers. MessageUpdatesHandler),
+            (r"/a/message/updates", chatdemo.handlers. MessageUpdatesHandler),
         ]

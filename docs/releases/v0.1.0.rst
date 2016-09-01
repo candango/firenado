@@ -20,8 +20,8 @@ Migration from iFlux to Firenado
 * Session
 * Services
 
-Migration changes:
-~~~~~~~~~~~~~~~~~~
+Migration changes
+~~~~~~~~~~~~~~~~~
 
 * Configuration
 * Command line tool

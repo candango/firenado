@@ -16,7 +16,7 @@
   ],
   "dependencies": {
     "jquery": "~2.1.4",
-    "canjs": "~2.2.7",
+    "canjs": "~2.2.9",
     "bootstrap": "~3.3.5",
     "font-awesome": "~4.2.0"
   }

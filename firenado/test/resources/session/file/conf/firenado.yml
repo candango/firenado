@@ -5,7 +5,7 @@ app:
         # Set here references from sources defined on data.sources
         #- session
   pythonpath: ..
-  port: 8888
+  port: 8887
   static_path: 'a_static_path'
 
 data:

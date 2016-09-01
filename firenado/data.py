@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright 2015 Flavio Garcia
+# Copyright 2015-2016 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,8 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-#
-# vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4:
 
 from __future__ import (absolute_import, division, print_function,
                         with_statement)
@@ -55,7 +53,7 @@ def configure_data_sources(data_sources, data_connected):
     elif isinstance(data_sources, list):
         for data_source in data_sources:
             configure_data_sources(data_source, data_connected)
-    #TODO Throw an error here if it is not string or list
+    # TODO Throw an error here if it is not string or list
 
 
 def configure(data_sources):
@@ -111,7 +109,7 @@ class Connector(object):
         self.__data_connected = data_connected
 
     def get_connection(self):
-        """ Returns the configured and connected database conection.
+        """ Returns the configured and connected database connection.
         """
         return None
 
@@ -184,26 +182,64 @@ class SqlalchemyConnector(Connector):
 
     def configure(self, config):
         from sqlalchemy import create_engine
-        from sqlalchemy.exc import OperationalError
-        from firenado.util.sqlalchemy_util import Session
 
-        self.__connection['engine'] = create_engine(config['url'])
+        # We will set the isolation level to READ UNCOMMITTED by default
+        # to avoid the "cache" effect sqlalchemy has without this option.
+        # Solution from: http://bit.ly/2bDq0Nv
+        # TODO: Get the isolation level from data source config
+        engine_params = {
+            'isolation_level': "READ UNCOMMITTED"
+        }
+        if 'backend' in config:
+            if config['backend'] == 'mysql':
+                # Setting connection default connection timeout for mysql
+                # backends as suggested on http://bit.ly/2bvOLxs
+                # TODO: ignore this if pool_recycle is defined on config
+                engine_params['pool_recycle'] = 3600
+
+        self.__connection['engine'] = create_engine(config['url'],
+                                                    **engine_params)
         logger.info("Connecting to the database using the engine: %s.",
                     self.__connection['engine'])
-        try:
-            self.__connection['engine'].connect()
-        except OperationalError as error:
-            logger.error("Error trying to connect to database: %s", error)
-            sys.exit(errno.ECONNREFUSED)
-
-        Session.configure(bind=self.__connection['engine'])
-        self.__connection['session'] = Session()
+        self.connect_engine()
+        self.configure_session()
         self.__connection['backend'] = config['backend']
         # TODO: Test the session right here. Without that the error
         # will just happen during the handler execution
 
     def get_connection(self):
+        # TODO: keep an eye on this:
+        # http://docs.sqlalchemy.org/en/latest/core/pooling.html
+        from sqlalchemy import select
+        from sqlalchemy.exc import OperationalError
+        conn = self.__connection['engine'].connect()
+        try:
+            conn.scalar(select([1]))
+            conn.close()
+        except OperationalError as op_error:
+            logger.warning(op_error)
+            logger.warning("Firenado will try to reestablish data source "
+                           "connection.")
+            conn.close()
+            self.__connection['engine'].dispose()
+            self.connect_engine()
+            self.configure_session()
+            logger.warning("Data source connection reestablished.")
         return self.__connection
+
+    def connect_engine(self):
+        from sqlalchemy.exc import OperationalError
+        try:
+            self.__connection['engine'].connect()
+        except OperationalError as op_error:
+            logger.error(
+                "Error trying to connect to database: %s", op_error)
+            sys.exit(errno.ECONNREFUSED)
+
+    def configure_session(self):
+        from firenado.util.sqlalchemy_util import Session
+        Session.configure(bind=self.__connection['engine'])
+        self.__connection['session'] = Session()
 
     @property
     def backend(self):

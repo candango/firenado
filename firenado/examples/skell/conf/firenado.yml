@@ -17,14 +17,14 @@ data:
 
 components:
   - id: skell
-    class: skell.application.SkellComponent
+    class: skell.app.SkellComponent
     enabled: true
   - id: internal
     class: skell.components.internal.component.SkellInternalComponent
     enabled: true
   #- id: admin
   #  enabled: true
-  - id: assets
+  - id: static_maps
     enabled: true
   - id: info
     enabled: true

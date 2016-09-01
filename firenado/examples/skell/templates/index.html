@@ -1,7 +1,18 @@
 {% extends "base.html" %}
 
-{% block content %}
+    {% block content %}
     {% module Header1(message) %}
     {% module Header2(message) %}
     {{message}}
+
+    {% module Header1("Session") %}
+    <ul>
+        <li><a href="/session">Session Counter</a></li>
+    </ul>
+
+    {% module Header1("Security") %}
+    <ul>
+        <li><a href="/login">Login</a></li>
+        <li><a href="/private">Not Public</a></li>
+    </ul>
 {% end %}

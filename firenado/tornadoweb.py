@@ -134,7 +134,7 @@ class TornadoApplication(tornado.web.Application, data.DataConnectedMixin,
                             comp_config_file)
                         self.components[key].process_config()
                     else:
-                        logger.warn('Failed to find the file for the '
+                        logger.debug('Failed to find the file for the '
                                     'component %s at %s. Component filename '
                                     'returned is %s.' % (
                                         key, firenado.conf.APP_CONFIG_PATH,
@@ -305,7 +305,7 @@ class TornadoHandler(tornado.web.RequestHandler):
                 if key is 'ignore_component':
                     ignore_component = kwargs[key]
                 if key is 'component':
-                   pass
+                    pass
         kwargs['user_agent'] = self.user_agent if hasattr(
             self, 'user_agent') else None
         kwargs['credential'] = self.credential if hasattr(
@@ -448,7 +448,7 @@ class TornadoWebSocketHandler(tornado.websocket.WebSocketHandler):
                 if key is 'ignore_component':
                     ignore_component = kwargs[key]
                 if key is 'component':
-                   pass
+                    pass
         kwargs['user_agent'] = self.user_agent if hasattr(
             self, 'user_agent') else None
         kwargs['credential'] = self.credential if hasattr(

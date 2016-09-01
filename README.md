@@ -37,7 +37,7 @@ redis data source defied and linked to the session.
 Firenado don't install redispy so it is necessary to either install it or turn
 the session as file based. You can disable the session engine too.
 
-To change the session type to file go to helloworld/conf/firenado.yaml and
+To change the session type to file go to helloworld/conf/firenado.yml and
 change the session definition to:
 
 ```yaml
@@ -54,7 +54,7 @@ session:
 ```
 
 If your helloworld project isn't on the python path just go 
-helloworld/conf/firenado.yaml and configure the application settings:
+helloworld/conf/firenado.yml and configure the application settings:
 
 ```yaml
 app:

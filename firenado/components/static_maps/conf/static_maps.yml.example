@@ -1,0 +1,9 @@
+maps:
+  - name: {map_name}
+    #root: .
+    handlers:
+    - name: "{handler_name}"
+      handler: "{handler_expression}"
+      path: "{handler_path}"
+      map_on_path: true
+      name_on_path: true

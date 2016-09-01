@@ -145,10 +145,10 @@ class SessionEnginedMixin(object):
 
 class Session(object):
 
-    def __init__(self, engine, data={}, id=None):
+    def __init__(self, engine, data=None, sess_id=None):
         self.__engine = engine
-        self.id = id
-        self.__data = data
+        self.id = sess_id
+        self.__data = {} if data is None else data
         self.__destroyed = False
         self.__changed = False
 
