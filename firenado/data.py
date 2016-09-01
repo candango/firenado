@@ -182,19 +182,23 @@ class SqlalchemyConnector(Connector):
 
     def configure(self, config):
         from sqlalchemy import create_engine
-        from sqlalchemy.exc import OperationalError
-        from firenado.util.sqlalchemy_util import Session
 
-        create_engine_params = {}
+        # We will set the isolation level to READ UNCOMMITTED by default
+        # to avoid the "cache" effect sqlalchemy has without this option.
+        # Solution from: http://bit.ly/2bDq0Nv
+        # TODO: Get the isolation level from data source config
+        engine_params = {
+            'isolation_level': "READ UNCOMMITTED"
+        }
         if 'backend' in config:
             if config['backend'] == 'mysql':
                 # Setting connection default connection timeout for mysql
                 # backends as suggested on http://bit.ly/2bvOLxs
                 # TODO: ignore this if pool_recycle is defined on config
-                create_engine_params['pool_recycle'] = 3600
+                engine_params['pool_recycle'] = 3600
 
         self.__connection['engine'] = create_engine(config['url'],
-                                                    **create_engine_params)
+                                                    **engine_params)
         logger.info("Connecting to the database using the engine: %s.",
                     self.__connection['engine'])
         self.connect_engine()
@@ -207,15 +211,20 @@ class SqlalchemyConnector(Connector):
         # TODO: keep an eye on this:
         # http://docs.sqlalchemy.org/en/latest/core/pooling.html
         from sqlalchemy import select
+        from sqlalchemy.exc import OperationalError
+        conn = self.__connection['engine'].connect()
         try:
-            self.__connection['session'].scalar(select([1]))
-        except Exception as error:
-            from sqlalchemy.exc import OperationalError
-            logger.warning(error.message)
-            self.__connection['session'].close()
+            conn.scalar(select([1]))
+            conn.close()
+        except OperationalError as op_error:
+            logger.warning(op_error)
+            logger.warning("Firenado will try to reestablish data source "
+                           "connection.")
+            conn.close()
             self.__connection['engine'].dispose()
             self.connect_engine()
             self.configure_session()
+            logger.warning("Data source connection reestablished.")
         return self.__connection
 
     def connect_engine(self):

@@ -10,7 +10,4 @@ install:
   - "pip install -r requirements-sqlalchemy.txt"
   - "pip install -r requirements-test.txt"
 script:
-  - "nosetests firenado.test.conf"
-  - "nosetests firenado.test.service"
-  - "nosetests firenado.test.tornadoweb"
-  - "nosetests firenado.test.util.file"
+  - "nosetests -v --all-modules firenado/test"
