@@ -17,7 +17,7 @@ data:
       # db: 0
 components:
   - id: {{app_name}}
-    class: {{module}}.application.{{component}}Component
+    class: {{module}}.app.{{component}}Component
     enabled: true
   #- id: admin
   #  enabled: true
