@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright 2015 Flavio Garcia
+# Copyright 2015-2016 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,8 +13,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-#
-# vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4:
+
 import os
 
 
@@ -29,6 +28,29 @@ def create_module(module, target):
         if not os.path.exists(os.path.join(target, cur_path, '__init__.py')):
             touch(os.path.join(target, cur_path, '__init__.py'))
     return cur_path
+
+def file_has_extension(filename):
+    """ Return True if the informed filename was extension on it.
+
+    :param filename: The filename.
+    :return: True if has extension.
+    """
+    if get_file_extension(filename) is None:
+        return False
+    return True
+
+
+def get_file_extension(filename):
+    """ Return the extension if the filename has it. None if not.
+
+    :param filename: The filename.
+    :return: Extension or None.
+    """
+    filename_x = filename.split('.')
+    if len(filename_x) > 1:
+        if filename_x[-1].strip() is not '':
+            return filename_x[-1]
+    return None
 
 
 def write(path, data):

@@ -1,0 +1,3 @@
+app:
+  name: "ymlapp"
+  static_path: "yml_static_path"

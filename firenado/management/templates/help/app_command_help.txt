@@ -1,0 +1,6 @@
+app <sub-command>
+
+Sub-commands are:
+
+      install        Triggers all components install methods(to install the app)
+      run            Runs the application

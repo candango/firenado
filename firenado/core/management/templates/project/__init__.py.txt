@@ -1,9 +1,0 @@
-import {{module}}.handlers
-import firenado.core
-
-class {{component}}Component(firenado.core.TornadoComponent):
-
-    def get_handlers(self):
-        return [
-            (r'/', {{module}}.handlers.IndexHandler),
-        ]
