@@ -1,0 +1,14 @@
+maps:
+  - name: bower_components
+    #root: .
+    handlers:
+    - name: "bootstrap"
+      handler: "/assets/bootstrap/(.*)"
+      path: "dist"
+      map_on_path: true
+      name_on_path: true
+    - name: "jquery"
+      handler: "/assets/jquery/(.*)"
+      path: "dist"
+      map_on_path: true
+      name_on_path: true

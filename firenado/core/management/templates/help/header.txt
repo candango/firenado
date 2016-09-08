@@ -1,4 +1,0 @@
-Firenado Framework
-{% if usage %}
-Usage: {{ parser.prog }} command
-{% end %}

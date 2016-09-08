@@ -1,7 +1,6 @@
 #!/usr/bin/env python
-# vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4:
 #
-# Copyright 2013-2014 Flavio Garcia
+# Copyright 2015-2016 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,13 +14,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from setuptools import setup
+from setuptools import setup, find_packages
+from pip.req import parse_requirements
 import firenado
 
-install_requires = [
-    "pyyaml>=3.11",
-    "tornado>=4.2.1",
-]
+# Solution from http://bit.ly/29Yl8VN
+def resolve_requires(requirements_file):
+    requirements = parse_requirements("./%s" % requirements_file,
+            session=False)
+    return [str(ir.req) for ir in requirements]
 
 setup(
     name='Firenado',
@@ -30,33 +31,20 @@ setup(
             'Tornado web framework/server.',
     license='Apache License V2.0',
     author='Flavio Garcia',
-    author_email='piraz@candango.org',
-    install_requires=install_requires,
+    author_email='piraz[at]candango.org',
+    maintainer='Flavio Garcia',
+    maintainer_email='piraz[at]candango.org',
+    install_requires=resolve_requires("requirements.txt"),
+    extras_require = {
+        'redis': resolve_requires("requirements-redis.txt"),
+        'sqlalchemy': resolve_requires("requirements-sqlalchemy.txt"),
+    },
     url='https://github.com/candango/firenado',
-    packages=[
-        'firenado',
-        'firenado.components',
-        'firenado.components.assets',
-        'firenado.components.firenado',
-        'firenado.conf',
-        'firenado.core',
-        'firenado.core.data',
-        'firenado.core.management',
-        'firenado.util',
-    ],
+    packages= find_packages(),
     package_dir={'firenado': 'firenado'},
-    package_data={'firenado': [
-        'conf/*.yaml', 'core/management/templates/*/*.txt',
-        'components/*/conf/*.yaml.example',
-        'components/*/templates/*.html',
-        'components/*/static/css/*.css',
-        'components/*/static/js/*.js',
-        'components/*/static/js/locales/*',
-        'components/*/static/js/views/*.ejs',
-
-    ]},
+    include_package_data=True,
     classifiers=[
-        'Development Status :: 1 - Planning',
+        'Development Status :: 3 - Alpha',
         'Environment :: Console',
         'Environment :: Web Environment',
         'License :: OSI Approved :: Apache Software License',
@@ -76,7 +64,6 @@ setup(
     ],
     scripts=['firenado/bin/firenado-cli.py'],
     entry_points={'console_scripts': [
-        'firenado = firenado.core.management:run_from_command_line',
+        'firenado = firenado.management:run_from_command_line',
     ]},
 )
-

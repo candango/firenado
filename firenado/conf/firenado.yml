@@ -1,0 +1,38 @@
+#
+# Firenado Framework configuration
+#
+
+components:
+  # Basic firenado Admin component
+  - id: admin
+    class: firenado.components.admin.AdminComponent
+  - id: static_maps
+    class: firenado.components.StaticMapsComponent
+  - id: info
+    class: firenado.components.FirenadoComponent
+
+data:
+  connectors:
+    - name: redis
+      class: firenado.data.RedisConnector
+    - name: sqlalchemy
+      class: firenado.data.SqlalchemyConnector
+
+log:
+  format: '%(levelname)s - %(name)s[%(module)s:%(lineno)d] - %(asctime)s - %(message)s'
+  level: INFO
+
+management:
+  commands:
+    - name: firenado
+      module: firenado.management.commands
+
+session:
+  handlers:
+    - name: file
+      class: firenado.session.FileSessionHandler
+    - name: redis
+      class: firenado.session.RedisSessionHandler
+  encoders:
+    - name: pickle
+      class: firenado.session.PickeSessionEncoder

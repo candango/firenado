@@ -1,0 +1,22 @@
+# Based on:
+# https://docs.landscape.io/configuration.html#python-targets-2-3
+doc-warnings: false
+test-warnings: false
+strictness: medium
+max-line-length: 80
+pep8:
+  full: true
+autodetect: true
+requirements:
+  - requirements.txt
+  - requirements-redis.txt
+  - requirements-sqlalchemy.txt
+  - requirements-test.txt
+ignore-paths:
+  - docs
+ignore-patterns:
+  - ^example/doc_.*\.py$
+  - (^|/)docs(/|$)
+python-targets:
+  - 2
+  - 3

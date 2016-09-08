@@ -1,0 +1,4 @@
+Firenado Framework
+{% if usage %}
+Usage: {{ parser.prog }} {%raw usage_message %}
+{% end %}

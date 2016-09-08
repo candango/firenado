@@ -1,0 +1,36 @@
+What's new in Firenado 0.1.5
+============================
+
+September 01, 2016
+---------------
+
+We are pleased to announce the release of Firenado 0.1.5.0.
+
+On this release the build was improved in order to provide extra requirements.
+
+Right now it is possible to install redis and sqlalchemy using extra
+requirements with pip or on the requirements file.
+
+Python 2.6 and 3.2 are not supported on this version to comply with Tornado
+4.4.1.
+
+Here are the highlights:
+
+Refactory
+~~~~~~~~~~~~
+
+* Depreciate python 2.6 and 3.2. `#118 <https://github.com/candango/firenado/issues/118>`_
+* Change application file from application.py to app.py. `#120 <https://github.com/candango/firenado/issues/120>`_
+
+New Features
+~~~~~~~~~~~~
+
+* Create the static maps component. `#57 <https://github.com/candango/firenado/issues/57>`_
+* Add optional requirements to setup.py. `#119 <https://github.com/candango/firenado/issues/119>`_
+
+Bug Fixes
+~~~~~~~~~
+
+* Fix managment command help. `#13 <https://github.com/candango/firenado/issues/13>`_
+* Six is not being installed by setup.py. `#121 <https://github.com/candango/firenado/issues/121>`_
+* Sqlalchemy connection is missed when database service restarts or the connection is renewed. `#127 <https://github.com/candango/firenado/issues/127>`_

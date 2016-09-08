@@ -1,7 +1,10 @@
 {% extends "skell:base.html" %}
 
 {% block content %}
-    <h1>Handling session</h1>
-    Value from session: {{session_value}}
-    <a href="/session?reset=True">Reset Value</a>
+    <h1>Session Counter</h1>
+    <p>Value from session: {{session_value}}</p>
+    <ul>
+        <li><a href="/session?reset=True">Reset Counter</a></li>
+        <li><a href="/">Index</a></li>
+    </ul>
 {% end %}
