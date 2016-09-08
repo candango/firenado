@@ -199,7 +199,7 @@ def process_log_config_section(config, log_config):
     if 'format' in log_config:
         config.log['format'] = log_config['format']
     if 'level' in log_config:
-        config.log['level'] = log_config['level']
+        config.log['level'] = log_level_from_string(log_config['level'])
 
 
 def process_management_config_section(config, management_config):

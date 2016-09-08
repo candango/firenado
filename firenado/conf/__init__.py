@@ -139,5 +139,4 @@ if HAS_APP_CONFIG_FILE:
     _config.process_app_config(sys.modules[__name__], app_config)
 
 # Set logging basic configurations
-logging.basicConfig(level=_config.log_level_from_string(log['level']),
-                    format=log['format'])
+logging.basicConfig(level=log['level'], format=log['format'])
