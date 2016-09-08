@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: UTF-8 -*-
 #
 # Copyright 2015-2016 Flavio Garcia
 #
@@ -61,9 +62,9 @@ def get_command_header(parser, usage_message="", usage=False):
     """
     loader = template.Loader(os.path.join(
         firenado.conf.ROOT, 'management', 'templates', 'help'))
-    return loader.load("header.txt").generate(parser=parser,
-                                              usage_message=usage_message,
-                                              usage=usage)
+    return loader.load("header.txt").generate(
+        parser=parser, usage_message=usage_message, usage=usage).decode(
+        sys.stdout.encoding)
 
 
 def show_command_line_usage(parser, usage=False):
@@ -76,10 +77,9 @@ def show_command_line_usage(parser, usage=False):
     help_message = loader.load("main_command_help.txt").generate(
         command_categories=command_categories,
         command_template=command_template
-    )
+    ).decode(sys.stdout.encoding)
     # TODO: This print has to go. Use proper stream instead(stdout or stderr)
-    print(''.join([help_header_message.decode(sys.stdout.encoding),
-                   help_message.decode(sys.stdout.encoding)]))
+    print(''.join([help_header_message, help_message]))
 
 
 def command_exists(command):

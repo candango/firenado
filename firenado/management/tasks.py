@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: UTF-8 -*-
 #
 # Copyright 2015-2016 Flavio Garcia
 #
@@ -49,12 +50,13 @@ class CreateProjectTask(ManagementTask):
             # Generating application firenado component and handlers
             _file.write(os.path.join(project_directory, "__init__.py"), "")
             _file.write(os.path.join(project_directory, "app.py"),
-                        project_init_content)
+                        project_init_content.decode(sys.stdout.encoding))
             handlers_file_name = os.path.join(project_directory, "handlers.py")
             _file.touch(handlers_file_name)
             project_handlers_content = loader.load("handlers.py.txt").generate(
                 handlers=["Index"])
-            _file.write(handlers_file_name, project_handlers_content)
+            _file.write(handlers_file_name,
+                        project_handlers_content.decode(sys.stdout.encoding))
             # Generating configuration
             project_conf_directory = os.path.join(project_directory, "conf")
             os.mkdir(project_conf_directory)
@@ -63,7 +65,8 @@ class CreateProjectTask(ManagementTask):
             _file.touch(project_conf_file)
             project_init_content = loader.load("firenado.yml.txt").generate(
                 app_name=project_name, module=module, component=component)
-            _file.write(project_conf_file, project_init_content)
+            _file.write(project_conf_file,
+                        project_init_content.decode(sys.stdout.encoding))
         else:
             #TODO: This thing has to go. The parameter validation should be
             #TODO: executed by the argument parser.
