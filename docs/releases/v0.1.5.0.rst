@@ -1,8 +1,8 @@
-What's new in Firenado 0.1.5
-============================
+What's new in Firenado 0.1.5.0
+==============================
 
 September 01, 2016
----------------
+------------------
 
 We are pleased to announce the release of Firenado 0.1.5.0.
 
@@ -17,7 +17,7 @@ Python 2.6 and 3.2 are not supported on this version to comply with Tornado
 Here are the highlights:
 
 Refactory
-~~~~~~~~~~~~
+~~~~~~~~~
 
 * Depreciate python 2.6 and 3.2. `#118 <https://github.com/candango/firenado/issues/118>`_
 * Change application file from application.py to app.py. `#120 <https://github.com/candango/firenado/issues/120>`_
