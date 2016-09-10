@@ -1,19 +1,21 @@
 What's new in Firenado 0.1.5.1
 ==============================
 
-June 30, 2016
--------------
+September 11, 2016
+------------------
 
-Release description here.
+We are pleased to announce the release of Firenado 0.1.5.1.
+
+This fixes some management tasks bugs and handles the sqlalchemy data source
+disconnect issue better.
 
 Here are the highlights:
-
-New Features
-~~~~~~~~~~~~
-
-* Features go here.
 
 Bug Fixes
 ~~~~~~~~~
 
 * Bug fixes go here.
+
+* Firenado project init is broken. `#138 <https://github.com/candango/firenado/issues/138>`_
+* Sub-command help is not being parsed correctly. `#139 <https://github.com/candango/firenado/issues/139>`_
+* Sqlalchemy session has errors after some time. `#145 <https://github.com/candango/firenado/issues/145>`_
