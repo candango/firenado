@@ -1,13 +1,13 @@
 What's new in Firenado 0.1.5.1
 ==============================
 
-September 11, 2016
+September 10, 2016
 ------------------
 
 We are pleased to announce the release of Firenado 0.1.5.1.
 
-This fixes some management tasks bugs and handles the sqlalchemy data source
-disconnect issue better.
+This release fixes some management tasks bugs and handles the sqlalchemy data
+source disconnect issue better.
 
 Here are the highlights:
 
