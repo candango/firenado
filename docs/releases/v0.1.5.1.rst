@@ -14,8 +14,6 @@ Here are the highlights:
 Bug Fixes
 ~~~~~~~~~
 
-* Bug fixes go here.
-
 * Firenado project init is broken. `#138 <https://github.com/candango/firenado/issues/138>`_
 * Sub-command help is not being parsed correctly. `#139 <https://github.com/candango/firenado/issues/139>`_
 * Sqlalchemy session has errors after some time. `#145 <https://github.com/candango/firenado/issues/145>`_
