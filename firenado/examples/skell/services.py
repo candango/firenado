@@ -25,6 +25,7 @@ def password_digest(pass_phrase):
     m.update(pass_phrase.encode('utf-8'))
     return m.hexdigest()
 
+
 class LoginService(service.FirenadoService):
 
     def __init__(self, handler, data_source=None):
@@ -64,13 +65,16 @@ class UserService(service.FirenadoService):
         db_session = self.get_data_source('test').session
         db_session.add(user)
         db_session.commit()
+        db_session.close()
         return user
 
     def by_username(self, username):
         created_utc = datetime.datetime.utcnow()
 
         db_session = self.get_data_source('test').session
-        return db_session.query(UserBase).filter(
+        user = db_session.query(UserBase).filter(
             UserBase.username == username).first()
+        db_session.close()
+        return user
 
 

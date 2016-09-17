@@ -50,7 +50,6 @@ class LoginHandler(firenado.tornadoweb.TornadoHandler):
             errors = self.session.get('login_errors')
         self.render("login.html", errors=errors)
 
-    @tornado.web.authenticated
     @service.served_by("skell.services.LoginService")
     def post(self):
         self.session.delete('login_errors')
