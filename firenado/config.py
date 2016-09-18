@@ -128,6 +128,10 @@ def process_app_config_section(config, app_config):
             config.app['data']['sources'] = app_config['data']['sources']
     if 'debug' in app_config:
         config.app['debug'] = app_config['debug']
+    if 'login' in app_config:
+        if 'urls' in app_config['login']:
+            for url in app_config['login']['urls']:
+                config.app['login']['urls'][url['name']] = url['value']
     if 'pythonpath' in app_config:
         config.app['pythonpath'] = app_config['pythonpath']
     if 'port' in app_config:
