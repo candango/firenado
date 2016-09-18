@@ -96,8 +96,9 @@ app['types'] = {}
 app['types']['tornado'] = {}
 app['types']['tornado']['name'] = "tornado"
 app['types']['tornado']['launcher'] = {}
-app['types']['tornado']['launcher']['class'] = 'TornadoLauncher'
-app['types']['tornado']['launcher']['module'] = 'firenado.tornadoweb'
+app['types']['tornado']['launcher']['class'] = "TornadoLauncher"
+app['types']['tornado']['launcher']['module'] = "firenado.tornadoweb"
+app['xsrf_cookies'] = False
 
 # Component section
 components = {}

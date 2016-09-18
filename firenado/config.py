@@ -147,6 +147,8 @@ def process_app_config_section(config, app_config):
             app_type['launcher'] = get_config_from_package(
                 app_type['launcher'])
             config.app['types'][app_type['name']] = app_type
+    if 'xsrf_cookies' in app_config:
+        config.app['xsrf_cookies'] = app_config['xsrf_cookies']
 
 
 def process_components_config_section(config, components_config):

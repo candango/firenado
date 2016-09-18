@@ -98,6 +98,8 @@ class TornadoApplication(tornado.web.Application, data.DataConnectedMixin,
             settings['ui_modules'] = ui_modules
         if firenado.conf.app['cookie_secret']:
             settings['cookie_secret'] = firenado.conf.app['cookie_secret']
+        if firenado.conf.app['xsrf_cookies']:
+            settings['xsrf_cookies'] = firenado.conf.app['xsrf_cookies']
         tornado.web.Application.__init__(self, handlers=handlers,
                                          default_host=default_host,
                                          transforms=transforms, **settings)
