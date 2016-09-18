@@ -21,10 +21,11 @@ import os
 import six
 
 if six.PY3:
-    if six.PY34:
+    try:
         import importlib
         reload = importlib.reload
-    else:
+    except ImportError:
+        # PY33
         import imp
         reload = imp.reload
 
