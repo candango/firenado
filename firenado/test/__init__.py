@@ -24,7 +24,7 @@ if six.PY3:
     try:
         import importlib
         reload = importlib.reload
-    except ImportError:
+    except AttributeError:
         # PY33
         import imp
         reload = imp.reload
