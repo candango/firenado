@@ -78,7 +78,8 @@ app = {}
 # Key to to be used on on the session context to store and retrieve the current
 # logged user
 app['component'] = None
-app['current_user_key'] = '__FIRENADO_CURRENT_USER_KEY__'
+app['cookie_secret'] = None
+app['current_user_key'] = "__FIRENADO_CURRENT_USER_KEY__"
 app['data'] = {}
 app['data']['sources'] = []
 app['debug'] = False
@@ -86,17 +87,18 @@ app['pythonpath'] = None
 app['port'] = 8888
 app['login'] = {}
 app['login']['urls'] = {}
-app['login']['urls']['default'] = '/login'
+app['login']['urls']['default'] = "/login"
 app['is_on_dir'] = False
 app['socket'] = None
 app['static_path'] = None
-app['type'] = 'tornado'
+app['type'] = "tornado"
 app['types'] = {}
 app['types']['tornado'] = {}
-app['types']['tornado']['name'] = 'tornado'
+app['types']['tornado']['name'] = "tornado"
 app['types']['tornado']['launcher'] = {}
-app['types']['tornado']['launcher']['class'] = 'TornadoLauncher'
-app['types']['tornado']['launcher']['module'] = 'firenado.tornadoweb'
+app['types']['tornado']['launcher']['class'] = "TornadoLauncher"
+app['types']['tornado']['launcher']['module'] = "firenado.tornadoweb"
+app['xsrf_cookies'] = False
 
 # Component section
 components = {}

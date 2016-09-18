@@ -6,6 +6,14 @@ app:
         - session
         - test
   pythonpath: ..
+  login:
+    urls:
+      - name: default
+        value: skell_login
+      - name: custom
+        value: custom_login
+  cookie_secret: "rebfcrj1qc81j76pxhb10pbrewe7exmjghftll93jh6sgporsc7igvrgk9l9oy9u"
+  xsrf_cookies: true
   port: 8888
 
 data:

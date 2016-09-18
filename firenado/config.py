@@ -121,11 +121,17 @@ def process_app_config_section(config, app_config):
     """
     if 'component' in app_config:
         config.app['component'] = app_config['component']
+    if 'cookie_secret' in app_config:
+        config.app['cookie_secret'] = app_config['cookie_secret']
     if 'data' in app_config:
         if 'sources' in app_config['data']:
             config.app['data']['sources'] = app_config['data']['sources']
     if 'debug' in app_config:
         config.app['debug'] = app_config['debug']
+    if 'login' in app_config:
+        if 'urls' in app_config['login']:
+            for url in app_config['login']['urls']:
+                config.app['login']['urls'][url['name']] = url['value']
     if 'pythonpath' in app_config:
         config.app['pythonpath'] = app_config['pythonpath']
     if 'port' in app_config:
@@ -141,6 +147,8 @@ def process_app_config_section(config, app_config):
             app_type['launcher'] = get_config_from_package(
                 app_type['launcher'])
             config.app['types'][app_type['name']] = app_type
+    if 'xsrf_cookies' in app_config:
+        config.app['xsrf_cookies'] = app_config['xsrf_cookies']
 
 
 def process_components_config_section(config, components_config):

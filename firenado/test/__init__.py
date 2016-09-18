@@ -21,8 +21,13 @@ import os
 import six
 
 if six.PY3:
-    import importlib
-    reload = importlib.reload
+    try:
+        import importlib
+        reload = importlib.reload
+    except AttributeError:
+        # PY33
+        import imp
+        reload = imp.reload
 
 
 def chdir_app(app_name, dir_name=None):
@@ -43,3 +48,4 @@ def chdir_app(app_name, dir_name=None):
         test_app_dirname = os.path.join(test_dirname, 'resources', app_name)
     os.chdir(test_app_dirname)
     reload(firenado.conf)
+

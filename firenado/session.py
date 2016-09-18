@@ -65,7 +65,6 @@ class SessionEngine(object):
                 session = self.__renew_session(request_handler)
             else:
                 session.id = session_id
-            # TODO: Check if the session is stored
             if not self.session_handler.is_session_stored(session_id):
                 if not cookie_created_on_request:
                     # Regenerating the session id. Because the
@@ -237,13 +236,26 @@ class SessionHandler(object):
     @staticmethod
     def create_session_id_cookie(request_handler):
         session_id = SessionHandler.__generate_session_id()
-        request_handler.set_cookie(
-            firenado.conf.session['name'], session_id,
-            **SessionHandler.__session_id_cookie_settings())
+        if 'cookie_secret' in request_handler.application.settings:
+            settings = SessionHandler.__session_id_cookie_settings(secret=True)
+            expires_days = settings.pop('expires_days')
+            request_handler.set_secure_cookie(
+                firenado.conf.session['name'], session_id,
+                expires_days=expires_days)
+        else:
+            request_handler.set_cookie(
+                name=firenado.conf.session['name'], value=session_id,
+                **SessionHandler.__session_id_cookie_settings())
         return session_id
 
     @staticmethod
     def get_session_id_cookie(request_handler):
+        if 'cookie_secret' in request_handler.application.settings:
+            cookie_id = request_handler.get_secure_cookie(
+                firenado.conf.session['name'])
+            if cookie_id is not None:
+                return cookie_id.decode()
+            return cookie_id
         return request_handler.get_cookie(firenado.conf.session['name'])
 
     def is_session_stored(self, session_id):
@@ -256,11 +268,13 @@ class SessionHandler(object):
         self.settings = settings
 
     @staticmethod
-    def __session_id_cookie_settings():
+    def __session_id_cookie_settings(secret=False):
         """ Defines some settings to be used with the session id cookie. """
         cookie_settings = {}
         cookie_settings.setdefault('expires', None)
         cookie_settings.setdefault('expires_days', None)
+        if secret:
+            cookie_settings['expires_days'] = 30
         return cookie_settings
 
     @staticmethod
