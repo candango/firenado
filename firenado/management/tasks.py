@@ -113,3 +113,12 @@ class RunApplicationTask(ManagementTask):
         app_type = firenado.conf.app['types'][firenado.conf.app['type']]
         launcher = get_class_from_config(app_type['launcher'])()
         launcher.launch()
+
+
+class GenerateCookieSecretTask(ManagementTask):
+    """ Generates a radom string to serve as the cookie secret for an
+    application.
+    """
+    def run(self, namespace):
+        from firenado.util import random_string
+        print(random_string(64))

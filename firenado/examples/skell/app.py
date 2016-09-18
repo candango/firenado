@@ -23,10 +23,12 @@ from skell import uimodules
 class SkellComponent(firenado.tornadoweb.TornadoComponent):
 
     def get_handlers(self):
+        import firenado.conf
+        default_login = firenado.conf.app['login']['urls']['default']
         return [
-            (r'/', skell.handlers.IndexHandler),
-            (r'/session', skell.handlers.SessionHandler),
-            (r'/login', skell.handlers.LoginHandler),
+            (r"/", skell.handlers.IndexHandler),
+            (r"/session", skell.handlers.SessionHandler),
+            (r"/%s" % default_login, skell.handlers.LoginHandler),
         ]
 
     def get_ui_modules(self):
