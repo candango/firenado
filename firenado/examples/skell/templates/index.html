@@ -3,7 +3,7 @@
     {% block content %}
     {% module Header1(message) %}
     {% module Header2(message) %}
-    {{message}}
+    {{ message }}
 
     {% module Header1("Session") %}
     <ul>
@@ -12,7 +12,7 @@
 
     {% module Header1("Security") %}
     <ul>
-        <li><a href="/login">Login</a></li>
+        <li><a href="/{{ login_url }}">Login</a></li>
         <li><a href="/private">Not Public</a></li>
     </ul>
 {% end %}
