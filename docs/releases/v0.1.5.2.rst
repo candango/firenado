@@ -1,0 +1,19 @@
+What's new in Firenado 0.1.5.2
+==============================
+
+June 30, 2016
+-------------
+
+Release description here.
+
+Here are the highlights:
+
+New Features
+~~~~~~~~~~~~
+
+* Features go here.
+
+Bug Fixes
+~~~~~~~~~
+
+* Bug fixes go here.
