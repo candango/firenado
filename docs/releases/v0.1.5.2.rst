@@ -1,0 +1,20 @@
+What's new in Firenado 0.1.5.2
+==============================
+
+September 18, 2016
+------------------
+
+We are pleased to announce the release of Firenado 0.1.5.2.
+
+This release add some features to secure cookies, prevent xsrf attacks and add
+login urls to the app.
+
+Here are the highlights:
+
+Features
+~~~~~~~~
+
+* Add cookie_secret to the config core feature session tornadoweb. `#123 <https://github.com/candango/firenado/issues/123>`_
+* Add login url to the app config . `#153 <https://github.com/candango/firenado/issues/153>`_
+* Add xsrf_cookies to the app config. `#154 <https://github.com/candango/firenado/issues/154>`_
+* Add management task to generate random cookie secrets. `#155 <https://github.com/candango/firenado/issues/155>`_

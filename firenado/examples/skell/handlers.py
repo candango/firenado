@@ -14,13 +14,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import firenado.conf
 import firenado.tornadoweb
 
 
 class IndexHandler(firenado.tornadoweb.TornadoHandler):
 
     def get(self):
-        self.render("index.html", message="Hello world!!!")
+        default_login = firenado.conf.app['login']['urls']['default']
+        self.render("index.html", message="Hello world!!!",
+                    login_url=default_login)
 
 
 class SessionHandler(firenado.tornadoweb.TornadoHandler):
@@ -45,12 +48,15 @@ class LoginHandler(firenado.tornadoweb.TornadoHandler):
     PASSWORD = "test"  # noqa
 
     def get(self):
+        default_login = firenado.conf.app['login']['urls']['default']
         errors = {}
         if self.session.has('login_errors'):
             errors = self.session.get('login_errors')
-        self.render("login.html", errors=errors)
+        self.render("login.html", errors=errors,
+                    login_url=default_login)
 
     def post(self):
+        default_login = firenado.conf.app['login']['urls']['default']
         username = self.get_argument('username')
         password = self.get_argument('password')
         errors = {}
@@ -64,4 +70,4 @@ class LoginHandler(firenado.tornadoweb.TornadoHandler):
 
         if errors:
             self.session.set('login_errors', errors)
-            self.redirect("login")
+            self.redirect(default_login)
