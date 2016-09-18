@@ -30,6 +30,9 @@ ManagementCommand(
                           tasks=tasks.InstallProjectTask),
         ManagementCommand('run', 'Runs a Firenado application', '',
                           tasks=tasks.RunApplicationTask),
+        ManagementCommand("cookie_secret_gen",
+                          "Generates a random cookie secret", "",
+                          tasks=tasks.GenerateCookieSecretTask),
     ])
 ManagementCommand(
     'project', 'Project related commands',

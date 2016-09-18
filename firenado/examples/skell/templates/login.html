@@ -1,7 +1,8 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <form class="form-signin" action="login" method="post">
+    <form class="form-signin" action="/{{ login_url }}" method="post">
+        {% module xsrf_form_html() %}
         <h2 class="form-signin-heading">Please sign in</h2>
         <label for="username" class="sr-only">User Name</label>
         <input type="login" id="username" name="username" class="form-control" placeholder="User Name" autofocus>
