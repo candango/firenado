@@ -96,6 +96,8 @@ class TornadoApplication(tornado.web.Application, data.DataConnectedMixin,
                     os.path.dirname(__file__), "static")
         if len(ui_modules) > 0:
             settings['ui_modules'] = ui_modules
+        if firenado.conf.app['cookie_secret']:
+            settings['cookie_secret'] = firenado.conf.app['cookie_secret']
         tornado.web.Application.__init__(self, handlers=handlers,
                                          default_host=default_host,
                                          transforms=transforms, **settings)
