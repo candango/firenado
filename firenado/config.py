@@ -121,6 +121,8 @@ def process_app_config_section(config, app_config):
     """
     if 'component' in app_config:
         config.app['component'] = app_config['component']
+    if 'cookie_secret' in app_config:
+        config.app['cookie_secret'] = app_config['cookie_secret']
     if 'data' in app_config:
         if 'sources' in app_config['data']:
             config.app['data']['sources'] = app_config['data']['sources']

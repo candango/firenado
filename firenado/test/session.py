@@ -71,9 +71,6 @@ class SessionTestCase(unittest.TestCase):
         app_session_handler_class = \
             application.session_engine.session_handler.__class__
         self.assertEquals(app_session_handler_class, session_handler_class)
-        print(str(session_handler_class))
-
-        print(application.session_engine.session_handler.__class__)
 
         sess_handler_path = application.session_engine.session_handler.path
 
