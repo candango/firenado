@@ -9,9 +9,6 @@ We are pleased to announce the release of Firenado 0.1.5.2.
 This release add some features to secure cookies, prevent xsrf attacks and add
 login urls to the app.
 
-Another feature is the ability to add permission level to the socket file
-created by the application.
-
 Here are the highlights:
 
 Features
