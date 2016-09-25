@@ -291,6 +291,12 @@ class TornadoHandler(tornado.web.RequestHandler):
         """
         self.__template_variables[name] = variable
 
+    def is_mobile(self):
+        from .util import browser
+        if 'User-Agent' in self.request.headers:
+            return browser.is_mobile(self.request.headers['User-Agent'])
+        return False
+
     @session.read
     def prepare(self):
         pass
