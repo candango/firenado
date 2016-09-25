@@ -91,6 +91,7 @@ app['login']['urls']['default'] = "/login"
 app['is_on_dir'] = False
 app['socket'] = None
 app['static_path'] = None
+app['static_url_prefix'] = "/static"
 app['type'] = "tornado"
 app['types'] = {}
 app['types']['tornado'] = {}

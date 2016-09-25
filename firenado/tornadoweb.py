@@ -94,6 +94,10 @@ class TornadoApplication(tornado.web.Application, data.DataConnectedMixin,
         else:
             settings['static_path'] = os.path.join(
                     os.path.dirname(__file__), "static")
+        static_url_prefix = firenado.conf.app['static_url_prefix']
+        if static_url_prefix != "/":
+            static_url_prefix = "%s/" % static_url_prefix
+        settings['static_url_prefix'] = static_url_prefix
         if len(ui_modules) > 0:
             settings['ui_modules'] = ui_modules
         if firenado.conf.app['cookie_secret']:
