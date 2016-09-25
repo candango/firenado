@@ -66,13 +66,13 @@ class ApplicationComponentTestCase(unittest.TestCase):
                 firenado.conf.APP_CONFIG_FILE))
 
     def test_static_path(self):
-        """ If static path is defined than app configuration should get it.
+        """ If static path is defined on the app configuration.
         """
         chdir_app("yml", "conf")
         self.assertEquals("yml_static_path", firenado.conf.app['static_path'])
 
     def test_static_path(self):
-        """ If static path is defined than app configuration should get it.
+        """ If static url prefix is defined on the app configuration.
         """
         chdir_app("yml", "conf")
         self.assertEquals("yml_static_url_prefix",
