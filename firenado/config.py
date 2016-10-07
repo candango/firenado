@@ -136,6 +136,8 @@ def process_app_config_section(config, app_config):
         config.app['pythonpath'] = app_config['pythonpath']
     if 'port' in app_config:
         config.app['port'] = app_config['port']
+    if 'settings' in app_config:
+        config.app['settings'] = app_config['settings']
     if 'socket' in app_config:
         config.app['socket'] = app_config['socket']
     if 'static_path' in app_config:

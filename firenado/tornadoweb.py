@@ -53,6 +53,7 @@ class TornadoApplication(tornado.web.Application, data.DataConnectedMixin,
         logger.debug('Wiring application located at %s.' %
                      firenado.conf.APP_ROOT_PATH)
         self.components = {}
+        settings.update(firenado.conf.app['settings'])
         handlers = []
         ui_modules = []
         data.configure_data_sources(firenado.conf.app['data']['sources'], self)

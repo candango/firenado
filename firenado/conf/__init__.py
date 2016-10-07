@@ -89,6 +89,7 @@ app['login'] = {}
 app['login']['urls'] = {}
 app['login']['urls']['default'] = "/login"
 app['is_on_dir'] = False
+app['settings'] = {}
 app['socket'] = None
 app['static_path'] = None
 app['static_url_prefix'] = "/static"
