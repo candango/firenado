@@ -24,6 +24,7 @@ from tornado import gen
 
 
 class TwitterHandlerMixin:
+
     COOKIE_NAME = 'twitterdemo_user'
 
     def get_current_user(self):
