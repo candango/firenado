@@ -1,0 +1,27 @@
+What's new in Firenado 0.1.5.3
+==============================
+
+October 09, 2016
+----------------
+
+We are pleased to announce the release of Firenado 0.1.5.3.
+
+We added couple features to give more flexibility to configure the application
+and check if the request was sent by a mobile device.
+
+The Tornado examples to handle Facebook and Twitter Oauth were added to the
+project and a Google one was created based on the Twitter one.
+
+Here are the highlights:
+
+New Features
+~~~~~~~~~~~~
+
+* Create method to check if the handler is dealing with a mobile. `#161 <https://github.com/candango/firenado/issues/161>`_
+* Add static_url_prefix to the config file. `#162 <https://github.com/candango/firenado/issues/162>`_
+* Add settings configuration list to the app config. `#163 <https://github.com/candango/firenado/issues/163>`_
+
+Examples
+~~~~~~~~
+
+* Create examples using facebook, twitter and google authentication. `#164 <https://github.com/candango/firenado/issues/164>`_

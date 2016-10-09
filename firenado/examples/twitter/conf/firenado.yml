@@ -1,0 +1,39 @@
+app:
+  component: 'twitter'
+  data:
+    sources:
+        # Set here references from sources defined on data.sources
+        - 'session'
+  #pythonpath: '..'
+  #type: 'tornado'
+  port: 8888
+  settings:
+    twitter_consumer_key: "__TODO:_YOUR_TWITTER_CONSUMER_KEY__"
+    twitter_consumer_secret: "__TODO:_YOUR_TWITTER_CONSUMER_SECRET__"
+    cookie_secret: "__TODO:_GENERATE_YOUR_OWN_RANDOM_VALUE_HERE__"
+data:
+  sources:
+    - name: session
+      connector: redis
+      # host: localhost
+      # port: 6379
+      # db: 0
+components:
+  - id: twitter
+    class: twitter.app.TwitterComponent
+    enabled: true
+  #- id: admin
+  #  enabled: true
+  #- id: info
+  #  enabled: true
+
+# Session types could be:
+# file or redis.
+session:
+  type: redis
+  enabled: true
+  # Redis session handler configuration
+  data:
+    source: session
+  # File session handler related configuration
+  # path: /tmp
