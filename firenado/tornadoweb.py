@@ -53,6 +53,7 @@ class TornadoApplication(tornado.web.Application, data.DataConnectedMixin,
         logger.debug('Wiring application located at %s.' %
                      firenado.conf.APP_ROOT_PATH)
         self.components = {}
+        settings.update(firenado.conf.app['settings'])
         handlers = []
         ui_modules = []
         data.configure_data_sources(firenado.conf.app['data']['sources'], self)
@@ -94,6 +95,10 @@ class TornadoApplication(tornado.web.Application, data.DataConnectedMixin,
         else:
             settings['static_path'] = os.path.join(
                     os.path.dirname(__file__), "static")
+        static_url_prefix = firenado.conf.app['static_url_prefix']
+        if static_url_prefix != "/":
+            static_url_prefix = "%s/" % static_url_prefix
+        settings['static_url_prefix'] = static_url_prefix
         if len(ui_modules) > 0:
             settings['ui_modules'] = ui_modules
         if firenado.conf.app['cookie_secret']:
@@ -290,6 +295,12 @@ class TornadoHandler(tornado.web.RequestHandler):
         the render or render_string execution.
         """
         self.__template_variables[name] = variable
+
+    def is_mobile(self):
+        from .util import browser
+        if 'User-Agent' in self.request.headers:
+            return browser.is_mobile(self.request.headers['User-Agent'])
+        return False
 
     @session.read
     def prepare(self):

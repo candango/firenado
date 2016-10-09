@@ -14,10 +14,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import facebook.handlers
+import firenado.tornadoweb
+import tornado
 
-"""The Firenado Framework"""
 
-from __future__ import (absolute_import, division, print_function,
-                        with_statement)
+class FacebookComponent(firenado.tornadoweb.TornadoComponent):
 
-__version__ = (0, 1, 5, 3)
+    def get_handlers(self):
+        return [
+            (r'/', facebook.handlers.MainHandler),
+            (r"/auth/login", facebook.handlers.AuthLoginHandler),
+            (r"/auth/logout", facebook.handlers.AuthLogoutHandler),
+        ]
+
+    def get_ui_modules(self):
+        return {"Post": PostModule}
+
+
+class PostModule(tornado.web.UIModule):
+    def render(self, post):
+        return self.render_string("modules/post.html", post=post)

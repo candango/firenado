@@ -14,10 +14,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import twitter.handlers
+import firenado.tornadoweb
 
-"""The Firenado Framework"""
 
-from __future__ import (absolute_import, division, print_function,
-                        with_statement)
+class TwitterComponent(firenado.tornadoweb.TornadoComponent):
 
-__version__ = (0, 1, 5, 3)
+    def get_handlers(self):
+        return [
+            ('/', twitter.handlers.MainHandler),
+            ('/login', twitter.handlers.LoginHandler),
+            ('/logout', twitter.handlers.LogoutHandler)
+        ]
