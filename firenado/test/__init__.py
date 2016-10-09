@@ -48,3 +48,4 @@ def chdir_app(app_name, dir_name=None):
         test_app_dirname = os.path.join(test_dirname, 'resources', app_name)
     os.chdir(test_app_dirname)
     reload(firenado.conf)
+

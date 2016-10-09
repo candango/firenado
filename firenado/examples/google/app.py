@@ -14,11 +14,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import google.handlers
+import firenado.tornadoweb
 
-"""The Firenado Framework"""
 
-from __future__ import (absolute_import, division, print_function,
-                        with_statement)
+class GoogleComponent(firenado.tornadoweb.TornadoComponent):
 
-__version__ = (0, 1, 5, 99)
-
+    def get_handlers(self):
+        return [
+            ('/', google.handlers.MainHandler),
+            ('/login', google.handlers.LoginHandler),
+            ('/logout', google.handlers.LogoutHandler)
+        ]

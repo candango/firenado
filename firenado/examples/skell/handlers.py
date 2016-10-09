@@ -16,11 +16,14 @@
 
 import firenado.conf
 import firenado.tornadoweb
+from firenado import service
+import tornado.web
 
 
 class IndexHandler(firenado.tornadoweb.TornadoHandler):
 
     def get(self):
+        import firenado.conf
         default_login = firenado.conf.app['login']['urls']['default']
         self.render("index.html", message="Hello world!!!",
                     login_url=default_login)
@@ -44,9 +47,6 @@ class SessionHandler(firenado.tornadoweb.TornadoHandler):
 
 class LoginHandler(firenado.tornadoweb.TornadoHandler):
 
-    USERNAME = "test"
-    PASSWORD = "test"  # noqa
-
     def get(self):
         default_login = firenado.conf.app['login']['urls']['default']
         errors = {}
@@ -55,19 +55,23 @@ class LoginHandler(firenado.tornadoweb.TornadoHandler):
         self.render("login.html", errors=errors,
                     login_url=default_login)
 
+    @service.served_by("skell.services.LoginService")
     def post(self):
+        self.session.delete('login_errors')
         default_login = firenado.conf.app['login']['urls']['default']
         username = self.get_argument('username')
         password = self.get_argument('password')
         errors = {}
-
         if username == "":
             errors['username'] = "Please inform the username"
         if password == "":
             errors['password'] = "Please inform the password"
 
-        self.session.delete('login_errors')
+        if not errors:
+            if not self.login_service.is_valid(username, password):
+                errors['fail'] = "Invalid login"
 
         if errors:
             self.session.set('login_errors', errors)
             self.redirect(default_login)
+

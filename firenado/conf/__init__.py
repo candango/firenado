@@ -89,8 +89,10 @@ app['login'] = {}
 app['login']['urls'] = {}
 app['login']['urls']['default'] = "/login"
 app['is_on_dir'] = False
+app['settings'] = {}
 app['socket'] = None
 app['static_path'] = None
+app['static_url_prefix'] = "/static"
 app['type'] = "tornado"
 app['types'] = {}
 app['types']['tornado'] = {}
@@ -141,5 +143,4 @@ if HAS_APP_CONFIG_FILE:
     _config.process_app_config(sys.modules[__name__], app_config)
 
 # Set logging basic configurations
-logging.basicConfig(level=_config.log_level_from_string(log['level']),
-                    format=log['format'])
+logging.basicConfig(level=log['level'], format=log['format'])

@@ -136,10 +136,14 @@ def process_app_config_section(config, app_config):
         config.app['pythonpath'] = app_config['pythonpath']
     if 'port' in app_config:
         config.app['port'] = app_config['port']
+    if 'settings' in app_config:
+        config.app['settings'] = app_config['settings']
     if 'socket' in app_config:
         config.app['socket'] = app_config['socket']
     if 'static_path' in app_config:
         config.app['static_path'] = app_config['static_path']
+    if 'static_url_prefix' in app_config:
+        config.app['static_url_prefix'] = app_config['static_url_prefix']
     if 'type' in app_config:
         config.app['type'] = app_config['type']
     if 'types' in app_config:
@@ -207,7 +211,7 @@ def process_log_config_section(config, log_config):
     if 'format' in log_config:
         config.log['format'] = log_config['format']
     if 'level' in log_config:
-        config.log['level'] = log_config['level']
+        config.log['level'] = log_level_from_string(log_config['level'])
 
 
 def process_management_config_section(config, management_config):

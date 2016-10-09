@@ -4,6 +4,7 @@ app:
     sources:
         # Set here references from sources defined on data.sources
         - session
+        - test
   pythonpath: ..
   login:
     urls:
@@ -22,6 +23,9 @@ data:
       # host: localhost
       # port: 6379
       # db: 0
+    - name: test
+      connector: sqlalchemy
+      url: mysql+pymysql://root:rootpass@localhost:3306/test
 
 components:
   - id: skell
