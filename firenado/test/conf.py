@@ -39,7 +39,7 @@ class ApplicationComponentTestCase(unittest.TestCase):
         """ Application config is provided. Test if the app config file was
         loaded.
         """
-        chdir_app('yml', 'conf')
+        chdir_app("yml", "conf")
         self.assertEquals(firenado.conf.stack[0],
                           firenado.conf.LIB_CONFIG_FILE)
         self.assertEquals(firenado.conf.stack[1],
@@ -49,39 +49,45 @@ class ApplicationComponentTestCase(unittest.TestCase):
         """ Checks if the app port is set correctly.
         """
         # Loading file from test/resources/session/file/conf/firenado.yml
-        chdir_app('file', 'session')
+        chdir_app("file", "session")
         self.assertTrue(firenado.conf.app['socket'] is None)
         self.assertEquals(firenado.conf.app['port'], 8887)
 
     def test_app_pythonpath(self):
-        chdir_app('file', 'session')
+        chdir_app("file", "session")
         self.assertEquals(firenado.conf.app['pythonpath'], "..")
 
     def test_yml_loaded(self):
         """ On an application with a yml and yaml config files the yml should
         be loaded.
         """
-        chdir_app('yml', 'conf')
-        self.assertEquals('yml', _file.get_file_extension(
+        chdir_app("yml", "conf")
+        self.assertEquals("yml", _file.get_file_extension(
                 firenado.conf.APP_CONFIG_FILE))
 
     def test_static_path(self):
-        """ If static path is defined than app configuration should get it.
+        """ If static path is defined on the app configuration.
         """
-        chdir_app('yml', 'conf')
-        self.assertEquals('yml_static_path', firenado.conf.app['static_path'])
+        chdir_app("yml", "conf")
+        self.assertEquals("yml_static_path", firenado.conf.app['static_path'])
+
+    def test_static_path(self):
+        """ If static url prefix is defined on the app configuration.
+        """
+        chdir_app("yml", "conf")
+        self.assertEquals("yml_static_url_prefix",
+                          firenado.conf.app['static_url_prefix'])
 
     def test_session_type_file(self):
         """ Checks if the session is enabled and the type is file
         """
-        chdir_app('file', 'session')
+        chdir_app("file", "session")
         self.assertEquals(firenado.conf.session['enabled'], True)
         self.assertEquals(firenado.conf.session['type'], "file")
-
 
     def test_session_type_redis(self):
         """ Checks if the session is enabled and the type is redis
         """
-        chdir_app('redis', 'session')
+        chdir_app("redis", "session")
         self.assertEquals(firenado.conf.session['enabled'], True)
-        self.assertEquals(firenado.conf.session['type'], 'redis')
+        self.assertEquals(firenado.conf.session['type'], "redis")

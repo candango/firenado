@@ -1,0 +1,44 @@
+app:
+  component: "facebook"
+  data:
+    sources:
+        # Set here references from sources defined on data.sources
+        - "session"
+  #pythonpath: ".."
+  #type: "tornado"
+  login:
+    urls:
+      - name: default
+        value: "/auth/login"
+  port: 8888
+  settings:
+    facebook_api_key: "__TODO:_YOUR_FACEBOOK_APP_API_KEY__"
+    facebook_secret: "__TODO:_YOUR_FACEBOOK_APP_SECRET__"
+    cookie_secret: "__TODO:_GENERATE_YOUR_OWN_RANDOM_VALUE_HERE__"
+
+data:
+  sources:
+    - name: session
+      connector: redis
+      # host: localhost
+      # port: 6379
+      # db: 0
+components:
+  - id: facebook
+    class: facebook.app.FacebookComponent
+    enabled: true
+  #- id: admin
+  #  enabled: true
+  #- id: info
+  #  enabled: true
+
+# Session types could be:
+# file or redis.
+session:
+  type: redis
+  enabled: true
+  # Redis session handler configuration
+  data:
+    source: session
+  # File session handler related configuration
+  # path: /tmp

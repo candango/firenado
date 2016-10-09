@@ -26,8 +26,6 @@ from firenado.tornadoweb import TornadoApplication
 
 chdir_app('file', 'session')
 
-print(firenado.conf.components)
-
 
 class StaticMapsTestCase(unittest.TestCase):
     """ Case that tests an Firenado application after being loaded from its
