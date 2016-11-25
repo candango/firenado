@@ -36,3 +36,6 @@ session:
   encoders:
     - name: pickle
       class: firenado.session.PickeSessionEncoder
+  id_generators:
+    - name: default
+      function: firenado.session.generate_session_id

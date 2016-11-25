@@ -89,6 +89,9 @@ app['login'] = {}
 app['login']['urls'] = {}
 app['login']['urls']['default'] = "/login"
 app['is_on_dir'] = False
+app['session'] = {
+    'id_generator': "default",
+}
 app['settings'] = {}
 app['socket'] = None
 app['static_path'] = None
@@ -127,6 +130,7 @@ session['encoders'] = {}
 session['file'] = {}
 session['file']['path'] = ''
 session['handlers'] = {}
+session['id_generators'] = {}
 session['name'] = 'FIRENADOSESSID'
 session['redis'] = {}
 session['redis']['data'] = {}

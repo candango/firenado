@@ -56,15 +56,17 @@ def get_config_from_package(package):
     return package_conf
 
 
-def get_class_from_config(config):
+def get_class_from_config(config, index="class"):
     """ Returns a class from a config dict bit containing the module
     and class references.
 
-    :param config: The config bit with module and class references.
+    :param
+        config: The config bit with module and class references.
+        index:
     :return: The class located at the module referred by the config.
     """
     module = importlib.import_module(config['module'])
-    return getattr(module, config['class'])
+    return getattr(module, config[index])
 
 
 def load_yaml_config_file(path):
@@ -262,3 +264,10 @@ def process_session_config_section(config, session_config):
             encoder['module'] = '.'.join(encoder_class_x[:-1][:])
             config.session['encoders'][encoder['name']] = encoder
             del config.session['encoders'][encoder['name']]['name']
+    if 'id_generators' in session_config:
+        for generator in session_config['id_generators']:
+            generator_ref_x = generator['function'].split('.')
+            generator['function'] = generator_ref_x[-1]
+            generator['module'] = '.'.join(generator_ref_x[:-1][:])
+            config.session['id_generators'][generator['name']] = generator
+            del config.session['id_generators'][generator['name']]['name']
