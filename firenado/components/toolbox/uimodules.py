@@ -14,3 +14,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import tornado.web
+from .pagination import Paginator
+
+
+class Paginate(tornado.web.UIModule):
+
+    def render(self, row_count, current_page, rows_per_page=None,
+               pages_per_block=None, argument="p",
+               template="toolbox:uimodules/pagination.html"):
+        component_conf = self.handler.component.conf
+        if 'pagination' in self.handler.component.conf:
+            if 'rows_per_page' in component_conf['pagination']:
+                rows_per_page = component_conf['pagination']['rows_per_page']
+            if 'pages_per_block' in component_conf['pagination']:
+                pages_per_block = component_conf['pagination'][
+                    'pages_per_block']
+        if rows_per_page is None:
+            rows_per_page = 10
+        if pages_per_block is None:
+            pages_per_block = 10
+        paginator = Paginator(row_count, current_page, rows_per_page,
+                              pages_per_block)
+        return self.render_string(template,argument=argument,
+                                  paginator=paginator)
