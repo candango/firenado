@@ -16,3 +16,4 @@
 
 from .firenado.component import FirenadoComponent
 from .static_maps.component import StaticMapsComponent
+from .toolbox.component import ToolboxComponent
