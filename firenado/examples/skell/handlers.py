@@ -18,6 +18,7 @@ import firenado.conf
 import firenado.tornadoweb
 from firenado import service
 import tornado.web
+from firenado.components.toolbox.pagination import Paginator
 
 
 class IndexHandler(firenado.tornadoweb.TornadoHandler):
@@ -75,3 +76,13 @@ class LoginHandler(firenado.tornadoweb.TornadoHandler):
             self.session.set('login_errors', errors)
             self.redirect(default_login)
 
+
+class PaginationHandler(firenado.tornadoweb.TornadoHandler):
+
+    def get(self):
+        pag_argument = "pag"
+        page = self.get_argument(pag_argument, default=1)
+        row_count = 316
+        paginator = Paginator(row_count, page)
+        self.render("pagination.html", row_count=row_count, page=page,
+                    paginator=paginator, pag_argument=pag_argument)

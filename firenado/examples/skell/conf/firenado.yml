@@ -40,6 +40,8 @@ components:
     enabled: true
   - id: info
     enabled: true
+  - id: toolbox
+    enabled: true
 
 log:
   level: DEBUG

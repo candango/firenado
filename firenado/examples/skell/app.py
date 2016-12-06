@@ -28,6 +28,7 @@ class SkellComponent(firenado.tornadoweb.TornadoComponent):
         return [
             (r"/", skell.handlers.IndexHandler),
             (r"/session", skell.handlers.SessionHandler),
+            (r"/pagination", skell.handlers.PaginationHandler),
             (r"/%s" % default_login, skell.handlers.LoginHandler),
         ]
 
