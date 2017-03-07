@@ -271,3 +271,5 @@ def process_session_config_section(config, session_config):
             generator['module'] = '.'.join(generator_ref_x[:-1][:])
             config.session['id_generators'][generator['name']] = generator
             del config.session['id_generators'][generator['name']]['name']
+    if 'life_time' in session_config:
+        config.session['life_time'] = session_config['life_time']

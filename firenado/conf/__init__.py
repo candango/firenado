@@ -131,6 +131,9 @@ session['file'] = {}
 session['file']['path'] = ''
 session['handlers'] = {}
 session['id_generators'] = {}
+# Default session life time is 30 minutes or 1800 seconds
+# If set to 0 the session will not expire
+session['life_time'] = 1800
 session['name'] = 'FIRENADOSESSID'
 session['redis'] = {}
 session['redis']['data'] = {}
