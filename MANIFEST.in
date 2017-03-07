@@ -1,7 +1,7 @@
 include LICENSE
-include requirements.txt
-include requirements-redis.txt
-include requirements-sqlalchemy.txt
+include requirements/basic.txt
+include requirements/redis.txt
+include requirements/sqlalchemy.txt
 include firenado/conf/*.yml
 include firenado/management/templates/*/*.txt
 include firenado/components/*/conf/*.yaml.example
