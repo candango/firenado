@@ -1,0 +1,11 @@
+{% extends "skell:base.html" %}
+
+{% block content %}
+    <h1>Session Timeout</h1>
+    <h2>Session Attributes</h2>
+    <p>Life time: {{ session_conf['life_time'] }} seconds</p>
+    <ul>
+        <li><a href="/session?reset=True">Reset Counter</a></li>
+        <li><a href="/">Index</a></li>
+    </ul>
+{% end %}

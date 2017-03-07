@@ -30,13 +30,20 @@ class IndexHandler(firenado.tornadoweb.TornadoHandler):
                     login_url=default_login)
 
 
-class SessionHandler(firenado.tornadoweb.TornadoHandler):
+class SessionTimeoutHandler(firenado.tornadoweb.TornadoHandler):
+
+    def get(self):
+        self.render("session_timeout.html",
+                    session_conf=firenado.conf.session)
+
+
+class SessionCounterHandler(firenado.tornadoweb.TornadoHandler):
 
     def get(self):
         reset = self.get_argument("reset", False, True)
         if reset:
             self.session.delete('counter')
-            self.redirect("/session")
+            self.redirect("/session/counter")
             return None
         counter = 0
         if self.session.has('counter'):
