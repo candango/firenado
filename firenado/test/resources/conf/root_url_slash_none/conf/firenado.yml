@@ -1,0 +1,3 @@
+app:
+  name: "/root_url_slash_none"
+  url_root_path: "        /   "

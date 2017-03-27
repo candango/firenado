@@ -71,6 +71,26 @@ class ApplicationComponentTestCase(unittest.TestCase):
         chdir_app("yml", "conf")
         self.assertEquals("yml_static_path", firenado.conf.app['static_path'])
 
+    def test_root_url(self):
+        """ Test if the root path was set on the app configuration.
+        """
+        chdir_app("root_url", "conf")
+        self.assertEquals("a_root_url", firenado.conf.app['url_root_path'])
+
+    def test_root_url_slash_in_front(self):
+        """ Test if the root path with a slash in the front will be returned
+        without it was set on the app configuration.
+        """
+        chdir_app("root_url_slash_in_front", "conf")
+        self.assertEquals("a_root_url",  firenado.conf.app['url_root_path'])
+
+    def test_root_url_slash_none(self):
+        """ Test if the root path with a slash in the front will be returned
+        without it was set on the app configuration.
+        """
+        chdir_app("root_url_slash_none", "conf")
+        self.assertEquals(None,  firenado.conf.app['url_root_path'])
+
     def test_static_path(self):
         """ If static url prefix is defined on the app configuration.
         """
