@@ -103,6 +103,7 @@ app['types']['tornado']['name'] = "tornado"
 app['types']['tornado']['launcher'] = {}
 app['types']['tornado']['launcher']['class'] = "TornadoLauncher"
 app['types']['tornado']['launcher']['module'] = "firenado.tornadoweb"
+app['url_root_path'] = None
 app['xsrf_cookies'] = False
 
 # Component section
