@@ -17,7 +17,6 @@
 import firenado.conf
 import firenado.tornadoweb
 from firenado import service
-import tornado.web
 from firenado.components.toolbox.pagination import Paginator
 
 
@@ -43,7 +42,7 @@ class SessionCounterHandler(firenado.tornadoweb.TornadoHandler):
         reset = self.get_argument("reset", False, True)
         if reset:
             self.session.delete('counter')
-            self.redirect("/session/counter")
+            self.redirect(self.get_rooted_path("/session/counter"))
             return None
         counter = 0
         if self.session.has('counter'):
@@ -81,7 +80,7 @@ class LoginHandler(firenado.tornadoweb.TornadoHandler):
 
         if errors:
             self.session.set('login_errors', errors)
-            self.redirect(default_login)
+            self.redirect(self.get_rooted_path(default_login))
 
 
 class PaginationHandler(firenado.tornadoweb.TornadoHandler):

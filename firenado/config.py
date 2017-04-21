@@ -138,6 +138,13 @@ def process_app_config_section(config, app_config):
         config.app['pythonpath'] = app_config['pythonpath']
     if 'port' in app_config:
         config.app['port'] = app_config['port']
+    if 'url_root_path' in app_config:
+        root_url = app_config['url_root_path'].strip()
+        if root_url[0] == "/":
+            root_url = root_url[1:]
+        if root_url == "":
+            root_url = None
+        config.app['url_root_path'] = root_url
     if 'settings' in app_config:
         config.app['settings'] = app_config['settings']
     if 'socket' in app_config:

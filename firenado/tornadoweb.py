@@ -29,9 +29,10 @@ from six import iteritems, string_types
 from tornado.escape import json_encode
 
 import firenado.conf
-from firenado import session
-from firenado.config import get_class_from_config, load_yaml_config_file
-from firenado import data
+from . import session
+from .config import get_class_from_config, load_yaml_config_file
+from . import data
+from . import uimodules
 from tornado.template import Loader
 
 
@@ -76,6 +77,7 @@ class TornadoApplication(tornado.web.Application, data.DataConnectedMixin,
                         component_handlers[i][1].component = component
             handlers = handlers + component_handlers
             # Adding component ui modules to the application ui modules list
+            ui_modules.append(uimodules)
             if component.get_ui_modules():
                 ui_modules.append(component.get_ui_modules())
         if firenado.conf.app['component']:
@@ -105,6 +107,13 @@ class TornadoApplication(tornado.web.Application, data.DataConnectedMixin,
             settings['cookie_secret'] = firenado.conf.app['cookie_secret']
         if firenado.conf.app['xsrf_cookies']:
             settings['xsrf_cookies'] = firenado.conf.app['xsrf_cookies']
+        if firenado.conf.app['url_root_path'] is not None:
+            from .util.url_util import rooted_path
+            for idx, handler in enumerate(handlers):
+                handler_list = list(handler)
+                handler_list[0] = rooted_path(
+                    firenado.conf.app['url_root_path'], handler_list[0])
+                handlers[idx] = tuple(handler_list)
         tornado.web.Application.__init__(self, handlers=handlers,
                                          default_host=default_host,
                                          transforms=transforms, **settings)
@@ -362,6 +371,11 @@ class TornadoHandler(tornado.web.RequestHandler):
         Return None to load templates relative to the calling file.
         """
         return self.application.settings.get('firenado_template_path')
+
+    def get_rooted_path(self, path):
+        from .util.url_util import rooted_path
+        root = firenado.conf.app['url_root_path']
+        return rooted_path(root, path)
 
     def get_template_path(self):
         """Override to customize template path for each handler.
