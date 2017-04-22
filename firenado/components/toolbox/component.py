@@ -14,6 +14,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .firenado.component import FirenadoComponent
-from .static_maps.component import StaticMapsComponent
-from .toolbox.component import ToolboxComponent
+import firenado.tornadoweb
+import logging
+from . import uimodules
+
+
+logger = logging.getLogger(__name__)
+
+
+class ToolboxComponent(firenado.tornadoweb.TornadoComponent):
+
+    def get_ui_modules(self):
+        return uimodules

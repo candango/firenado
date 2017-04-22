@@ -6,10 +6,12 @@ components:
   # Basic firenado Admin component
   - id: admin
     class: firenado.components.admin.AdminComponent
-  - id: static_maps
-    class: firenado.components.StaticMapsComponent
   - id: info
     class: firenado.components.FirenadoComponent
+  - id: static_maps
+    class: firenado.components.StaticMapsComponent
+  - id: toolbox
+    class: firenado.components.ToolboxComponent
 
 data:
   connectors:
@@ -36,3 +38,6 @@ session:
   encoders:
     - name: pickle
       class: firenado.session.PickeSessionEncoder
+  id_generators:
+    - name: default
+      function: firenado.session.generate_session_id

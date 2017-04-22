@@ -7,12 +7,18 @@
 
     {% module Header1("Session") %}
     <ul>
-        <li><a href="/session">Session Counter</a></li>
+        <li><a href="{% module RootedPath('/session/counter') %}">Session Counter</a></li>
+        <li><a href="{% module RootedPath('/session/timeout') %}">Session Timeout</a></li>
     </ul>
 
     {% module Header1("Security") %}
     <ul>
-        <li><a href="/{{ login_url }}">Login</a></li>
-        <li><a href="/private">Not Public</a></li>
+        <li><a href="{% module RootedPath(login_url) %}">Login</a></li>
+        <li><a href="{% module RootedPath('/private') %}">Not Public</a></li>
+    </ul>
+
+    {% module Header1("Toolbox") %}
+    <ul>
+        <li><a href="{% module RootedPath('/pagination') %}">Pagination</a></li>
     </ul>
 {% end %}

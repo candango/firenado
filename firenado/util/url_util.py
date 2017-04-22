@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright 2015-2016 Flavio Garcia
+# Copyright 2015-2017 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,6 +14,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .firenado.component import FirenadoComponent
-from .static_maps.component import StaticMapsComponent
-from .toolbox.component import ToolboxComponent
+
+def rooted_path(root, path):
+    if root is None:
+        root = "/"
+    if root[0] != "/":
+        root = "/%s" % root
+    if root[-1] != "/":
+        root = "%s/" % root
+    rooted_path = "".join([root, path.lstrip("/")])
+    if rooted_path == "/":
+        return rooted_path
+    return rooted_path.rstrip("/")

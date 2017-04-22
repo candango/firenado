@@ -129,7 +129,7 @@ class SessionEnginedMixin(object):
     session engined entity.
 
     Example:
-    >>> class MyApplication(firenado.core.TornadoApplication,
+    >>> class MyApplication(firenado.tornadoweb.TornadoApplication,
     >>>                     SessionEnginedMixin):
 
     Refer to SessionEngine documentation in order to know which methods are
@@ -279,10 +279,21 @@ class SessionHandler(object):
 
     @staticmethod
     def __generate_session_id():
-        # TODO we should make this generation more secure
-        # TODO I think this is a good place to put a customized session
-        # generator based on the configuration
-        return random_string(64)
+        """
+        Retrieves the session id generator function from the configuration.
+
+        It is possible for a developer create a new session id generator
+        function and and use it here.
+
+        Returns:
+            A probably unique session id.
+        """
+        session_id_generator = get_class_from_config(
+            firenado.conf.session['id_generators'][
+                firenado.conf.app['session']['id_generator']
+            ], "function"
+        )
+        return session_id_generator()
 
 
 def create_session_engine(obj, session_engine_attribute, session_engine_class):
@@ -415,3 +426,13 @@ class PickeSessionEncoder(SessionEncoder):
     def decode(self, data):
         import pickle
         return pickle.loads(data)
+
+
+def generate_session_id():
+    """
+    Default firenado session id generator
+
+    Returns:
+        A random string containing digits, upper and lower characters
+    """
+    return random_string(64)

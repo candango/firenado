@@ -1,0 +1,3 @@
+app:
+  name: "root_url"
+  url_root_path: "a_root_url"

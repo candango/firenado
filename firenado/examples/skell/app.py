@@ -27,7 +27,9 @@ class SkellComponent(firenado.tornadoweb.TornadoComponent):
         default_login = firenado.conf.app['login']['urls']['default']
         return [
             (r"/", skell.handlers.IndexHandler),
-            (r"/session", skell.handlers.SessionHandler),
+            (r"/session/counter", skell.handlers.SessionCounterHandler),
+            (r"/session/timeout", skell.handlers.SessionTimeoutHandler),
+            (r"/pagination", skell.handlers.PaginationHandler),
             (r"/%s" % default_login, skell.handlers.LoginHandler),
         ]
 
