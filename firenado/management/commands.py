@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright 2015-2016 Flavio Garcia
+# Copyright 2015-2017 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -35,7 +35,7 @@ ManagementCommand(
                           tasks=tasks.GenerateCookieSecretTask),
     ])
 ManagementCommand(
-    'project', 'Project related commands',
+    'proj(ect)', 'Project related commands',
     loader.load("project_command_help.txt"), category='Firenado',
     sub_commands=[
         ManagementCommand('init', 'Initiates a new Firenado project', '',

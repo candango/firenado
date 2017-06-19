@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 #
-# Copyright 2015-2016 Flavio Garcia
+# Copyright 2015-2017 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -88,7 +88,7 @@ def command_exists(command):
     """
     for category, commands in iteritems(command_categories):
         for existing_command in commands:
-            if command == existing_command.name:
+            if existing_command.match(command):
                 return True
     return False
 
@@ -98,7 +98,7 @@ def run_command(command, args):
     """
     for category, commands in iteritems(command_categories):
         for existing_command in commands:
-            if command == existing_command.name:
+            if existing_command.match(command):
                 existing_command.run(args)
 
 
@@ -125,6 +125,10 @@ class ManagementCommand(object):
         """
         self.category = category
         self.name = name
+        self.commands = self.name.split("(")
+        if len(self.commands) > 1:
+            self.commands[1] = "%s%s" % (self.commands[0],
+                                         self.commands[1][:-1])
         self.description = description
         self.help = cmd_help
         self.sub_commands = sub_commands
@@ -143,6 +147,9 @@ class ManagementCommand(object):
 
     def get_help(self):
         return self.help
+
+    def match(self, command):
+        return command in self.name
 
     def run(self, args):
         has_sub_commands = False
