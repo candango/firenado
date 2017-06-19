@@ -110,8 +110,20 @@ def process_app_config(config, config_data):
     file.
     """
     process_config(config, config_data)
-    if 'app' in config_data:
-        process_app_config_section(config, config_data['app'])
+
+    # If apps is on config data, this is running o multi app mode
+    if 'apps' in config_data:
+        config.app['multi'] = True
+        process_apps_config_session(config, config_data['apps'])
+    else:
+        # If not the app definition is on the firenado config file
+        if 'app' in config_data:
+            process_app_config_section(config, config_data['app'])
+
+
+def process_apps_config_session(config, apps_config):
+
+    print(apps_config)
 
 
 def process_app_config_section(config, app_config):
