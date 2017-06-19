@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright 2015-2016 Flavio Garcia
+# Copyright 2015-2017 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -48,4 +48,3 @@ def chdir_app(app_name, dir_name=None):
         test_app_dirname = os.path.join(test_dirname, 'resources', app_name)
     os.chdir(test_app_dirname)
     reload(firenado.conf)
-
