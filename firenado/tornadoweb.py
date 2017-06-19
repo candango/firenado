@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright 2015-2016 Flavio Garcia
+# Copyright 2015-2017 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -165,8 +165,8 @@ class TornadoLauncher(FirenadoLauncher):
 
     def __init__(self):
         self.http_server = None
-        # TODO get this from firenado.conf
-        self.MAX_WAIT_SECONDS_BEFORE_SHUTDOWN = 3
+        self.MAX_WAIT_SECONDS_BEFORE_SHUTDOWN = firenado.conf.app[
+            'wait_before_shutdown']
 
     def launch(self):
         import signal
@@ -200,20 +200,26 @@ class TornadoLauncher(FirenadoLauncher):
             component.shutdown()
         self.http_server.stop()
 
-        logger.info('Will shutdown in %s seconds ...',
-                     self.MAX_WAIT_SECONDS_BEFORE_SHUTDOWN)
         io_loop = tornado.ioloop.IOLoop.instance()
 
-        deadline = time.time() + self.MAX_WAIT_SECONDS_BEFORE_SHUTDOWN
+        if self.MAX_WAIT_SECONDS_BEFORE_SHUTDOWN == 0:
+            io_loop.stop()
+            logger.info('Application is down.')
+        else:
 
-        def stop_loop():
-            now = time.time()
-            if now < deadline and (io_loop._callbacks or io_loop._timeouts):
-                io_loop.add_timeout(now + 1, stop_loop)
-            else:
-                io_loop.stop()
-                logger.info('Shutdown')
-        stop_loop()
+            logger.info('Will shutdown in %s seconds ...',
+                        self.MAX_WAIT_SECONDS_BEFORE_SHUTDOWN)
+            deadline = time.time() + self.MAX_WAIT_SECONDS_BEFORE_SHUTDOWN
+
+            def stop_loop():
+                now = time.time()
+                if now < deadline and (io_loop._callbacks or
+                                           io_loop._timeouts):
+                    io_loop.add_timeout(now + 1, stop_loop)
+                else:
+                    io_loop.stop()
+                    logger.info('Application is down.')
+            stop_loop()
 
 
 class TornadoComponent(object):
