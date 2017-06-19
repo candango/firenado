@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright 2015-2016 Flavio Garcia
+# Copyright 2015-2017 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,12 +21,54 @@ import unittest
 import firenado.conf
 import firenado.util.file as _file
 from firenado.test import chdir_app
+import os
+import six
+
+if six.PY3:
+    try:
+        import importlib
+        reload = importlib.reload
+    except AttributeError:
+        # PY33
+        import imp
+        reload = imp.reload
 
 
 class ApplicationComponentTestCase(unittest.TestCase):
     """ Case that tests an Firenado application after being loaded from its
     configuration file.
     """
+
+    def test_conf_root(self):
+        """ Test if Firenado root matches the upper directory relative to the
+        current one. """
+        import os
+        current_path = os.path.dirname(os.path.realpath(__file__))
+        firenado_root = ("%s" % os.sep).join(current_path.split(os.sep)[:-1])
+        self.assertEqual(firenado_root, firenado.conf.ROOT)
+
+    def test_conf_root(self):
+        """ Test if Firenado root matches the upper directory relative to the
+        current one. """
+        current_path = os.path.dirname(os.path.realpath(__file__))
+        firenado_root = ("%s" % os.sep).join(current_path.split(os.sep)[:-1])
+        self.assertEqual(firenado_root, firenado.conf.ROOT)
+
+    def test_firenado_config_file_default_value(self):
+        """ Test if the default Firenado config file value will be "firenado".
+        """
+        self.assertEqual("firenado", firenado.conf.FIRENADO_CONFIG_FILE)
+
+    def test_firenado_config_file_custom_value(self):
+        """ Test if Firenado config file value will be changed setting
+        FIRENADO_CONFIG_FILE env variable.
+        """
+        custom_file_name = "custom_file"
+        os.environ['FIRENADO_CONFIG_FILE'] = custom_file_name
+        reload(firenado.conf)
+        self.assertEqual(firenado.conf.FIRENADO_CONFIG_FILE, custom_file_name)
+        del os.environ['FIRENADO_CONFIG_FILE']
+        reload(firenado.conf)
 
     def test_only_framework_stack(self):
         """ Tests is only the framework config stack was loaded.
@@ -54,6 +96,8 @@ class ApplicationComponentTestCase(unittest.TestCase):
         self.assertEquals(firenado.conf.app['port'], 8887)
 
     def test_app_pythonpath(self):
+        """ Checks if the pythonpath is set on the application config file.
+        """
         chdir_app("file", "session")
         self.assertEquals(firenado.conf.app['pythonpath'], "..")
 
@@ -111,3 +155,20 @@ class ApplicationComponentTestCase(unittest.TestCase):
         chdir_app("redis", "session")
         self.assertEquals(firenado.conf.session['enabled'], True)
         self.assertEquals(firenado.conf.session['type'], "redis")
+
+
+class MultiAppTestCase(unittest.TestCase):
+    """ Case that tests multi app configuration.
+    """
+
+    def test_multi_app_true(self):
+        """ Checks if the application is multi app
+        """
+        chdir_app("multiapp")
+        self.assertTrue(firenado.conf.app['multi'])
+
+    def test_multi_app_false(self):
+        """ Checks if the application isn't multi app
+        """
+        chdir_app("tornadoweb")
+        self.assertFalse(firenado.conf.app['multi'])

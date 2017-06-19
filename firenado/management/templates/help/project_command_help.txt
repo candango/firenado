@@ -1,4 +1,4 @@
-project <sub-command>
+proj(ect) <sub-command>
 
 Sub-commands are:
 

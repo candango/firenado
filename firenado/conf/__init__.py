@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright 2015-2016 Flavio Garcia
+# Copyright 2015-2017 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -48,6 +48,7 @@ APP_ROOT_PATH = os.path.join(os.getcwd())
 # conf dir
 APP_CONFIG_PATH = os.getenv('FIRENADO_CURRENT_APP_CONFIG_PATH',
                             os.path.join(APP_ROOT_PATH, 'conf'))
+#print(APP_CONFIG_PATH)
 APP_CONFIG_FILE = os.path.join(APP_CONFIG_PATH, FIRENADO_CONFIG_FILE)
 
 HAS_LIB_CONFIG_FILE = False
@@ -88,6 +89,7 @@ app['port'] = 8888
 app['login'] = {}
 app['login']['urls'] = {}
 app['login']['urls']['default'] = "/login"
+app['multi'] = False
 app['is_on_dir'] = False
 app['session'] = {
     'id_generator': "default",
@@ -104,6 +106,8 @@ app['types']['tornado']['launcher'] = {}
 app['types']['tornado']['launcher']['class'] = "TornadoLauncher"
 app['types']['tornado']['launcher']['module'] = "firenado.tornadoweb"
 app['url_root_path'] = None
+# Wait before shutdown is on seconds
+app['wait_before_shutdown'] = 0
 app['xsrf_cookies'] = False
 
 # Component section
