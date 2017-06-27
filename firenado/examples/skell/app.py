@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright 2015-2016 Flavio Garcia
+# Copyright 2015-2017 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -31,6 +31,7 @@ class SkellComponent(firenado.tornadoweb.TornadoComponent):
             (r"/session/timeout", skell.handlers.SessionTimeoutHandler),
             (r"/pagination", skell.handlers.PaginationHandler),
             (r"/%s" % default_login, skell.handlers.LoginHandler),
+            (r"/private", skell.handlers.PrivateHandler),
         ]
 
     def get_ui_modules(self):
