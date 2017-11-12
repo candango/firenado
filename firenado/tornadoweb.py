@@ -177,7 +177,8 @@ class TornadoLauncher(FirenadoLauncher):
 
         signal.signal(signal.SIGTERM, self.sig_handler)
         signal.signal(signal.SIGINT, self.sig_handler)
-        signal.signal(signal.SIGTSTP, self.sig_handler)
+        if os.name == "posix":
+            signal.signal(signal.SIGTSTP, self.sig_handler)
         self.application = TornadoApplication(debug=firenado.conf.app['debug'])
         self.http_server = tornado.httpserver.HTTPServer(
             self.application)

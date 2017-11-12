@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright 2015-2016 Flavio Garcia
+# Copyright 2015-2017 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ class LoginService(service.FirenadoService):
         """
         user = self.user_service.by_username(username)
         if user:
-            if user.password == password_digest(password):
+            if user['pass'] == password:
                 return True
         return False
 
@@ -69,12 +69,9 @@ class UserService(service.FirenadoService):
         return user
 
     def by_username(self, username):
-        created_utc = datetime.datetime.utcnow()
-
-        db_session = self.get_data_source('test').session
-        user = db_session.query(UserBase).filter(
-            UserBase.username == username).first()
-        db_session.close()
+        user = None
+        if username == "test":
+            user = {'usename': "test", 'pass': "testpass"}
         return user
 
 
