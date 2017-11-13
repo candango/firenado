@@ -1,0 +1,72 @@
+What's new in Firenado 0.1.6.0
+==============================
+
+November 12, 2017
+-----------------
+
+We are pleased to announce the release of Firenado 0.1.6.0.
+
+With this release we added the idea of url root path to the application.
+
+By default the url root path will be set as / and that is ideal for
+applications that runs over the url root (ie. http://example.com). If an
+application isn't located at the root of the domain
+(ie. http://example.com/my/app/address) we should change the url root path to
+/my/app/adress.
+
+The configuration is set in the firenado.yml:
+
+::
+
+  app:
+    url_root_path: "my/app/address"
+
+A method on the request and an ui module were added to help build links
+regarding the url root path configuration:
+
+On the request:
+
+::
+
+  self.get_rooted_path("/an_url_path")
+
+On a template:
+
+::
+
+  {% module RootedPath('/an_url_path') %}
+
+Both will return <url_root_path>/an_url_path.
+
+It is possible to set the time to wait before the shutdown by a configuration
+item.
+
+A new toolbox component was added with a full pagination functionality.
+
+Also a shortcut to the firenado project command as added. Here is an example:
+
+::
+
+  firenado proj init
+
+
+A bug fix made possible to run firenado on windows. The skell application is
+running without problems after the fix.
+
+Here are the highlights:
+
+
+New Features
+~~~~~~~~~~~~
+
+* Added url_root_path to the app config. `#160 <https://github.com/candango/firenado/issues/160>`_
+* New toolbox component. `#161 <https://github.com/candango/firenado/issues/161>`_
+* Added pagination to the toolbox component. `#170 <https://github.com/candango/firenado/issues/170>`_
+* New wait_before_shutdown configuration item. `#178 <https://github.com/candango/firenado/issues/178>`_
+* Added shortcut proj to the firenado project command. `#179 <https://github.com/candango/firenado/issues/179>`_
+
+
+Bug Fixes
+~~~~~~~~~
+
+* Adding sinal handler for SIGTSTP will break application start on windows. `#181 <https://github.com/candango/firenado/issues/181>`_

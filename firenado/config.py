@@ -56,15 +56,17 @@ def get_config_from_package(package):
     return package_conf
 
 
-def get_class_from_config(config):
+def get_class_from_config(config, index="class"):
     """ Returns a class from a config dict bit containing the module
     and class references.
 
-    :param config: The config bit with module and class references.
+    :param
+        config: The config bit with module and class references.
+        index:
     :return: The class located at the module referred by the config.
     """
     module = importlib.import_module(config['module'])
-    return getattr(module, config['class'])
+    return getattr(module, config[index])
 
 
 def load_yaml_config_file(path):
@@ -108,8 +110,20 @@ def process_app_config(config, config_data):
     file.
     """
     process_config(config, config_data)
-    if 'app' in config_data:
-        process_app_config_section(config, config_data['app'])
+
+    # If apps is on config data, this is running o multi app mode
+    if 'apps' in config_data:
+        config.app['multi'] = True
+        process_apps_config_session(config, config_data['apps'])
+    else:
+        # If not the app definition is on the firenado config file
+        if 'app' in config_data:
+            process_app_config_section(config, config_data['app'])
+
+
+def process_apps_config_session(config, apps_config):
+
+    print(apps_config)
 
 
 def process_app_config_section(config, app_config):
@@ -136,6 +150,13 @@ def process_app_config_section(config, app_config):
         config.app['pythonpath'] = app_config['pythonpath']
     if 'port' in app_config:
         config.app['port'] = app_config['port']
+    if 'url_root_path' in app_config:
+        root_url = app_config['url_root_path'].strip()
+        if root_url[0] == "/":
+            root_url = root_url[1:]
+        if root_url == "":
+            root_url = None
+        config.app['url_root_path'] = root_url
     if 'settings' in app_config:
         config.app['settings'] = app_config['settings']
     if 'socket' in app_config:
@@ -211,7 +232,7 @@ def process_log_config_section(config, log_config):
     if 'format' in log_config:
         config.log['format'] = log_config['format']
     if 'level' in log_config:
-        config.log['level'] = log_config['level']
+        config.log['level'] = log_level_from_string(log_config['level'])
 
 
 def process_management_config_section(config, management_config):
@@ -262,3 +283,12 @@ def process_session_config_section(config, session_config):
             encoder['module'] = '.'.join(encoder_class_x[:-1][:])
             config.session['encoders'][encoder['name']] = encoder
             del config.session['encoders'][encoder['name']]['name']
+    if 'id_generators' in session_config:
+        for generator in session_config['id_generators']:
+            generator_ref_x = generator['function'].split('.')
+            generator['function'] = generator_ref_x[-1]
+            generator['module'] = '.'.join(generator_ref_x[:-1][:])
+            config.session['id_generators'][generator['name']] = generator
+            del config.session['id_generators'][generator['name']]['name']
+    if 'life_time' in session_config:
+        config.session['life_time'] = session_config['life_time']

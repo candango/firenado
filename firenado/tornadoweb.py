@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright 2015-2016 Flavio Garcia
+# Copyright 2015-2017 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -29,9 +29,10 @@ from six import iteritems, string_types
 from tornado.escape import json_encode
 
 import firenado.conf
-from firenado import session
-from firenado.config import get_class_from_config, load_yaml_config_file
-from firenado import data
+from . import session
+from .config import get_class_from_config, load_yaml_config_file
+from . import data
+from . import uimodules
 from tornado.template import Loader
 
 
@@ -76,6 +77,7 @@ class TornadoApplication(tornado.web.Application, data.DataConnectedMixin,
                         component_handlers[i][1].component = component
             handlers = handlers + component_handlers
             # Adding component ui modules to the application ui modules list
+            ui_modules.append(uimodules)
             if component.get_ui_modules():
                 ui_modules.append(component.get_ui_modules())
         if firenado.conf.app['component']:
@@ -105,6 +107,13 @@ class TornadoApplication(tornado.web.Application, data.DataConnectedMixin,
             settings['cookie_secret'] = firenado.conf.app['cookie_secret']
         if firenado.conf.app['xsrf_cookies']:
             settings['xsrf_cookies'] = firenado.conf.app['xsrf_cookies']
+        if firenado.conf.app['url_root_path'] is not None:
+            from .util.url_util import rooted_path
+            for idx, handler in enumerate(handlers):
+                handler_list = list(handler)
+                handler_list[0] = rooted_path(
+                    firenado.conf.app['url_root_path'], handler_list[0])
+                handlers[idx] = tuple(handler_list)
         tornado.web.Application.__init__(self, handlers=handlers,
                                          default_host=default_host,
                                          transforms=transforms, **settings)
@@ -156,8 +165,8 @@ class TornadoLauncher(FirenadoLauncher):
 
     def __init__(self):
         self.http_server = None
-        # TODO get this from firenado.conf
-        self.MAX_WAIT_SECONDS_BEFORE_SHUTDOWN = 3
+        self.MAX_WAIT_SECONDS_BEFORE_SHUTDOWN = firenado.conf.app[
+            'wait_before_shutdown']
 
     def launch(self):
         import signal
@@ -168,7 +177,8 @@ class TornadoLauncher(FirenadoLauncher):
 
         signal.signal(signal.SIGTERM, self.sig_handler)
         signal.signal(signal.SIGINT, self.sig_handler)
-        signal.signal(signal.SIGTSTP, self.sig_handler)
+        if os.name == "posix":
+            signal.signal(signal.SIGTSTP, self.sig_handler)
         self.application = TornadoApplication(debug=firenado.conf.app['debug'])
         self.http_server = tornado.httpserver.HTTPServer(
             self.application)
@@ -191,20 +201,26 @@ class TornadoLauncher(FirenadoLauncher):
             component.shutdown()
         self.http_server.stop()
 
-        logger.info('Will shutdown in %s seconds ...',
-                     self.MAX_WAIT_SECONDS_BEFORE_SHUTDOWN)
         io_loop = tornado.ioloop.IOLoop.instance()
 
-        deadline = time.time() + self.MAX_WAIT_SECONDS_BEFORE_SHUTDOWN
+        if self.MAX_WAIT_SECONDS_BEFORE_SHUTDOWN == 0:
+            io_loop.stop()
+            logger.info('Application is down.')
+        else:
 
-        def stop_loop():
-            now = time.time()
-            if now < deadline and (io_loop._callbacks or io_loop._timeouts):
-                io_loop.add_timeout(now + 1, stop_loop)
-            else:
-                io_loop.stop()
-                logger.info('Shutdown')
-        stop_loop()
+            logger.info('Will shutdown in %s seconds ...',
+                        self.MAX_WAIT_SECONDS_BEFORE_SHUTDOWN)
+            deadline = time.time() + self.MAX_WAIT_SECONDS_BEFORE_SHUTDOWN
+
+            def stop_loop():
+                now = time.time()
+                if now < deadline and (io_loop._callbacks or
+                                           io_loop._timeouts):
+                    io_loop.add_timeout(now + 1, stop_loop)
+                else:
+                    io_loop.stop()
+                    logger.info('Application is down.')
+            stop_loop()
 
 
 class TornadoComponent(object):
@@ -362,6 +378,11 @@ class TornadoHandler(tornado.web.RequestHandler):
         Return None to load templates relative to the calling file.
         """
         return self.application.settings.get('firenado_template_path')
+
+    def get_rooted_path(self, path):
+        from .util.url_util import rooted_path
+        root = firenado.conf.app['url_root_path']
+        return rooted_path(root, path)
 
     def get_template_path(self):
         """Override to customize template path for each handler.

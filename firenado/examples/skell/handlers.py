@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright 2015-2016 Flavio Garcia
+# Copyright 2015-2017 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,23 +16,44 @@
 
 import firenado.conf
 import firenado.tornadoweb
+from firenado import service
+from firenado.components.toolbox.pagination import Paginator
+from firenado.security import authenticated
+
+
+class AuthenticatedHandler(firenado.tornadoweb.TornadoHandler):
+
+    def get_current_user(self):
+        from tornado.escape import json_decode
+        user_cookie = self.session.get("user")
+        if user_cookie:
+            return json_decode(user_cookie)
+        return None
 
 
 class IndexHandler(firenado.tornadoweb.TornadoHandler):
 
     def get(self):
+        import firenado.conf
         default_login = firenado.conf.app['login']['urls']['default']
         self.render("index.html", message="Hello world!!!",
                     login_url=default_login)
 
 
-class SessionHandler(firenado.tornadoweb.TornadoHandler):
+class SessionTimeoutHandler(firenado.tornadoweb.TornadoHandler):
+
+    def get(self):
+        self.render("session_timeout.html",
+                    session_conf=firenado.conf.session)
+
+
+class SessionCounterHandler(firenado.tornadoweb.TornadoHandler):
 
     def get(self):
         reset = self.get_argument("reset", False, True)
         if reset:
             self.session.delete('counter')
-            self.redirect("/session")
+            self.redirect(self.get_rooted_path("/session/counter"))
             return None
         counter = 0
         if self.session.has('counter'):
@@ -44,9 +65,6 @@ class SessionHandler(firenado.tornadoweb.TornadoHandler):
 
 class LoginHandler(firenado.tornadoweb.TornadoHandler):
 
-    USERNAME = "test"
-    PASSWORD = "test"  # noqa
-
     def get(self):
         default_login = firenado.conf.app['login']['urls']['default']
         errors = {}
@@ -55,19 +73,46 @@ class LoginHandler(firenado.tornadoweb.TornadoHandler):
         self.render("login.html", errors=errors,
                     login_url=default_login)
 
+    @service.served_by("skell.services.LoginService")
+    @service.served_by("skell.services.UserService")
     def post(self):
+        from tornado.escape import json_encode
+        self.session.delete('login_errors')
         default_login = firenado.conf.app['login']['urls']['default']
         username = self.get_argument('username')
         password = self.get_argument('password')
         errors = {}
-
         if username == "":
             errors['username'] = "Please inform the username"
         if password == "":
             errors['password'] = "Please inform the password"
 
-        self.session.delete('login_errors')
+        if not errors:
+            if not self.login_service.is_valid(username, password):
+                errors['fail'] = "Invalid login"
+            else:
+                user = self.user_service.by_username(username)
+                self.session.set("user", json_encode(user))
+                self.redirect(self.get_rooted_path("private"))
 
         if errors:
             self.session.set('login_errors', errors)
-            self.redirect(default_login)
+            self.redirect(self.get_rooted_path(default_login))
+
+
+class PrivateHandler(AuthenticatedHandler):
+
+    @authenticated
+    def get(self):
+        self.render("private.html")
+
+
+class PaginationHandler(firenado.tornadoweb.TornadoHandler):
+
+    def get(self):
+        pag_argument = "pag"
+        page = self.get_argument(pag_argument, default=1)
+        row_count = 316
+        paginator = Paginator(row_count, page)
+        self.render("pagination.html", row_count=row_count, page=page,
+                    paginator=paginator, pag_argument=pag_argument)

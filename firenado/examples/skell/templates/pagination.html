@@ -1,0 +1,24 @@
+{% extends "skell:base.html" %}
+
+{% block content %}
+    <h1>Pagination Test</h1>
+    <ul>
+        <li><a href="{% module RootedPath('/') %}">Index</a></li>
+    </ul>
+
+    <h2>Pagination Component:</h2>
+    {% module Paginate(row_count, page, argument=pag_argument) %}
+
+    <h2>Pagination Data:</h2>
+    <p><b>Current page:</b> {{ paginator.current_page }}</p>
+    <p><b>Row count:</b> {{ paginator.row_count }}</p>
+    <p><b>Page count:</b> {{ paginator.page_count }}</p>
+    <p><b>Rows in the last page:</b> {{ paginator.rows_last_page }}</p>
+    <p><b>Block count:</b> {{ paginator.block_count }}</p>
+    <p><b>Pages in the last block:</b> {{ paginator.pages_last_block }}</p>
+    <p><b>Current block:</b> {{ paginator.current_block }}</p>
+    <p><b>Current First Row:</b> {{ paginator.current_first_row }}</p>
+    <p><b>Current Last Row:</b> {{ paginator.current_last_row }}</p>
+    <p><b>Block First Page:</b> {{ paginator.block_first_page }}</p>
+    <p><b>Block Last Page:</b> {{ paginator.block_last_page }}</p>
+{% end %}

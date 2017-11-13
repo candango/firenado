@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright 2015-2016 Flavio Garcia
+# Copyright 2015-2017 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 
 import skell.handlers
 import firenado.tornadoweb
+from firenado import service
 from skell import uimodules
 
 
@@ -26,15 +27,42 @@ class SkellComponent(firenado.tornadoweb.TornadoComponent):
         default_login = firenado.conf.app['login']['urls']['default']
         return [
             (r"/", skell.handlers.IndexHandler),
-            (r"/session", skell.handlers.SessionHandler),
+            (r"/session/counter", skell.handlers.SessionCounterHandler),
+            (r"/session/timeout", skell.handlers.SessionTimeoutHandler),
+            (r"/pagination", skell.handlers.PaginationHandler),
             (r"/%s" % default_login, skell.handlers.LoginHandler),
+            (r"/private", skell.handlers.PrivateHandler),
         ]
 
     def get_ui_modules(self):
         return uimodules
 
+    def initialize(self):
+        import firenado.conf
+        firenado.conf.app['login']['urls']['buga'] = 'buga'
+
+    @service.served_by("skell.services.UserService")
     def install(self):
-        """ Component installation functional test.
-        This is only printing some output but it could be something more.
+        """  Installing test database
         """
-        print("Skell app doesn't need to be installed.")
+        from firenado.util.sqlalchemy_util import Base
+        print('Installing Diasporapy Pod...')
+        print('Creating Pod ...')
+        engine = self.application.get_data_source(
+            'test').engine
+        engine.echo = True
+        # Dropping all
+        # TODO Not to drop all if something is installed right?
+        Base.metadata.drop_all(engine)
+        # Creating database
+        Base.metadata.create_all(engine)
+        self.user_service.create({
+            'username': "Test",
+            'first_name': "Test",
+            'last_name': "User",
+            'password': "testpass",
+            'email': "test@test.ts"
+        })
+
+    def get_data_sources(self):
+        return self.application.data_sources

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright 2015-2016 Flavio Garcia
+# Copyright 2015-2017 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,16 +15,24 @@
 # limitations under the License.
 
 from firenado import service
+from .models import UserBase
+import datetime
+
+
+def password_digest(pass_phrase):
+    import hashlib
+    m = hashlib.md5()
+    m.update(pass_phrase.encode('utf-8'))
+    return m.hexdigest()
 
 
 class LoginService(service.FirenadoService):
 
     def __init__(self, handler, data_source=None):
-        self.USERNAME = "test"
-        self.PASSWORD = "test"  # noqa
         service.FirenadoService.__init__(self, handler, data_source)
 
-    def user_is_valid(self, username, password):
+    @service.served_by("skell.services.UserService")
+    def is_valid(self, username, password):
         """ Checks if challenge username and password matches
         username and password defined on the service constructor..
 
@@ -36,7 +44,34 @@ class LoginService(service.FirenadoService):
         username and password defined on the service constructor.
 
         """
-        if username == self.USERNAME:
-            if password == self.PASSWORD:
+        user = self.user_service.by_username(username)
+        if user:
+            if user['pass'] == password:
                 return True
         return False
+
+
+class UserService(service.FirenadoService):
+
+    def create(self, user_data):
+        created_utc = datetime.datetime.utcnow()
+        user = UserBase()
+        user.username = user_data['username']
+        user.first_name = user_data['first_name']
+        user.last_name = user_data['last_name']
+        user.password = password_digest(user_data['password'])
+        user.email = user_data['last_name']
+
+        db_session = self.get_data_source('test').session
+        db_session.add(user)
+        db_session.commit()
+        db_session.close()
+        return user
+
+    def by_username(self, username):
+        user = None
+        if username == "test":
+            user = {'usename': "test", 'pass': "testpass"}
+        return user
+
+

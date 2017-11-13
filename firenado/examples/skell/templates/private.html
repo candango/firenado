@@ -1,0 +1,9 @@
+{% extends "skell:base.html" %}
+
+{% block content %}
+    <h1>Private Page</h1>
+    <p>This is a private page you can see because you're logged.</p>
+    <ul>
+        <li><a href="{% module RootedPath('/') %}">Index</a></li>
+    </ul>
+{% end %}

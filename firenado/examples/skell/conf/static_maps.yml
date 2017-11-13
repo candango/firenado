@@ -12,3 +12,8 @@ maps:
       path: "dist"
       map_on_path: true
       name_on_path: true
+    - name: "waypoints"
+      handler: "/assets/waypoints/(.*)"
+      path: "lib"
+      map_on_path: true
+      name_on_path: true

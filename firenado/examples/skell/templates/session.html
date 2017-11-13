@@ -4,7 +4,7 @@
     <h1>Session Counter</h1>
     <p>Value from session: {{session_value}}</p>
     <ul>
-        <li><a href="/session?reset=True">Reset Counter</a></li>
-        <li><a href="/">Index</a></li>
+        <li><a href="{% module RootedPath('/session/counter') %}?reset=True">Reset Counter</a></li>
+        <li><a href="{% module RootedPath('/') %}">Index</a></li>
     </ul>
 {% end %}
