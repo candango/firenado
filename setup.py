@@ -17,6 +17,7 @@
 from setuptools import setup, find_packages
 from pip.req import parse_requirements
 import firenado
+import os
 
 # Solution from http://bit.ly/29Yl8VN
 def resolve_requires(requirements_file):
@@ -24,16 +25,28 @@ def resolve_requires(requirements_file):
             session=False)
     return [str(ir.req) for ir in requirements]
 
+# Utility function to read the README file.
+# Used for the long_description.  It's nice, because now 1) we have a top level
+# README file and 2) it's easier to type in the README file than to put a raw
+# string in below ...
+# Solution from: http://bit.ly/2mig8RT
+def read(fname):
+    return open(os.path.join(os.path.dirname(__file__), fname)).read()
+
+# We still running: python setup.py sdist upload --repository=testpypi
+# Twine isn't handling long_descriptions as per:
+# https://github.com/pypa/twine/issues/262
 setup(
     name="Firenado",
     version=".".join(map(str,firenado.__version__)),
     description="Firenado is a python web framework based on "
                 "Tornado web framework/server.",
+    long_description=read('README.rst'),
     license="Apache License V2.0",
     author="Flavio Garcia",
-    author_email="piraz[at]candango.org",
+    author_email="piraz@candango.org",
     maintainer="Flavio Garcia",
-    maintainer_email="piraz[at]candango.org",
+    maintainer_email="piraz@candango.org",
     install_requires=resolve_requires("requirements/basic.txt"),
     extras_require = {
         'redis': resolve_requires("requirements/redis.txt"),
