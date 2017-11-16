@@ -31,6 +31,8 @@ components:
 session:
   type: redis
   enabled: true
+  life_time: 1900
+  scan_interval: 40
   # Redis session handler configuration
   #data:
     #source: session
