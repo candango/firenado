@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright 2015-2016 Flavio Garcia
+# Copyright 2015-2017 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,8 +22,12 @@ from firenado.config import get_class_from_config
 from firenado.util import file, random_string
 
 import functools
+import logging
 import os
-import tornado.web
+import tornado
+
+
+logger = logging.getLogger(__name__)
 
 
 class SessionEngine(object):
@@ -33,19 +37,37 @@ class SessionEngine(object):
     def __init__(self, session_aware_instance):
         self.session_aware_instance = None
         self.session_handler = None
+        self.session_callback = None
 
         # TODO: By the way session could be disabled. How do we 
         # handle that?
         # TODO: check if session type exists. Maybe disable it if type is not
         # defined. We need to inform the error here
         if firenado.conf.session['enabled']:
+            # Transforming session scan interval to milliseconds.
+            scan_interval = firenado.conf.session['scan_interval'] * 1000
+            logging.debug("Session periodic call back will be set with scan "
+                          "interval of %sms." % scan_interval)
             session_handler_class = get_class_from_config(
-                firenado.conf.session['handlers'][firenado.conf.session['type']]
+                firenado.conf.session['handlers'][
+                    firenado.conf.session['type']]
             )
+            logging.debug("Setting session handler %s.%s." %
+                          (session_handler_class.__module__,
+                           session_handler_class.__name__)
+                          )
             self.session_aware_instance = session_aware_instance
             self.session_handler = session_handler_class(self)
+            self.session_callback = tornado.ioloop.PeriodicCallback(
+                self.session_handler.purge_expired_sessions,
+                scan_interval
+            )
             self.session_handler.set_settings({})
             self.session_handler.configure()
+
+            # Starting session periodic callback
+            self.session_callback.start()
+            logging.debug("Session periodic callback started by the engine.")
             encoder_class = get_class_from_config(
                 firenado.conf.session['encoders'][
                     firenado.conf.session['encoder']
@@ -233,6 +255,9 @@ class SessionHandler(object):
     def destroy_stored_session(self, session_id):
         pass
 
+    def purge_expired_sessions(self):
+        pass
+
     @staticmethod
     def create_session_id_cookie(request_handler):
         session_id = SessionHandler.__generate_session_id()
@@ -378,10 +403,12 @@ class RedisSessionHandler(SessionHandler):
     """
     Session handler that deals with file data stored  in a redis database.
     """
-
-    data_source = None
+    def __init__(self, engine):
+        SessionHandler.__init__(self,engine)
+        self.data_source = None
 
     def configure(self):
+        self.life_time = firenado.conf.session['life_time']
         self.data_source = self.engine.get_session_aware_instance().\
             get_data_source(firenado.conf.session['redis']['data']['source'])
 
@@ -389,23 +416,53 @@ class RedisSessionHandler(SessionHandler):
         self.write_stored_session(session_id, data)
 
     def read_stored_session(self, session_id):
-        return self.data_source.get_connection().get(
-            self.__get_key(session_id))
+        key = self.__get_key(session_id)
+        self.data_source.get_connection().expire(key, self.life_time)
+        return self.data_source.get_connection().get(key)
 
     def write_stored_session(self, session_id, data):
-        self.data_source.get_connection().set(
-            self.__get_key(session_id), data)
+        key = self.__get_key(session_id)
+        self.data_source.get_connection().set(key, data)
+        self.data_source.get_connection().expire(key, self.life_time)
 
     def destroy_stored_session(self, session_id):
         key = self.__get_key(session_id)
         self.data_source.get_connection().delete(key)
 
+    def purge_expired_sessions(self):
+        """ On Redis we don't destroy expired sessions per-se.
+        If a session has no ttl we just reset an expiration value to it.
+        """
+        logger.debug("Redis handler looking for sessions without ttl.")
+        self.engine.session_callback.stop()
+        logging.debug("Session periodic callback stopped by the redis "
+                      "handler.")
+        keys = self.data_source.get_connection().keys(self.__get_key("*"))
+        for key in keys:
+            ttl = self.data_source.get_connection().ttl(key)
+            if ttl is None:
+                logger.warning("Session %s without ttl setting expiration now."
+                               % key)
+                self.data_source.get_connection().expire(key, self.life_time)
+        self.engine.session_callback.start()
+        logging.debug("Session periodic callback resumed by the redis "
+                      "handler.")
+
     def is_session_stored(self, session_id):
-        return self.data_source.get_connection().get(
-            self.__get_key(session_id)) is not None
+        key = self.__get_key(session_id)
+        return self.data_source.get_connection().get(key) is not None
 
     def __get_key(self, session_id):
-        return '%s:%s' % (firenado.conf.session['redis']['prefix'], session_id)
+        if firenado.conf.app['id'] is not None:
+            return '%s:%s:%s' % (
+                firenado.conf.session['redis']['prefix'],
+                firenado.conf.app['id'],
+                session_id
+            )
+        return '%s:%s' % (
+            firenado.conf.session['redis']['prefix'],
+            session_id
+        )
 
 
 class SessionEncoder(object):
