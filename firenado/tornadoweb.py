@@ -117,6 +117,12 @@ class TornadoApplication(tornado.web.Application, data.DataConnectedMixin,
         tornado.web.Application.__init__(self, handlers=handlers,
                                          default_host=default_host,
                                          transforms=transforms, **settings)
+        logger.debug("Checking if session is enabled.")
+        if firenado.conf.session['enabled']:
+            logger.debug("Session is enabled. Starting session engine.")
+            self.session_engine
+        else:
+            logger.debug("Session is disabled.")
 
     def get_app_component(self):
         return self.components[firenado.conf.app['component']]
