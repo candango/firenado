@@ -48,7 +48,7 @@ class FileSessionTestCase(unittest.TestCase):
         session section
         """
         self.assertEquals(firenado.conf.session['life_time'], 1800)
-        self.assertEquals(firenado.conf.session['scan_interval'], 60)
+        self.assertEquals(firenado.conf.session['scan_interval'], 120)
 
     def test_application_session_handler(self):
         """ Checks if the session handler loaded is the same the session
