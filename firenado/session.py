@@ -19,7 +19,7 @@ from __future__ import (absolute_import, division, print_function,
 
 import firenado.conf
 from firenado.config import get_class_from_config
-from firenado.util import file, random_string
+from firenado.util import file as _file, random_string
 
 import functools
 import logging
@@ -357,6 +357,7 @@ class FileSessionHandler(SessionHandler):
     path = None
 
     def configure(self):
+        self.life_time = int(firenado.conf.session['life_time'])
         if os.path.exists(firenado.conf.session['file']['path']):
             self.path = firenado.conf.session['file']['path']
         else:
@@ -367,18 +368,25 @@ class FileSessionHandler(SessionHandler):
 
     def create_session(self, session_id, data):
         # TODO: What could possibly go wrong here? Let's handle it!
-        session_file = os.path.join(self.path, self.__get_filename(session_id))
         if os.path.exists(firenado.conf.session['file']['path']):
-            file.touch(session_file)
-            file.write(session_file, data)
+            session_file = os.path.join(self.path,
+                                        self.__get_filename(session_id))
+            _file.touch(session_file)
+            self.write_stored_session(session_id, data)
 
     def read_stored_session(self, session_id):
+        import binascii
         session_file = os.path.join(self.path, self.__get_filename(session_id))
-        return file.read(session_file)
+        timed_data = _file.read(session_file)
+        return binascii.unhexlify(timed_data.split("--")[0])
 
     def write_stored_session(self, session_id, data):
+        import binascii
+        import time
+        timed_data = "%s--%s" % (binascii.hexlify(data).decode("ascii"),
+                                 int(time.time()))
         session_file = os.path.join(self.path, self.__get_filename(session_id))
-        file.write(session_file, data)
+        _file.write(session_file, timed_data)
 
     def destroy_stored_session(self, session_id):
         try:
@@ -390,6 +398,34 @@ class FileSessionHandler(SessionHandler):
         except OSError:
             # TODO Why we are deleting the session file twice?
             pass
+
+    def purge_expired_sessions(self):
+        import time
+        """ A file session contains a data separated by --
+        The first part is the hexadecimal representation of the encoded session
+        data. Second is the epoch of the last write.
+        If current epoch - file epoch is lower than the session life time then
+        we need to delete this file.
+        """
+        logger.debug("File handler looking for expired sessions.")
+        self.engine.session_callback.stop()
+        logging.debug("Session periodic callback stopped by the file "
+                      "handler.")
+        for dirname, dirnames, filenames in os.walk(self.path):
+            for filename in filenames:
+                file_path = os.path.join(self.path, filename)
+                sess_id = filename.split(".")[0].split("_")[-1]
+                timed_data = _file.read(file_path)
+                last_write = timed_data.split("--")[1]
+                age = int(time.time()) - int(last_write)
+                if age > self.life_time:
+                    logging.debug("Session %s is expired. Removing file "
+                                  "from the session path." % sess_id)
+                    os.remove(file_path)
+
+        self.engine.session_callback.start()
+        logging.debug("Session periodic callback resumed by the file "
+                      "handler.")
 
     def is_session_stored(self, session_id):
         return os.path.isfile(os.path.join(self.path, self.__get_filename(
