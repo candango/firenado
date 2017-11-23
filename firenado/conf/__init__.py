@@ -145,9 +145,9 @@ session['redis'] = {}
 session['redis']['data'] = {}
 session['redis']['data']['source'] = ''
 session['redis']['prefix'] = 'firenado:session'
-# Default session scan intervail is 30 seconds
+# Default session scan intervail is 2 minutes
 # This is the time application will scan for expired sessions
-session['scan_interval'] = 60
+session['scan_interval'] = 120
 session['type'] = ''
 
 if HAS_LIB_CONFIG_FILE:
