@@ -120,10 +120,10 @@ def process_app_config(config, config_data):
         if 'app' in config_data:
             process_app_config_section(config, config_data['app'])
 
-
+# TODO: This is being used for the multi app configuration
 def process_apps_config_session(config, apps_config):
-
-    print(apps_config)
+    pass
+    #print(apps_config)
 
 
 def process_app_config_section(config, app_config):
@@ -142,6 +142,8 @@ def process_app_config_section(config, app_config):
             config.app['data']['sources'] = app_config['data']['sources']
     if 'debug' in app_config:
         config.app['debug'] = app_config['debug']
+    if 'id' in app_config:
+        config.app['id'] = app_config['id']
     if 'login' in app_config:
         if 'urls' in app_config['login']:
             for url in app_config['login']['urls']:
@@ -292,3 +294,5 @@ def process_session_config_section(config, session_config):
             del config.session['id_generators'][generator['name']]['name']
     if 'life_time' in session_config:
         config.session['life_time'] = session_config['life_time']
+    if 'scan_interval' in session_config:
+        config.session['scan_interval'] = session_config['scan_interval']

@@ -43,6 +43,12 @@ class FileSessionTestCase(unittest.TestCase):
         self.session_handler_class = get_class_from_config(
             self.session_handler_config)
 
+    def test_defaults_session_parameters(self):
+        """ Checks default session parameters on the configuration
+        session section
+        """
+        self.assertEquals(firenado.conf.session['life_time'], 1800)
+        self.assertEquals(firenado.conf.session['scan_interval'], 120)
 
     def test_application_session_handler(self):
         """ Checks if the session handler loaded is the same the session
@@ -66,18 +72,30 @@ class FileSessionTestCase(unittest.TestCase):
         self.assertEquals(app_session_handler_class, session_handler_class)
 
 
-class SessionTestCase(unittest.TestCase):
+class RedisSessionTestCase(unittest.TestCase):
     """ Case that tests an Firenado application after being loaded from its
     configuration file.
     """
+
+    def setUp(self):
+        """ Application configuration file will be read and components will be
+        loaded.
+        """
+        chdir_app('redis', 'session')
 
     def test_session_type_redis(self):
         """ Checks if test component was loaded correctly by the application
         __init__ method.
         """
-        chdir_app('redis', 'session')
         self.assertEquals(firenado.conf.session['enabled'], True)
         self.assertEquals(firenado.conf.session['type'], 'redis')
+
+    def test_custom_session_parameters(self):
+        """ Checks default session parameters on the configuration
+        session section
+        """
+        self.assertEquals(firenado.conf.session['life_time'], 1900)
+        self.assertEquals(firenado.conf.session['scan_interval'], 40)
 
     def test_pickle_session_encoder(self):
         """ Checks if the pickle session encoder will keep a dict structure

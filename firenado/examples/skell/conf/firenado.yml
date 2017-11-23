@@ -1,4 +1,5 @@
 app:
+  id: firenado-test-app
   component: skell
   data:
     sources:
@@ -52,6 +53,10 @@ log:
 session:
   type: redis
   enabled: true
+  # Life time by default is 30 minutes = 1800 minutes
+  # life_time 1800
+  # Scan interval by default is 2 minutes = 120 seconds
+  # scan_interval: 120
   # Redis session handler configuration
   data:
     source: session
