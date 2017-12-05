@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright 2015-2016 Flavio Garcia
+# Copyright 2015-2017 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -38,17 +38,26 @@ def configure_data_sources(data_sources, data_connected):
     """
     if isinstance(data_sources, (string_types, text_type)):
         import firenado.conf
-        # TODO Handler unknow connection instance here
-        config = firenado.conf.data['sources'][data_sources]
-        connection_handler_config = firenado.conf.data['connectors'][
-            config['connector']]
-        module = importlib.import_module(connection_handler_config['module'])
-        handler_class = getattr(module, connection_handler_config['class'])
-        data_source_instance = handler_class(data_connected)
-        config = data_source_instance.process_config(config)
-        data_source_instance.configure(config)
-        data_connected.set_data_source(data_sources, data_source_instance)
-        # Testing the connection
+        if data_sources in firenado.conf.data['sources']:
+            logger.debug("Found data source [%s] in the list. Preceding with "
+                         "the configuration process." % data_sources)
+            config = firenado.conf.data['sources'][data_sources]
+            connection_handler_config = firenado.conf.data['connectors'][
+                config['connector']]
+            module = importlib.import_module(connection_handler_config['module'])
+            handler_class = getattr(module, connection_handler_config['class'])
+            data_source_instance = handler_class(data_connected)
+            config = data_source_instance.process_config(config)
+            data_source_instance.configure(config)
+            data_connected.set_data_source(data_sources, data_source_instance)
+        else:
+            logger.fatal("It was not possible to find [%s] in the list of "
+                         "available data sources. Please fix the firenado "
+                         "configuration file. Sometimes that could be only a "
+                         "typo in one of app data sources to be created. Look "
+                         "at app.data.sources list." % data_sources)
+            sys.exit(errno.ENOKEY)
+        # TODO: Testing the connection
         # Without that the error will just happen during the handler execution
     elif isinstance(data_sources, list):
         for data_source in data_sources:
@@ -144,7 +153,7 @@ class RedisConnector(Connector):
         try:
             self.__connection.ping()
         except redis.ConnectionError as error:
-            logger.error("Error trying to connect to redis: %s", error)
+            logger.fatal("Error trying to connect to redis: %s", error)
             sys.exit(errno.ECONNREFUSED)
 
     def get_connection(self):
@@ -256,8 +265,7 @@ class SqlalchemyConnector(Connector):
         try:
             self.__engine.connect()
         except OperationalError as op_error:
-            logger.error(
-                "Error trying to connect to database: %s", op_error)
+            logger.fatal("Error trying to connect to database: %s", op_error)
             sys.exit(errno.ECONNREFUSED)
 
     def get_a_session(self):
