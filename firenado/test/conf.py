@@ -149,12 +149,26 @@ class ApplicationComponentTestCase(unittest.TestCase):
         self.assertEquals(firenado.conf.session['enabled'], True)
         self.assertEquals(firenado.conf.session['type'], "file")
 
+    def test_session_name_default(self):
+        """ Checks if the session name is default, FIRENADOSESSID
+        """
+        chdir_app("file", "session")
+        self.assertEquals(firenado.conf.session['enabled'], True)
+        self.assertEquals(firenado.conf.session['name'], "FIRENADOSESSID")
+
     def test_session_type_redis(self):
         """ Checks if the session is enabled and the type is redis
         """
         chdir_app("redis", "session")
         self.assertEquals(firenado.conf.session['enabled'], True)
         self.assertEquals(firenado.conf.session['type'], "redis")
+
+    def test_session_name_custom(self):
+        """ Checks if the session name will be defined as in the config file
+        """
+        chdir_app("redis", "session")
+        self.assertEquals(firenado.conf.session['enabled'], True)
+        self.assertEquals(firenado.conf.session['name'], "REDISSESSID")
 
 
 class MultiAppTestCase(unittest.TestCase):
