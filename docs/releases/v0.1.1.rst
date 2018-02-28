@@ -2,7 +2,7 @@ What's new in Firenado 0.1.1
 ============================
 
 October 28, 2015
--------------
+----------------
 
 We are pleased to announce the release of Firenado 0.1.1. Now we start to
 support Python 3 and have fixed some bugs fixed.

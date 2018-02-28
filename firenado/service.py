@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright 2015-2016 Flavio Garcia
+# Copyright 2015-2018 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -46,15 +46,29 @@ class FirenadoService(object):
         return self.get_data_sources()[name]
 
     def get_data_sources(self):
-        """ Will recurse over services until find a consumer that is holding
-        a data connected instance.
+        """ If a data connected is returned then returns all data sources.
+        If not returns None.
 
         :return: The data connected data sources
         """
+        data_connected = self.data_connected
+        if data_connected is not None:
+            return data_connected.data_sources
+        return None
+
+    @property
+    def data_connected(self):
+        """ Will recurse over services until the data connected instance.
+        If service has no consumer returns None.
+
+        :return: The data connected object in the top of the hierarchy.
+        """
+        if self.consumer is None:
+            return None
         invert_op = getattr(self.consumer, "get_data_connected", None)
         if callable(invert_op):
-            return self.consumer.get_data_connected().data_sources
-        return self.consumer.get_data_sources()
+            return self.consumer.get_data_connected()
+        return self.consumer.data_connected
 
 
 def served_by(service, attribute_name=None):

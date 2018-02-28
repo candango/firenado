@@ -1,19 +1,23 @@
 What's new in Firenado 0.1.6.1
 ==============================
 
-December 15, 2017
+March 03, 2018
 -----------------
 
-Release description here.
+We are pleased to announce the release of Firenado 0.1.6.1.
+
+This is the release we changed the package to production ready as the session
+engine will expire and clean invalid session data.
 
 Here are the highlights:
 
 New Features
 ~~~~~~~~~~~~
 
-* Features go here.
+* Implement session timeout `#151 <https://github.com/candango/firenado/issues/151>`_
+* Session id should be defined by a config item `#169 <https://github.com/candango/firenado/issues/169>`_
 
 Bug Fixes
 ~~~~~~~~~
 
-* Bug fixes go here.
+* Handle better data source key error during the configuration process `#187 <https://github.com/candango/firenado/issues/187>`_
