@@ -1,8 +1,8 @@
 What's new in Firenado 0.1.6.1
 ==============================
 
-March 03, 2018
------------------
+March 05, 2018
+--------------
 
 We are pleased to announce the release of Firenado 0.1.6.1.
 
@@ -16,8 +16,9 @@ New Features
 
 * Implement session timeout `#151 <https://github.com/candango/firenado/issues/151>`_
 * Session id should be defined by a config item `#169 <https://github.com/candango/firenado/issues/169>`_
+* Provide data_connected method to the service `#173 <https://github.com/candango/firenado/issues/173>`_
 
 Bug Fixes
 ~~~~~~~~~
 
-* Handle better data source key error during the configuration process `#187 <https://github.com/candango/firenado/issues/187>`_
+* Handle better data source key error during configuration process `#187 <https://github.com/candango/firenado/issues/187>`_
