@@ -1,7 +1,7 @@
 Session
 =======
 
-Firenado provides a session layer that can be based on redis or files.
+Firenado provides a session layer supporting redis or files backends.
 
 To setup the application session it is necessary configure the session section
 into the firenado.yml file.
