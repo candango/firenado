@@ -1,5 +1,5 @@
 Introduction
-------------
+============
 
 Firenado is a Python web framework that primarily extends the
 `Tornado <http://www.tornadoweb.org>`_ framework and runs over it's web server.

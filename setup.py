@@ -57,7 +57,7 @@ setup(
     package_dir={'firenado': "firenado"},
     include_package_data=True,
     classifiers=[
-        "Development Status :: 3 - Alpha",
+        "Development Status :: 5 - Production/Stable",
         "Environment :: Console",
         "Environment :: Web Environment",
         "License :: OSI Approved :: Apache Software License",

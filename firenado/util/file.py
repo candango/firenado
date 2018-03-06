@@ -53,9 +53,12 @@ def get_file_extension(filename):
     return None
 
 
-def write(path, data):
+def write(path, data, binary=False):
     """ Writes a given data to a file located at the given path. """
-    with open(path, 'w') as f:
+    mode = "w"
+    if binary:
+        mode = "wb"
+    with open(path, mode) as f:
         f.write(data)
     f.close()
 
