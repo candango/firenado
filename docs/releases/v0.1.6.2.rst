@@ -1,0 +1,17 @@
+What's new in Firenado 0.1.6.2
+==============================
+
+May 06, 2018
+------------
+
+We are pleased to announce the release of Firenado 0.1.6.2.
+
+Fixed error installing Firenado on pip 10.
+
+Here are the highlights:
+
+
+Bug Fixes
+~~~~~~~~~
+
+* Cannot install on pip 10. `#197 <https://github.com/candango/firenado/issues/197>`_

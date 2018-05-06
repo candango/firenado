@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright 2015-2016 Flavio Garcia
+# Copyright 2015-2018 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,7 +15,10 @@
 # limitations under the License.
 
 from setuptools import setup, find_packages
-from pip.req import parse_requirements
+try: # for pip >= 10
+    from pip._internal.req import parse_requirements
+except ImportError: # for pip <= 9.0.3
+    from pip.req import parse_requirements
 import firenado
 import os
 
