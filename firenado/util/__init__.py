@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright 2015-2016 Flavio Garcia
+# Copyright 2015-2018 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import string
 # Recommended here: http://bit.ly/2fm97H3
 # Confirmed here:
 # https://docs.python.org/2/library/random.html#random.SystemRandom
+# TODO: Use that after 3.6 https://bit.ly/2wvubJ6
 def random_string(length=5, upper_chars=True, punctuation=False):
     """
     Generates a random string with the size equal to the given length.
