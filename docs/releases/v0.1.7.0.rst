@@ -1,0 +1,17 @@
+What's new in Firenado 0.1.7.0
+==============================
+
+May 06, 2018
+------------
+
+We are pleased to announce the release of Firenado 0.1.7.0.
+
+Tornado 5 added to the project and python 3.3 removed from the supported
+versions.
+
+Here are the highlights:
+
+
+Bug Fixes
+~~~~~~~~~
+
