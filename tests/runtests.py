@@ -19,8 +19,8 @@ from __future__ import (absolute_import, division, print_function,
 
 import unittest
 from tests import (components_test, conf_test, service_test, session_test,
-    tornadoweb_test)
-
+                   tornadoweb_test)
+from tests.util import file_test, url_util_test
 
 def suite():
     testLoader = unittest.TestLoader()
@@ -30,6 +30,8 @@ def suite():
     alltests.addTests(testLoader.loadTestsFromModule(service_test))
     alltests.addTests(testLoader.loadTestsFromModule(session_test))
     alltests.addTests(testLoader.loadTestsFromModule(tornadoweb_test))
+    alltests.addTests(testLoader.loadTestsFromModule(file_test))
+    alltests.addTests(testLoader.loadTestsFromModule(url_util_test))
     return alltests
 
 
