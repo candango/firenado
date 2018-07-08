@@ -21,10 +21,10 @@ from tests import conf_test
 def suite():
     alltests = unittest.TestSuite()
     alltests.addTests(conf_test.application_component_suite())
-    alltests.addTests(conf_test.multiapp_suite())
+    alltests.addTests(conf_test.multiapp_suite()
     return alltests
 
 
 if __name__ == "__main__":
-    runner = unittest.TextTestRunner(verbosity=2)
+    runner = unittest.TextTestRunner()
     runner.run(suite())
