@@ -187,12 +187,3 @@ class MultiAppTestCase(unittest.TestCase):
         """
         chdir_app("tornadoweb")
         self.assertFalse(firenado.conf.app['multi'])
-
-
-def application_component_suite():
-    return unittest.TestLoader().loadTestsFromTestCase(
-        ApplicationComponentTestCase)
-
-
-def multiapp_suite():
-    return unittest.TestLoader().loadTestsFromTestCase(MultiAppTestCase)
