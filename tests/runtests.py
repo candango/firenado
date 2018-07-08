@@ -21,7 +21,7 @@ from tests import conf_test
 def suite():
     alltests = unittest.TestSuite()
     alltests.addTests(conf_test.application_component_suite())
-    alltests.addTests(conf_test.multiapp_suite()
+    alltests.addTests(conf_test.multiapp_suite())
     return alltests
 
 
