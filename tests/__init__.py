@@ -34,7 +34,7 @@ def chdir_app(app_name, dir_name=None):
     """ Change to the application directory located at the resource directory
     for conf tests.
 
-    The conf resources directory is firenado/firenado/test/resources/conf.
+    The conf resources directory is firenado/tests/resources/conf.
 
     :param app_name: The application name
     """

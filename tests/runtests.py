@@ -14,13 +14,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import (absolute_import, division, print_function,
+                        with_statement)
+
 import unittest
-from tests import conf_test
+from tests import components_test, conf_test, service_test, tornadoweb_test
 
 
 def suite():
+    testLoader = unittest.TestLoader()
     alltests = unittest.TestSuite()
-    alltests.addTests(unittest.TestLoader().loadTestsFromModule(conf_test))
+    alltests.addTests(testLoader.loadTestsFromModule(components_test))
+    alltests.addTests(testLoader.loadTestsFromModule(conf_test))
+    alltests.addTests(testLoader.loadTestsFromModule(service_test))
+    alltests.addTests(testLoader.loadTestsFromModule(tornadoweb_test))
     return alltests
 
 

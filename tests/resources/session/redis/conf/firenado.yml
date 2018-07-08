@@ -17,7 +17,7 @@ data:
       # db: 0
 components:
   - id: test
-    class: firenado.test.tornadoweb.TestComponent
+    class: tests.tornadoweb_test.TestComponent
     enabled: true
   #- id: admin
   #  enabled: true
