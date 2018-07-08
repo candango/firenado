@@ -17,7 +17,7 @@ data:
       # db: 0
 components:
   - id: test
-    class: firenado.test.tornadoweb.TestComponent
+    class: tests.tornadoweb_test.TestComponent
     enabled: true
   #- id: admin
   #  enabled: true
@@ -30,12 +30,9 @@ components:
 # file or redis.
 session:
   type: redis
-  enabled: true
-  name: REDISSESSID
-  life_time: 1900
-  scan_interval: 40
+  enabled: false
   # Redis session handler configuration
-  #data:
-    #source: session
+  data:
+    source: session
   # File session handler related configuration
   # path: /tmp

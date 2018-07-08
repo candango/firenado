@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright 2015-2016 Flavio Garcia
+# Copyright 2015-2018 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ from __future__ import (absolute_import, division, print_function,
 
 import unittest
 from firenado.util.url_util import rooted_path
+
 
 class UrlUtilTestCase(unittest.TestCase):
     """ Case that tests the file util functions.

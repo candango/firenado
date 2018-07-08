@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright 2015-2016 Flavio Garcia
+# Copyright 2015-2018 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ from firenado.tornadoweb import TornadoApplication
 from firenado.tornadoweb import TornadoHandler
 from firenado.tornadoweb import TornadoComponent
 import unittest
-from firenado.test import chdir_app
+from tests import chdir_app
 
 
 class MainHandler(TornadoHandler):
@@ -69,10 +69,10 @@ class ApplicationComponentTestCase(unittest.TestCase):
         """ Checks if test component was loaded correctly by the application
         __init__ method.
         """
-        import firenado.test
+        import tests.tornadoweb_test
         self.assertTrue('test' in self.application.components)
         self.assertTrue(isinstance(self.application.components['test'],
-                                   firenado.test.tornadoweb.TestComponent))
+                                   tests.tornadoweb_test.TestComponent))
         self.assertFalse('disabled' in self.application.components)
 
     def test_static_path(self):

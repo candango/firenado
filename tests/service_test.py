@@ -74,7 +74,7 @@ class ServedByInstance(object):
         """
         pass
 
-    @served_by('firenado.test.service.MockTestService')
+    @served_by('tests.service_test.MockTestService')
     def do_served_by_string(self):
         """
         This method will be decorated with served_by with the class as string

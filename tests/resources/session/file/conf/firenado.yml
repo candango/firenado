@@ -5,7 +5,7 @@ app:
         # Set here references from sources defined on data.sources
         #- session
   pythonpath: ..
-  port: 8888
+  port: 8887
   static_path: 'a_static_path'
 
 data:
@@ -17,7 +17,7 @@ data:
       # db: 0
 components:
   - id: test
-    class: firenado.test.tornadoweb.TestComponent
+    class: tests.tornadoweb_test.TestComponent
     enabled: true
   #- id: admin
   #  enabled: true
@@ -29,10 +29,10 @@ components:
 # Session types could be:
 # file or redis.
 session:
-  type: redis
-  enabled: false
+  type: file
+  enabled: true
   # Redis session handler configuration
-  data:
-    source: session
+  #data:
+    #source: session
   # File session handler related configuration
   # path: /tmp

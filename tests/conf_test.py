@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright 2015-2017 Flavio Garcia
+# Copyright 2015-2018 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ from __future__ import (absolute_import, division, print_function,
 import unittest
 import firenado.conf
 import firenado.util.file as _file
-from firenado.test import chdir_app
+from tests import chdir_app
 import os
 import six
 
@@ -52,6 +52,7 @@ class ApplicationComponentTestCase(unittest.TestCase):
         current one. """
         current_path = os.path.dirname(os.path.realpath(__file__))
         firenado_root = ("%s" % os.sep).join(current_path.split(os.sep)[:-1])
+        firenado_root = os.path.join(firenado_root, "firenado")
         self.assertEqual(firenado_root, firenado.conf.ROOT)
 
     def test_firenado_config_file_default_value(self):

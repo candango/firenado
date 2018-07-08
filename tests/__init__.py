@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright 2015-2017 Flavio Garcia
+# Copyright 2015-2018 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ def chdir_app(app_name, dir_name=None):
     """ Change to the application directory located at the resource directory
     for conf tests.
 
-    The conf resources directory is firenado/firenado/test/resources/conf.
+    The conf resources directory is firenado/tests/resources/conf.
 
     :param app_name: The application name
     """
