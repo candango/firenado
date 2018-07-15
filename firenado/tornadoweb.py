@@ -318,6 +318,14 @@ class TornadoHandler(tornado.web.RequestHandler):
         """
         self.__template_variables[name] = variable
 
+    def authenticated(self):
+        """ Returns if the current user is authenticated. If the current user
+        is set then we consider authenticated.
+
+        :return: bool True is current user is set
+        """
+        return self.current_user is not None;
+
     def is_mobile(self):
         from .util import browser
         if 'User-Agent' in self.request.headers:
