@@ -90,7 +90,7 @@ class ApplicationComponentTestCase(unittest.TestCase):
         """ Checks the static_path was placed in the application settings.
         """
         static_path_x = self.application.settings['static_path'].split("/")
-        self.assertEquals(firenado.conf.app['static_path'], static_path_x[-1])
+        self.assertEqual(firenado.conf.app['static_path'], static_path_x[-1])
 
 
 class TornadoHandlerTestCase(unittest.TestCase):
