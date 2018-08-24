@@ -75,7 +75,10 @@ def load_yaml_config_file(path):
     :param path: Path where the yaml file is located.
     :return: The yaml configuration represented by the yaml file.
     """
-    return yaml.safe_load(open(path, 'r'))
+    result = None
+    with open(path, 'r') as steam:
+        result = yaml.safe_load(steam)
+    return result
 
 
 def process_config(config, config_data):
