@@ -51,5 +51,5 @@ class StaticMapsTestCase(unittest.TestCase):
         """
         app_session_handler_class = \
             self.application.session_engine.session_handler.__class__
-        self.assertEquals(
+        self.assertEqual(
             app_session_handler_class, self.session_handler_class)

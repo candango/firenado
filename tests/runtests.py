@@ -22,6 +22,7 @@ from tests import (components_test, conf_test, service_test, session_test,
                    tornadoweb_test)
 from tests.util import file_test, url_util_test
 
+
 def suite():
     testLoader = unittest.TestLoader()
     alltests = unittest.TestSuite()

@@ -43,6 +43,17 @@ class TestComponent(TornadoComponent):
         ]
 
 
+class FakeRequest:
+
+    def __init__(self):
+        self.connection = FakeConnection()
+
+
+class FakeConnection:
+
+    def set_close_callback(self, callback):
+        pass
+
 class DisabledTestComponent(TornadoComponent):
     """ Disabled component referenced at the application configuration file
     """
@@ -79,4 +90,23 @@ class ApplicationComponentTestCase(unittest.TestCase):
         """ Checks the static_path was placed in the application settings.
         """
         static_path_x = self.application.settings['static_path'].split("/")
-        self.assertEquals(firenado.conf.app['static_path'], static_path_x[-1])
+        self.assertEqual(firenado.conf.app['static_path'], static_path_x[-1])
+
+
+class TornadoHandlerTestCase(unittest.TestCase):
+    """ TornadoHandler tests
+    """
+
+    def setUp(self):
+        """ Application configuration file will be read and components will be
+        loaded.
+        """
+        chdir_app('tornadoweb')
+        self.application = TornadoApplication()
+
+    def test_authenticated(self):
+        kwargs = {"component": self.application.components['test']}
+        handler = MainHandler(self.application, FakeRequest(), **kwargs)
+        self.assertFalse(handler.authenticated())
+        handler.current_user = "a user"
+        self.assertTrue(handler.authenticated())

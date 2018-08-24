@@ -47,8 +47,8 @@ class FileSessionTestCase(unittest.TestCase):
         """ Checks default session parameters on the configuration
         session section
         """
-        self.assertEquals(firenado.conf.session['life_time'], 1800)
-        self.assertEquals(firenado.conf.session['scan_interval'], 120)
+        self.assertEqual(firenado.conf.session['life_time'], 1800)
+        self.assertEqual(firenado.conf.session['scan_interval'], 120)
 
     def test_application_session_handler(self):
         """ Checks if the session handler loaded is the same the session
@@ -56,7 +56,7 @@ class FileSessionTestCase(unittest.TestCase):
         """
         app_session_handler_class = \
             self.application.session_engine.session_handler.__class__
-        self.assertEquals(
+        self.assertEqual(
             app_session_handler_class, self.session_handler_class)
 
     def test_session_type_file(self):
@@ -69,7 +69,7 @@ class FileSessionTestCase(unittest.TestCase):
         session_handler_class = get_class_from_config(session_handler_config)
         app_session_handler_class = \
             application.session_engine.session_handler.__class__
-        self.assertEquals(app_session_handler_class, session_handler_class)
+        self.assertEqual(app_session_handler_class, session_handler_class)
 
 
 class RedisSessionTestCase(unittest.TestCase):
@@ -87,15 +87,15 @@ class RedisSessionTestCase(unittest.TestCase):
         """ Checks if test component was loaded correctly by the application
         __init__ method.
         """
-        self.assertEquals(firenado.conf.session['enabled'], True)
-        self.assertEquals(firenado.conf.session['type'], 'redis')
+        self.assertEqual(firenado.conf.session['enabled'], True)
+        self.assertEqual(firenado.conf.session['type'], 'redis')
 
     def test_custom_session_parameters(self):
         """ Checks default session parameters on the configuration
         session section
         """
-        self.assertEquals(firenado.conf.session['life_time'], 1900)
-        self.assertEquals(firenado.conf.session['scan_interval'], 40)
+        self.assertEqual(firenado.conf.session['life_time'], 1900)
+        self.assertEqual(firenado.conf.session['scan_interval'], 40)
 
     def test_pickle_session_encoder(self):
         """ Checks if the pickle session encoder will keep a dict structure
@@ -111,6 +111,6 @@ class RedisSessionTestCase(unittest.TestCase):
         encoder = PickeSessionEncoder()
         encoded_data = encoder.encode(my_dict)
         decoded_data = encoder.decode(encoded_data)
-        self.assertEquals(decoded_data['value1'], my_dict['value1'])
-        self.assertEquals(decoded_data['value2']['value3'],
+        self.assertEqual(decoded_data['value1'], my_dict['value1'])
+        self.assertEqual(decoded_data['value2']['value3'],
                           my_dict['value2']['value3'])

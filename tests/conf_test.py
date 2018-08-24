@@ -75,7 +75,7 @@ class ApplicationComponentTestCase(unittest.TestCase):
         """ Tests is only the framework config stack was loaded.
         No app config is provided.
         """
-        self.assertEquals(firenado.conf.stack[0],
+        self.assertEqual(firenado.conf.stack[0],
                           firenado.conf.LIB_CONFIG_FILE)
 
     def test_app_stack(self):
@@ -83,10 +83,30 @@ class ApplicationComponentTestCase(unittest.TestCase):
         loaded.
         """
         chdir_app("yml", "conf")
-        self.assertEquals(firenado.conf.stack[0],
+        self.assertEqual(firenado.conf.stack[0],
                           firenado.conf.LIB_CONFIG_FILE)
-        self.assertEquals(firenado.conf.stack[1],
+        self.assertEqual(firenado.conf.stack[1],
                           firenado.conf.APP_CONFIG_FILE)
+
+    def test_app_addresses_default(self):
+        """ If no addresses are provided to the application we default to
+        ipv4 and ipv6 loopbacks.
+        """
+        # There is no addresses configured into the conf/yml firenado.yml
+        chdir_app("yml", "conf")
+        self.assertTrue(firenado.conf.app['socket'] is None)
+        self.assertEqual(len(firenado.conf.app['addresses']), 2)
+        self.assertEqual(firenado.conf.app['addresses'][0], "::")
+        self.assertEqual(firenado.conf.app['addresses'][1], "0.0.0.0")
+
+    def test_app_addresses_from_conf(self):
+        """ Getting localhost defined into the configuration.
+        """
+        # At the conf/root_url app.addresses has only localhost
+        chdir_app("root_url", "conf")
+        self.assertTrue(firenado.conf.app['socket'] is None)
+        self.assertEqual(len(firenado.conf.app['addresses']), 1)
+        self.assertEqual(firenado.conf.app['addresses'][0], "localhost")
 
     def test_app_port(self):
         """ Checks if the app port is set correctly.
@@ -94,82 +114,82 @@ class ApplicationComponentTestCase(unittest.TestCase):
         # Loading file from test/resources/session/file/conf/firenado.yml
         chdir_app("file", "session")
         self.assertTrue(firenado.conf.app['socket'] is None)
-        self.assertEquals(firenado.conf.app['port'], 8887)
+        self.assertEqual(firenado.conf.app['port'], 8887)
 
     def test_app_pythonpath(self):
         """ Checks if the pythonpath is set on the application config file.
         """
         chdir_app("file", "session")
-        self.assertEquals(firenado.conf.app['pythonpath'], "..")
+        self.assertEqual(firenado.conf.app['pythonpath'], "..")
 
     def test_yml_loaded(self):
         """ On an application with a yml and yaml config files the yml should
         be loaded.
         """
         chdir_app("yml", "conf")
-        self.assertEquals("yml", _file.get_file_extension(
+        self.assertEqual("yml", _file.get_file_extension(
                 firenado.conf.APP_CONFIG_FILE))
 
     def test_static_path(self):
         """ If static path is defined on the app configuration.
         """
         chdir_app("yml", "conf")
-        self.assertEquals("yml_static_path", firenado.conf.app['static_path'])
+        self.assertEqual("yml_static_path", firenado.conf.app['static_path'])
 
     def test_root_url(self):
         """ Test if the root path was set on the app configuration.
         """
         chdir_app("root_url", "conf")
-        self.assertEquals("a_root_url", firenado.conf.app['url_root_path'])
+        self.assertEqual("a_root_url", firenado.conf.app['url_root_path'])
 
     def test_root_url_slash_in_front(self):
         """ Test if the root path with a slash in the front will be returned
         without it was set on the app configuration.
         """
         chdir_app("root_url_slash_in_front", "conf")
-        self.assertEquals("a_root_url",  firenado.conf.app['url_root_path'])
+        self.assertEqual("a_root_url",  firenado.conf.app['url_root_path'])
 
     def test_root_url_slash_none(self):
         """ Test if the root path with a slash in the front will be returned
         without it was set on the app configuration.
         """
         chdir_app("root_url_slash_none", "conf")
-        self.assertEquals(None,  firenado.conf.app['url_root_path'])
+        self.assertEqual(None,  firenado.conf.app['url_root_path'])
 
     def test_static_path(self):
         """ If static url prefix is defined on the app configuration.
         """
         chdir_app("yml", "conf")
-        self.assertEquals("yml_static_url_prefix",
+        self.assertEqual("yml_static_url_prefix",
                           firenado.conf.app['static_url_prefix'])
 
     def test_session_type_file(self):
         """ Checks if the session is enabled and the type is file
         """
         chdir_app("file", "session")
-        self.assertEquals(firenado.conf.session['enabled'], True)
-        self.assertEquals(firenado.conf.session['type'], "file")
+        self.assertEqual(firenado.conf.session['enabled'], True)
+        self.assertEqual(firenado.conf.session['type'], "file")
 
     def test_session_name_default(self):
         """ Checks if the session name is default, FIRENADOSESSID
         """
         chdir_app("file", "session")
-        self.assertEquals(firenado.conf.session['enabled'], True)
-        self.assertEquals(firenado.conf.session['name'], "FIRENADOSESSID")
+        self.assertEqual(firenado.conf.session['enabled'], True)
+        self.assertEqual(firenado.conf.session['name'], "FIRENADOSESSID")
 
     def test_session_type_redis(self):
         """ Checks if the session is enabled and the type is redis
         """
         chdir_app("redis", "session")
-        self.assertEquals(firenado.conf.session['enabled'], True)
-        self.assertEquals(firenado.conf.session['type'], "redis")
+        self.assertEqual(firenado.conf.session['enabled'], True)
+        self.assertEqual(firenado.conf.session['type'], "redis")
 
     def test_session_name_custom(self):
         """ Checks if the session name will be defined as in the config file
         """
         chdir_app("redis", "session")
-        self.assertEquals(firenado.conf.session['enabled'], True)
-        self.assertEquals(firenado.conf.session['name'], "REDISSESSID")
+        self.assertEqual(firenado.conf.session['enabled'], True)
+        self.assertEqual(firenado.conf.session['name'], "REDISSESSID")
 
 
 class MultiAppTestCase(unittest.TestCase):
