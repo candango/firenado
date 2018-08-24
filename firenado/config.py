@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright 2015-2016 Flavio Garcia
+# Copyright 2015-2018 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -133,6 +133,8 @@ def process_app_config_section(config, app_config):
     configuration data from the config_data.
     :param app_config: App section from a config data dict.
     """
+    if 'addresses' in app_config:
+        config.app['addresses'] = app_config['addresses']
     if 'component' in app_config:
         config.app['component'] = app_config['component']
     if 'cookie_secret' in app_config:

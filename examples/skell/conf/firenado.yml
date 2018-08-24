@@ -16,6 +16,8 @@ app:
   #url_root_path: "skell"
   cookie_secret: "rebfcrj1qc81j76pxhb10pbrewe7exmjghftll93jh6sgporsc7igvrgk9l9oy9u"
   xsrf_cookies: true
+  addresses:
+    - localhost
   port: 8888
 
 data:

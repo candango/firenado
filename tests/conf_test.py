@@ -88,6 +88,26 @@ class ApplicationComponentTestCase(unittest.TestCase):
         self.assertEqual(firenado.conf.stack[1],
                           firenado.conf.APP_CONFIG_FILE)
 
+    def test_app_addresses_default(self):
+        """ If no addresses are provided to the application we default to
+        ipv4 and ipv6 loopbacks.
+        """
+        # There is no addresses configured into the conf/yml firenado.yml
+        chdir_app("yml", "conf")
+        self.assertTrue(firenado.conf.app['socket'] is None)
+        self.assertEqual(len(firenado.conf.app['addresses']), 2)
+        self.assertEqual(firenado.conf.app['addresses'][0], "::")
+        self.assertEqual(firenado.conf.app['addresses'][1], "0.0.0.0")
+
+    def test_app_addresses_from_conf(self):
+        """ Getting localhost defined into the configuration.
+        """
+        # At the conf/root_url app.addresses has only localhost
+        chdir_app("root_url", "conf")
+        self.assertTrue(firenado.conf.app['socket'] is None)
+        self.assertEqual(len(firenado.conf.app['addresses']), 1)
+        self.assertEqual(firenado.conf.app['addresses'][0], "localhost")
+
     def test_app_port(self):
         """ Checks if the app port is set correctly.
         """
