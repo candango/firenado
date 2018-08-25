@@ -43,6 +43,10 @@ class StaticMapsComponent(firenado.tornadoweb.TornadoComponent):
         ).get_component_path()
         if self.conf:
             if 'maps' in self.conf:
+                if self.conf['maps'] is None:
+                    logger.warning("Maps configuration is empty. Finish the"
+                                   "static maps configuration.")
+                    return handlers
                 for map_item in self.conf['maps']:
                     logger.debug("Mapping %s handlers." % map_item['name'])
                     self.static_maps[map_item['name']] = {}
@@ -64,6 +68,8 @@ class StaticMapsComponent(firenado.tornadoweb.TornadoComponent):
                         else:
                             handlers = handlers + self.get_static_handlers(
                                 map_item)
+        else:
+            logger.warning("No static maps configurations were provided.")
         return handlers
 
     def get_static_handlers(self, map_item):
