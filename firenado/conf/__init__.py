@@ -78,6 +78,7 @@ TMP_APP_PATH = TMP_SYS_PATH
 app = {}
 # Key to to be used on on the session context to store and retrieve the current
 # logged user
+app['addresses'] = ["::", "0.0.0.0"]
 app['component'] = None
 app['cookie_secret'] = None
 app['current_user_key'] = "__FIRENADO_CURRENT_USER_KEY__"

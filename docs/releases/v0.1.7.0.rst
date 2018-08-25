@@ -1,0 +1,30 @@
+What's new in Firenado 0.1.7.0
+==============================
+
+Aug 24, 2018
+------------
+
+We are pleased to announce the release of Firenado 0.1.7.0.
+
+Tornado 5 added to the project and python 3.3 removed from the supported
+versions.
+
+Here are the highlights:
+
+New Features
+~~~~~~~~~~~~
+
+* Add tornado 5. `#174 <https://github.com/candango/firenado/issues/174>`_
+* Add to the handler a method to check if user is authenticated. `#204 <https://github.com/candango/firenado/issues/204>`_
+* Add addresses configuration item to the application. `#205 <https://github.com/candango/firenado/issues/205>`_
+
+Bug Fixes
+~~~~~~~~~
+
+* Handle empty static maps config files. `#175 <https://github.com/candango/firenado/issues/175>`_
+* The configuration file stream is opened for a while after we load the yaml file. `#206 <https://github.com/candango/firenado/issues/206>`_
+
+Refactoring
+~~~~~~~~~~~
+
+* Replace nose with python unittest. `#185 <https://github.com/candango/firenado/issues/185>`_

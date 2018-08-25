@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright 2015-2017 Flavio Garcia
+# Copyright 2015-2018 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -149,7 +149,7 @@ class TornadoApplication(tornado.web.Application, data.DataConnectedMixin,
                         for extension in config_file_extensions:
                             candidate_filename = os.path.join(
                                     firenado.conf.APP_CONFIG_PATH,
-                                    '%s.%s' % (filename, extension))
+                                    "%s.%s" % (filename, extension))
                             if os.path.isfile(candidate_filename):
                                 comp_config_file = candidate_filename
                                 break
@@ -158,12 +158,12 @@ class TornadoApplication(tornado.web.Application, data.DataConnectedMixin,
                             comp_config_file)
                         self.components[key].process_config()
                     else:
-                        logger.debug('Failed to find the file for the '
-                                    'component %s at %s. Component filename '
-                                    'returned is %s.' % (
+                        logger.debug("Failed to find the file for the "
+                                     "component %s at %s. Component filename "
+                                     "returned is %s." % (
                                         key, firenado.conf.APP_CONFIG_PATH,
                                         self.components[key].get_config_file())
-                                    )
+                                     )
                 self.components[key].initialize()
 
 
@@ -193,8 +193,14 @@ class TornadoLauncher(FirenadoLauncher):
             socket = bind_unix_socket(firenado.conf.app['socket'])
             self.http_server.add_socket(socket)
         else:
-            self.http_server.listen(firenado.conf.app['port'])
+            addresses = firenado.conf.app['addresses']
+            port = firenado.conf.app['port']
+            for address in addresses:
+                self.http_server.listen(port, address)
+                logger.info("Firenado listening at ""http://%s:%s" % (address,
+                                                                      port))
         tornado.ioloop.IOLoop.instance().start()
+
 
     def sig_handler(self, sig, frame):
         logger.warning('Caught signal: %s', sig)
@@ -317,6 +323,14 @@ class TornadoHandler(tornado.web.RequestHandler):
         the render or render_string execution.
         """
         self.__template_variables[name] = variable
+
+    def authenticated(self):
+        """ Returns if the current user is authenticated. If the current user
+        is set then we consider authenticated.
+
+        :return: bool True is current user is set
+        """
+        return self.current_user is not None;
 
     def is_mobile(self):
         from .util import browser
@@ -454,7 +468,7 @@ class FirenadoComponentLoader(Loader):
                      self).resolve_path(name_resolved, parent_path)
 
 
-# TODO: We need to create a class to avoid those methods repetition here.
+# TODO: We need to create a class to avoid those methods repeated here.
 class TornadoWebSocketHandler(tornado.websocket.WebSocketHandler):
 
     def __init__(self, application, request, **kwargs):

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright 2015-2016 Flavio Garcia
+# Copyright 2015-2018 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import unittest
 
 import firenado.conf
 from firenado.config import get_class_from_config
-from firenado.test import chdir_app
+from tests import chdir_app
 from firenado.tornadoweb import TornadoApplication
 
 chdir_app('file', 'session')
@@ -51,5 +51,5 @@ class StaticMapsTestCase(unittest.TestCase):
         """
         app_session_handler_class = \
             self.application.session_engine.session_handler.__class__
-        self.assertEquals(
+        self.assertEqual(
             app_session_handler_class, self.session_handler_class)

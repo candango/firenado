@@ -74,7 +74,7 @@ class ServedByInstance(object):
         """
         pass
 
-    @served_by('firenado.test.service.MockTestService')
+    @served_by('tests.service_test.MockTestService')
     def do_served_by_string(self):
         """
         This method will be decorated with served_by with the class as string
@@ -138,12 +138,12 @@ class ServiceTestCase(unittest.TestCase):
 
     def test_data_connected_from_service(self):
         data_connected = self.served_by_instance.get_data_connected()
-        self.assertEquals(data_connected, self.data_connected_instance)
+        self.assertEqual(data_connected, self.data_connected_instance)
 
     def test_data_connected_from_service_recursively(self):
         data_connected = self.served_by_instance.\
             get_service_data_connected_recursively()
-        self.assertEquals(data_connected, self.data_connected_instance)
+        self.assertEqual(data_connected, self.data_connected_instance)
 
     def test_data_connected_from_service_none(self):
         mock_service = MockTestService(None)
@@ -153,15 +153,15 @@ class ServiceTestCase(unittest.TestCase):
     def test_get_data_source_from_service(self):
         data_sources = self.served_by_instance.get_service_data_sources()
         self.assertTrue(len(data_sources) == 2)
-        self.assertEquals(data_sources['datasource1'], "DataSource1")
-        self.assertEquals(data_sources['datasource2'], "DataSource2")
+        self.assertEqual(data_sources['datasource1'], "DataSource1")
+        self.assertEqual(data_sources['datasource2'], "DataSource2")
 
     def test_get_data_source_from_service_recursively(self):
         data_sources = self.served_by_instance.\
             get_service_data_sources_recursively()
         self.assertTrue(len(data_sources) == 2)
-        self.assertEquals(data_sources['datasource1'], "DataSource1")
-        self.assertEquals(data_sources['datasource2'], "DataSource2")
+        self.assertEqual(data_sources['datasource1'], "DataSource1")
+        self.assertEqual(data_sources['datasource2'], "DataSource2")
 
     def test_get_data_source_from_service_none(self):
         mock_service = MockTestService(None)
