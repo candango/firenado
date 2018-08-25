@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright 2015-2016 Flavio Garcia
+# Copyright 2015-2018 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ import firenado.tornadoweb
 import logging
 import tornado.web
 import os
-
 
 logger = logging.getLogger(__name__)
 
@@ -44,6 +43,10 @@ class StaticMapsComponent(firenado.tornadoweb.TornadoComponent):
         ).get_component_path()
         if self.conf:
             if 'maps' in self.conf:
+                if self.conf['maps'] is None:
+                    logger.warning("Maps configuration is empty. Finish the"
+                                   "static maps configuration.")
+                    return handlers
                 for map_item in self.conf['maps']:
                     logger.debug("Mapping %s handlers." % map_item['name'])
                     self.static_maps[map_item['name']] = {}
@@ -59,8 +62,14 @@ class StaticMapsComponent(firenado.tornadoweb.TornadoComponent):
                                 os.path.join(self.static_root,
                                              map_item['root']))
                     if 'handlers' in map_item:
-                        handlers = handlers + self.get_static_handlers(
-                            map_item)
+                        if map_item['handlers'] is None:
+                            logger.warning("There is no handles mapped in the"
+                                           " static maps config file.")
+                        else:
+                            handlers = handlers + self.get_static_handlers(
+                                map_item)
+        else:
+            logger.warning("No static maps configurations were provided.")
         return handlers
 
     def get_static_handlers(self, map_item):
