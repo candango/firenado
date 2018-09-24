@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright 2015-2016 Flavio Garcia
+# Copyright 2015-2018 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -80,6 +80,21 @@ def identify(method):
         else:
             self.credential.set_authenticated(True)
         return method(self, *args, **kwargs)
+    return wrapper
+
+
+def only_xhr(method):
+    """ Decorates a method in a handler to only accepts XMLHttpRequest
+    requests.
+    """
+    @functools.wraps(method)
+    def wrapper(self, *args, **kwargs):
+        if "X-Requested-With" in self.request.headers:
+            if self.request.headers['X-Requested-With'] == "XMLHttpRequest":
+                return method(self, *args, **kwargs)
+        else:
+            self.set_status(403)
+            self.write("This is an XMLHttpRequest request only.")
     return wrapper
 
 
