@@ -185,6 +185,12 @@ class SqlalchemyConnector(Connector):
         super(SqlalchemyConnector, self).__init__(data_connected)
         self.__connection = {
             'backend': None,
+            'session': {
+                'autoflush': True,
+                'autocommit': False,
+                'expire_on_commit': True,
+                'info': None
+            }
         }
         self.__engine = None
 
@@ -198,19 +204,33 @@ class SqlalchemyConnector(Connector):
         engine_params = {
             'isolation_level': "READ UNCOMMITTED"
         }
-        if 'backend' in config:
+        if "backend" in config:
             if config['backend'] == 'mysql':
                 # Setting connection default connection timeout for mysql
                 # backends as suggested on http://bit.ly/2bvOLxs
                 # TODO: ignore this if pool_recycle is defined on config
                 engine_params['pool_recycle'] = 3600
 
-        self.__engine = create_engine(config['url'],
-                                                    **engine_params)
-        # Adding ping connection event handler as described at the pessimistic
-        # disconnect section of: http://bit.ly/2c8Sm2t
+        if "session" in config:
+            if "autoflush" in config['session']:
+                self.__connection['session']['autoflush'] = config[
+                    'session']['autoflush']
+            if "autocommit" in config['session']:
+                self.__connection['session']['autocommit'] = config[
+                    'session']['autocommit']
+            if "expire_on_commit" in config['session']:
+                self.__connection['session']['expire_on_commit'] = config[
+                    'session']['expire_on_commit']
+            if "info" in config['session']:
+                self.__connection['session']['info'] = config['session'][
+                    'info']
+
+        self.__engine = create_engine(config['url'], **engine_params)
+
         @event.listens_for(self.__engine, "engine_connect")
         def ping_connection(connection, branch):
+            # Adding ping connection event handler as described at the
+            # pessimistic disconnect section of: http://bit.ly/2c8Sm2t
             logger.debug("Pinging sqlalchemy connection.")
             if branch:
                 # "branch" refers to a sub-connection of a connection,
@@ -268,9 +288,13 @@ class SqlalchemyConnector(Connector):
             logger.fatal("Error trying to connect to database: %s", op_error)
             sys.exit(errno.ECONNREFUSED)
 
-    def get_a_session(self):
+    def get_a_session(self, autoflush=True, autocommit=False,
+                      expire_on_commit=True, info=None):
+
         from firenado.util.sqlalchemy_util import Session
-        Session.configure(bind=self.__engine)
+        Session.configure(bind=self.__engine, autoflush=autoflush,
+                          autocommit=autocommit,
+                          expire_on_commit=expire_on_commit, info=info)
         return Session()
 
     @property
@@ -290,8 +314,8 @@ class SqlalchemyConnector(Connector):
             'type': 'sqlalchemy',
         }
         for key in config:
-            # TODO Need to handle other properies and create the url if needed.
-            if key in ['url']:
+            # TODO Handle other properties and create the url if needed.
+            if key in ['url', 'session']:
                 db_config[key] = config[key]
         # TODO: Handler errors here
         db_config['backend'] = db_config['url'].split(':')[0].split('+')[0]
