@@ -67,5 +67,5 @@ class SecurityTestCase(unittest.TestCase):
         self.handler.request.headers.pop('X-Requested-With')
         self.handler.get_only_xhr()
         self.assertEqual(self.handler.status, 403)
-        self.assertEqual(self.handler.response, "This is an XMLHttpRequest "
+        self.assertEqual(self.handler.response, "This is a XMLHttpRequest "
                                                 "request only.")

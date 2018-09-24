@@ -94,7 +94,7 @@ def only_xhr(method):
                 return method(self, *args, **kwargs)
         else:
             self.set_status(403)
-            self.write("This is an XMLHttpRequest request only.")
+            self.write("This is a XMLHttpRequest request only.")
     return wrapper
 
 
