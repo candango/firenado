@@ -1,0 +1,22 @@
+What's new in Firenado 0.1.7.1
+==============================
+
+Oct 05, 2018
+------------
+
+We are pleased to announce the release of Firenado 0.1.7.1.
+
+Added some minor features and fixed the management commands stack.
+
+Here are the highlights:
+
+New Features
+~~~~~~~~~~~~
+
+* Add session parameters to the sqlalchemy data source configuration. `#213 <https://github.com/candango/firenado/issues/213>`_
+* Create a decorator to limit a handler method only to XMLHttpRequest(ajax). `#214 <https://github.com/candango/firenado/issues/214>`_
+
+Bug Fixes
+~~~~~~~~~
+
+* Application management commands configuration removes the default framework ones. `#216 <https://github.com/candango/firenado/issues/216>`_

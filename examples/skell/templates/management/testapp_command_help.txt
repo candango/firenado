@@ -1,0 +1,6 @@
+testapp <sub-command>
+
+Sub-commands are:
+
+      command1       Run command 1 task
+      command2       Run command 2 task

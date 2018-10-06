@@ -50,6 +50,11 @@ components:
 log:
   level: DEBUG
 
+management:
+  commands:
+    - name: skell
+      module: skell.management.commands
+
 # Session types could be:
 # file or redis.
 session:

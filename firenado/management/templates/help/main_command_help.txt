@@ -3,5 +3,4 @@ Commands are:
 {{ category }}:
 
     {% for command in command_categories[category] %}{{ command_template.format(command) }}
-    {% end %}
-{% end %}
+    {% end %}{% end %}
