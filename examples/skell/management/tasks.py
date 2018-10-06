@@ -1,6 +1,7 @@
 #!/usr/bin/env python
+# -*- coding: UTF-8 -*-
 #
-# Copyright 2015-2018 Flavio Garcia
+# Copyright 2015-2016 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,13 +15,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import firenado.conf
-from .util.url_util import rooted_path
-import tornado.web
+import logging
+from firenado.management import ManagementTask
 
 
-class RootedPath(tornado.web.UIModule):
+logger = logging.getLogger(__name__)
 
-    def render(self, path):
-        root = firenado.conf.app['url_root_path']
-        return rooted_path(root, path)
+
+class TestAppCommand1Task(ManagementTask):
+    """ Run the command 1.
+    """
+    def run(self, namespace):
+        logger.debug("Running TestApp Command 1")
+        print("Test App Command 1")
+
+
+class TestAppCommand2Task(ManagementTask):
+    """ Run the command 2.
+    """
+    def run(self, namespace):
+        logger.debug("Running TestApp Command 2")
+        print("Test App Command 2")
