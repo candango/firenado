@@ -127,7 +127,7 @@ log['level'] = logging.NOTSET
 
 # Management section
 management = {}
-management['commands'] = {}
+management['commands'] = []
 
 # Session section
 session = {}

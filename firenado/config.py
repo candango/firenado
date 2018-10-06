@@ -250,7 +250,8 @@ def process_management_config_section(config, management_config):
     :param management_config: Management section from a config data dict.
     """
     if 'commands' in management_config:
-        config.management['commands'] = management_config['commands']
+        for command in management_config['commands']:
+            config.management['commands'].append(command)
 
 
 def process_session_config_section(config, session_config):

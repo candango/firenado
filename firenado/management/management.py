@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 #
-# Copyright 2015-2017 Flavio Garcia
+# Copyright 2015-2018 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,10 +21,13 @@ from __future__ import (absolute_import, division,
 import firenado.conf
 from firenado.util.argparse_util import FirenadoArgumentError
 from firenado.util.argparse_util import FirenadoArgumentParser
+import logging
 import os
 import sys
 from six import iteritems
 from tornado import template
+
+logger = logging.getLogger(__name__)
 
 # Commands will be registered here. This is done by ManagementCommand
 command_categories = dict()
@@ -34,6 +37,10 @@ def run_from_command_line():
     """ Run Firenado's management commands from a command line
     """
     for commands_conf in firenado.conf.management['commands']:
+        logger.debug("Loading %s commands from %s." % (
+            commands_conf['name'],
+            commands_conf['module']
+        ))
         exec('import %s' % commands_conf['module'])
     command_index = 1
     for arg in sys.argv[1:]:
@@ -63,7 +70,8 @@ def get_command_header(parser, usage_message="", usage=False):
     loader = template.Loader(os.path.join(
         firenado.conf.ROOT, 'management', 'templates', 'help'))
     return loader.load("header.txt").generate(
-        parser=parser, usage_message=usage_message, usage=usage).decode(
+        parser=parser, usage_message=usage_message, usage=usage,
+        firenado_version=".".join(map(str,firenado.__version__))).decode(
         sys.stdout.encoding)
 
 
