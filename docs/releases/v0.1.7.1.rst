@@ -1,0 +1,18 @@
+What's new in Firenado 0.1.7.1
+==============================
+
+Sep 29, 2018
+------------
+
+We are pleased to announce the release of Firenado 0.1.7.1.
+
+Tornado 5 added to the project and python 3.3 removed from the supported
+versions.
+
+Here are the highlights:
+
+New Features
+~~~~~~~~~~~~
+
+* Add session parameters to the sqlalchemy data source configuration. `#213 <https://github.com/candango/firenado/issues/213>`_
+* Create a decorator to limit a handler method only to XMLHttpRequest(ajax). `#214 <https://github.com/candango/firenado/issues/214>`_
