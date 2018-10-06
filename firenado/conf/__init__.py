@@ -142,6 +142,7 @@ session['id_generators'] = {}
 # If set to 0 the session will not expire
 session['life_time'] = 1800
 session['name'] = 'FIRENADOSESSID'
+session['purge_limit'] = 500
 session['redis'] = {}
 session['redis']['data'] = {}
 session['redis']['data']['source'] = ''

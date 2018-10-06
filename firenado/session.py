@@ -411,6 +411,7 @@ class FileSessionHandler(SessionHandler):
         self.engine.session_callback.stop()
         logging.debug("Session periodic callback stopped by the file "
                       "handler.")
+        purge_count = 0
         for dirname, dirnames, filenames in os.walk(self.path):
             for filename in filenames:
                 file_path = os.path.join(self.path, filename)
@@ -422,7 +423,13 @@ class FileSessionHandler(SessionHandler):
                     logging.debug("Session %s is expired. Removing file "
                                   "from the session path." % sess_id)
                     os.remove(file_path)
-
+                    purge_count += 1
+            if purge_count == firenado.session['purge_limit']:
+                logger.warning(
+                    "Expired 500 sessions. Exiting the call and waiting for "
+                    "next purge wave."
+                )
+                break
         self.engine.session_callback.start()
         logging.debug("Session periodic callback resumed by the file "
                       "handler.")
@@ -474,12 +481,21 @@ class RedisSessionHandler(SessionHandler):
         logging.debug("Session periodic callback stopped by the redis "
                       "handler.")
         keys = self.data_source.get_connection().keys(self.__get_key("*"))
+        purge_count = 0
         for key in keys:
             ttl = self.data_source.get_connection().ttl(key)
             if ttl is None:
-                logger.warning("Session %s without ttl setting expiration now."
-                               % key)
+                logger.warning(
+                    "Session %s without ttl. Setting expiration now." % key
+                )
                 self.data_source.get_connection().expire(key, self.life_time)
+                purge_count += 1
+                if purge_count == firenado.session['purge_limit']:
+                    logger.warning(
+                        "Set ttl to 500 sessions. Exiting the call and wait "
+                        "for next purge wave."
+                    )
+                    break
         self.engine.session_callback.start()
         logging.debug("Session periodic callback resumed by the redis "
                       "handler.")
