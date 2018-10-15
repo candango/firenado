@@ -142,6 +142,12 @@ management['commands'] = []
 
 # Session section
 session = {}
+# Default session hiccup time is 10 seconds
+# This is the time the callback will hiccup if purge_limit is reached
+session['callback_hiccup'] = 10
+# Default session callback time is 2 minutes
+# This is the time the application will scan for expired sessions
+session['callback_time'] = 120
 session['enabled'] = False
 session['encoder'] = 'pickle'
 session['encoders'] = {}
@@ -158,9 +164,6 @@ session['redis'] = {}
 session['redis']['data'] = {}
 session['redis']['data']['source'] = ''
 session['redis']['prefix'] = 'firenado:session'
-# Default session scan intervail is 2 minutes
-# This is the time application will scan for expired sessions
-session['scan_interval'] = 120
 session['type'] = ''
 
 if HAS_LIB_CONFIG_FILE:

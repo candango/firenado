@@ -302,5 +302,9 @@ def process_session_config_section(config, session_config):
         config.session['name'] = session_config['name']
     if 'life_time' in session_config:
         config.session['life_time'] = session_config['life_time']
-    if 'scan_interval' in session_config:
-        config.session['scan_interval'] = session_config['scan_interval']
+    if 'callback_hiccup' in session_config:
+        config.session['callback_hiccup'] = session_config['callback_hiccup']
+    if 'callback_time' in session_config:
+        config.session['callback_time'] = session_config['callback_time']
+    if 'purge_limit' in session_config:
+        config.session['purge_limit'] = session_config['purge_limit']
