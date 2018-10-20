@@ -21,6 +21,7 @@ import unittest
 import firenado.conf
 import firenado.util.file as _file
 from tests import chdir_app
+import logging
 import os
 import six
 
@@ -71,6 +72,22 @@ class ApplicationComponentTestCase(unittest.TestCase):
         del os.environ['FIRENADO_CONFIG_FILE']
         reload(firenado.conf)
 
+    def test_system_config_path_default_value(self):
+        """ Test if the default system config path is /etc/firenado
+        """
+        self.assertEqual(firenado.conf.SYS_CONFIG_PATH, "/etc/firenado")
+
+    def test_system_config_path_custom_value(self):
+        """ Test if the default system config path will be changed setting the
+        FIRENADO_SYS_CONFIG_PATH env variable
+        """
+        custom_sys_config_path = "/etc/anotherplace"
+        os.environ['FIRENADO_SYS_CONFIG_PATH'] = custom_sys_config_path
+        reload(firenado.conf)
+        self.assertEqual(firenado.conf.SYS_CONFIG_PATH, custom_sys_config_path)
+        del os.environ['FIRENADO_SYS_CONFIG_PATH']
+        reload(firenado.conf)
+
     def test_only_framework_stack(self):
         """ Tests is only the framework config stack was loaded.
         No app config is provided.
@@ -87,6 +104,22 @@ class ApplicationComponentTestCase(unittest.TestCase):
                           firenado.conf.LIB_CONFIG_FILE)
         self.assertEqual(firenado.conf.stack[1],
                           firenado.conf.APP_CONFIG_FILE)
+
+    def test_sys_stack(self):
+        """ System config path is provided. Test if the system config file was
+        loaded.
+        """
+        os.environ['FIRENADO_SYS_CONFIG_PATH'] = os.path.join(
+            os.path.dirname(__file__), "resources", "conf", "sys_config")
+        reload(firenado.conf)
+        self.assertEqual(firenado.conf.stack[0],
+                          firenado.conf.LIB_CONFIG_FILE)
+        self.assertEqual(firenado.conf.stack[1],
+                          firenado.conf.SYS_CONFIG_FILE)
+        self.assertEqual("sys_log_format", firenado.conf.log['format'])
+        self.assertEqual(logging.DEBUG, firenado.conf.log['level'])
+        del os.environ['FIRENADO_SYS_CONFIG_PATH']
+        reload(firenado.conf)
 
     def test_app_addresses_default(self):
         """ If no addresses are provided to the application we default to

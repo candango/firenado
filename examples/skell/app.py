@@ -18,7 +18,9 @@ import skell.handlers
 import firenado.tornadoweb
 from firenado import service
 from skell import uimodules
+import logging
 
+logger = logging.getLogger(__name__)
 
 class SkellComponent(firenado.tornadoweb.TornadoComponent):
 
@@ -66,3 +68,9 @@ class SkellComponent(firenado.tornadoweb.TornadoComponent):
 
     def get_data_sources(self):
         return self.application.data_sources
+
+    def after_handler(self, handler):
+        logging.info("Doing something after handler: %s" % handler)
+
+    def before_handler(self, handler):
+        logging.info("Doing something before handler: %s" % handler)

@@ -48,7 +48,7 @@ class FileSessionTestCase(unittest.TestCase):
         session section
         """
         self.assertEqual(firenado.conf.session['life_time'], 1800)
-        self.assertEqual(firenado.conf.session['scan_interval'], 120)
+        self.assertEqual(firenado.conf.session['callback_time'], 120)
 
     def test_application_session_handler(self):
         """ Checks if the session handler loaded is the same the session
@@ -95,7 +95,7 @@ class RedisSessionTestCase(unittest.TestCase):
         session section
         """
         self.assertEqual(firenado.conf.session['life_time'], 1900)
-        self.assertEqual(firenado.conf.session['scan_interval'], 40)
+        self.assertEqual(firenado.conf.session['callback_time'], 40)
 
     def test_pickle_session_encoder(self):
         """ Checks if the pickle session encoder will keep a dict structure

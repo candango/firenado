@@ -33,7 +33,7 @@ session:
   enabled: true
   name: REDISSESSID
   life_time: 1900
-  scan_interval: 40
+  callback_time: 40
   # Redis session handler configuration
   #data:
     #source: session

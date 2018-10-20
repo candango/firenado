@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright 2015-2017 Flavio Garcia
+# Copyright 2015-2018 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -51,7 +51,13 @@ APP_CONFIG_PATH = os.getenv('FIRENADO_CURRENT_APP_CONFIG_PATH',
 #print(APP_CONFIG_PATH)
 APP_CONFIG_FILE = os.path.join(APP_CONFIG_PATH, FIRENADO_CONFIG_FILE)
 
+# If FIRENADO_SYS_CONFIG_PATH is not set than set default sys config path
+SYS_CONFIG_PATH = os.getenv('FIRENADO_SYS_CONFIG_PATH',
+                            os.path.join(os.sep, "etc", "firenado"))
+SYS_CONFIG_FILE = os.path.join(SYS_CONFIG_PATH, FIRENADO_CONFIG_FILE)
+
 HAS_LIB_CONFIG_FILE = False
+HAS_SYS_CONFIG_FILE = False
 HAS_APP_CONFIG_FILE = False
 
 config_file_extensions = ['yml', 'yaml']
@@ -61,6 +67,11 @@ for extension in config_file_extensions:
             HAS_LIB_CONFIG_FILE = True
             LIB_CONFIG_FILE = '%s.%s' % (LIB_CONFIG_FILE, extension)
             stack.append(LIB_CONFIG_FILE)
+    if not HAS_SYS_CONFIG_FILE:
+        if os.path.isfile('%s.%s' % (SYS_CONFIG_FILE, extension)):
+            HAS_SYS_CONFIG_FILE = True
+            SYS_CONFIG_FILE = '%s.%s' % (SYS_CONFIG_FILE, extension)
+            stack.append(SYS_CONFIG_FILE)
     if not HAS_APP_CONFIG_FILE:
         if os.path.isfile('%s.%s' % (APP_CONFIG_FILE, extension)):
             HAS_APP_CONFIG_FILE = True
@@ -131,6 +142,12 @@ management['commands'] = []
 
 # Session section
 session = {}
+# Default session hiccup time is 10 seconds
+# This is the time the callback will hiccup if purge_limit is reached
+session['callback_hiccup'] = 10
+# Default session callback time is 2 minutes
+# This is the time the application will scan for expired sessions
+session['callback_time'] = 120
 session['enabled'] = False
 session['encoder'] = 'pickle'
 session['encoders'] = {}
@@ -142,18 +159,20 @@ session['id_generators'] = {}
 # If set to 0 the session will not expire
 session['life_time'] = 1800
 session['name'] = 'FIRENADOSESSID'
+session['purge_limit'] = 500
 session['redis'] = {}
 session['redis']['data'] = {}
 session['redis']['data']['source'] = ''
 session['redis']['prefix'] = 'firenado:session'
-# Default session scan intervail is 2 minutes
-# This is the time application will scan for expired sessions
-session['scan_interval'] = 120
 session['type'] = ''
 
 if HAS_LIB_CONFIG_FILE:
     lib_config = _config.load_yaml_config_file(LIB_CONFIG_FILE)
     _config.process_config(sys.modules[__name__], lib_config)
+
+if HAS_SYS_CONFIG_FILE:
+    sys_config = _config.load_yaml_config_file(SYS_CONFIG_FILE)
+    _config.process_config(sys.modules[__name__], sys_config)
 
 if HAS_APP_CONFIG_FILE:
     app_config = _config.load_yaml_config_file(APP_CONFIG_FILE)

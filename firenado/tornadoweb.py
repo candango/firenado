@@ -246,6 +246,18 @@ class TornadoComponent(object):
         self.conf = {}
         self.plugins = dict()
 
+    def after_handler(self, handler):
+        """ Add a logic to be executed after all component's handlers
+        execution.
+        """
+        pass
+
+    def before_handler(self, handler):
+        """ Add a logic to be executed before all component's handler
+        execution.
+        """
+        pass
+
     def get_handlers(self):
         """ Returns handlers being added by the component to the application.
         :return: A list of handlers the component provides.
@@ -340,13 +352,11 @@ class TornadoHandler(tornado.web.RequestHandler):
 
     @session.read
     def prepare(self):
-        pass
-        #self.component.run_before_handler(self)
+        self.component.before_handler(self)
 
     @session.write
     def on_finish(self):
-        pass
-        #self.component.run_after_handler(self)
+        self.component.after_handler(self)
 
     def render_string(self, template_name, **kwargs):
         ignore_component = False
@@ -488,13 +498,11 @@ class TornadoWebSocketHandler(tornado.websocket.WebSocketHandler):
 
     @session.read
     def prepare(self):
-        pass
-        #self.component.run_before_handler(self)
+        self.component.before_handler(self)
 
     @session.write
     def on_finish(self):
-        pass
-        #self.component.run_after_handler(self)
+        self.component.after_handler(self)
 
     def render_string(self, template_name, **kwargs):
         ignore_component = False
