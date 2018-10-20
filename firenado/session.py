@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright 2015-2017 Flavio Garcia
+# Copyright 2015-2018 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -26,7 +26,6 @@ import logging
 import os
 import tornado
 import tornado.ioloop
-
 
 logger = logging.getLogger(__name__)
 
@@ -344,6 +343,7 @@ def read(method):
     def wrapper(self, *args, **kwargs):
         session = self.application.session_engine.get_session(self)
         self.session = session
+        logging.debug("Reading session %s." % self.session.id)
         return method(self, *args, **kwargs)
     return wrapper
 
@@ -351,8 +351,10 @@ def read(method):
 def write(method):
     @functools.wraps(method)
     def wrapper(self, *args, **kwargs):
+        retval = method(self, *args, **kwargs)
+        logging.debug("Writing session %s." % self.session.id)
         self.application.session_engine.store_session(self)
-        return method(self, *args, **kwargs)
+        return retval
     return wrapper
 
 
