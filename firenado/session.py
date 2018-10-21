@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright 2015-2017 Flavio Garcia
+# Copyright 2015-2018 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ import functools
 import logging
 import os
 import tornado
-
+import tornado.ioloop
 
 logger = logging.getLogger(__name__)
 
@@ -38,16 +38,18 @@ class SessionEngine(object):
         self.session_aware_instance = None
         self.session_handler = None
         self.session_callback = None
+        self.callback_time = None
+        self.callback_hiccup = firenado.conf.session['callback_hiccup'] * 1000
 
         # TODO: By the way session could be disabled. How do we 
         # handle that?
         # TODO: check if session type exists. Maybe disable it if type is not
         # defined. We need to inform the error here
         if firenado.conf.session['enabled']:
-            # Transforming session scan interval to milliseconds.
-            scan_interval = firenado.conf.session['scan_interval'] * 1000
-            logging.debug("Session periodic call back will be set with scan "
-                          "interval of %sms." % scan_interval)
+            # Transforming session callback time to milliseconds.
+            self.callback_time = firenado.conf.session['callback_time'] * 1000
+            logging.debug("Session periodic callback will be set with time of "
+                          "%sms." % self.callback_time)
             session_handler_class = get_class_from_config(
                 firenado.conf.session['handlers'][
                     firenado.conf.session['type']]
@@ -60,7 +62,7 @@ class SessionEngine(object):
             self.session_handler = session_handler_class(self)
             self.session_callback = tornado.ioloop.PeriodicCallback(
                 self.session_handler.purge_expired_sessions,
-                scan_interval
+                self.callback_time
             )
             self.session_handler.set_settings({})
             self.session_handler.configure()
@@ -129,6 +131,14 @@ class SessionEngine(object):
 
     def get_session_aware_instance(self):
         return self.session_aware_instance
+
+    def set_purge_normal(self):
+        self.session_callback.callback_time = self.callback_time
+        logger.debug("No hiccups. Callback in %sms." % self.callback_time)
+
+    def set_purge_hiccup(self):
+        self.session_callback.callback_time = self.callback_hiccup
+        logger.warning("Purge hiccup in %sms." % self.callback_hiccup)
 
     def __renew_session(self, request_handler):
         if firenado.conf.session['enabled']:
@@ -333,6 +343,7 @@ def read(method):
     def wrapper(self, *args, **kwargs):
         session = self.application.session_engine.get_session(self)
         self.session = session
+        logging.debug("Reading session %s." % self.session.id)
         return method(self, *args, **kwargs)
     return wrapper
 
@@ -340,8 +351,10 @@ def read(method):
 def write(method):
     @functools.wraps(method)
     def wrapper(self, *args, **kwargs):
+        retval = method(self, *args, **kwargs)
+        logging.debug("Writing session %s." % self.session.id)
         self.application.session_engine.store_session(self)
-        return method(self, *args, **kwargs)
+        return retval
     return wrapper
 
 
@@ -411,6 +424,8 @@ class FileSessionHandler(SessionHandler):
         self.engine.session_callback.stop()
         logging.debug("Session periodic callback stopped by the file "
                       "handler.")
+        purge_count = 0
+        purge_hiccup = False
         for dirname, dirnames, filenames in os.walk(self.path):
             for filename in filenames:
                 file_path = os.path.join(self.path, filename)
@@ -422,7 +437,18 @@ class FileSessionHandler(SessionHandler):
                     logging.debug("Session %s is expired. Removing file "
                                   "from the session path." % sess_id)
                     os.remove(file_path)
-
+                    purge_count += 1
+            if purge_count == firenado.session['purge_limit']:
+                purge_hiccup = True
+                logger.warning(
+                    "Expired 500 sessions. Exiting the call and waiting for "
+                    "purge hiccup."
+                )
+                break
+        if purge_hiccup:
+            self.engine.set_purge_hiccup()
+        else:
+            self.engine.set_purge_normal()
         self.engine.session_callback.start()
         logging.debug("Session periodic callback resumed by the file "
                       "handler.")
@@ -474,12 +500,27 @@ class RedisSessionHandler(SessionHandler):
         logging.debug("Session periodic callback stopped by the redis "
                       "handler.")
         keys = self.data_source.get_connection().keys(self.__get_key("*"))
+        purge_count = 0
+        purge_hiccup = False
         for key in keys:
             ttl = self.data_source.get_connection().ttl(key)
             if ttl is None:
-                logger.warning("Session %s without ttl setting expiration now."
-                               % key)
+                logger.warning(
+                    "Session %s without ttl. Setting expiration now." % key
+                )
                 self.data_source.get_connection().expire(key, self.life_time)
+                purge_count += 1
+                if purge_count == firenado.session['purge_limit']:
+                    purge_hiccup = True
+                    logger.warning(
+                        "Set ttl to 500 sessions. Exiting the call and waiting"
+                        " for purge hiccup."
+                    )
+                    break
+        if purge_hiccup:
+            self.engine.set_purge_hiccup()
+        else:
+            self.engine.set_purge_normal()
         self.engine.session_callback.start()
         logging.debug("Session periodic callback resumed by the redis "
                       "handler.")
