@@ -1,0 +1,25 @@
+What's new in Firenado 0.1.7.2
+==============================
+
+Oct 21, 2018
+------------
+
+We are pleased to announce the release of Firenado 0.1.7.2.
+
+The system configuration file was implemented and improvements to session and
+components were added to the framework.
+
+Here are the highlights:
+
+New Features
+~~~~~~~~~~~~
+
+* Implement system conf file. `#222 <https://github.com/candango/firenado/issues/222>`_
+* Add after and before handler methods to the component. `#223 <https://github.com/candango/firenado/issues/223>`_
+* Add method to execute a sql script to the sqlalchemy util. `#225 <https://github.com/candango/firenado/issues/225>`_
+
+Bug Fixes
+~~~~~~~~~
+
+* Run session write after the handler on_finish. `#39 <https://github.com/candango/firenado/issues/39>`_
+* Redis session expiration control is blocking. `#221 <https://github.com/candango/firenado/issues/221>`_
