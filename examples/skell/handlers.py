@@ -16,9 +16,8 @@
 
 import firenado.conf
 import firenado.tornadoweb
-from firenado import service
+from firenado import security, service
 from firenado.components.toolbox.pagination import Paginator
-from firenado.security import authenticated
 
 
 class AuthenticatedHandler(firenado.tornadoweb.TornadoHandler):
@@ -102,7 +101,7 @@ class LoginHandler(firenado.tornadoweb.TornadoHandler):
 
 class PrivateHandler(AuthenticatedHandler):
 
-    @authenticated
+    @security.authenticated
     def get(self):
         self.render("private.html")
 
