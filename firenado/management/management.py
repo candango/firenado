@@ -18,6 +18,7 @@
 from __future__ import (absolute_import, division,
                         print_function, with_statement)
 
+import argparse
 import firenado.conf
 from firenado.util.argparse_util import FirenadoArgumentError
 from firenado.util.argparse_util import FirenadoArgumentParser
@@ -47,8 +48,11 @@ def run_from_command_line():
         command_index += 1
         if arg[0] != "-":
             break
-    parser = FirenadoArgumentParser(prog=os.path.split(sys.argv[0])[1])
-    parser.add_argument("command", help="Command to executed")
+    parser = FirenadoArgumentParser(prog=os.path.split(sys.argv[0])[1],
+                                    add_help=False)
+    parser.add_argument("-h", "--help", default=argparse.SUPPRESS)
+    parser.add_argument("command", default="help", help="Command to executed")
+
     try:
         namespace = parser.parse_args(sys.argv[1:command_index])
         if not command_exists(namespace.command):
@@ -174,6 +178,7 @@ class ManagementCommand(object):
                         break
         if not has_sub_commands:
             self.run_tasks(args)
+            exit(0)
         else:
             if not subcommands_resolved:
                 from tornado.template import Template
@@ -184,6 +189,7 @@ class ManagementCommand(object):
                 if isinstance(msg_help, Template):
                     msg_help = msg_help.generate(parser=parser)
                 print(get_command_header(parser, msg_help, True))
+            exit(0)
 
     def run_tasks(self, args):
         cmd_parser = FirenadoArgumentParser(

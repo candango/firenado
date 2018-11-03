@@ -1,4 +1,4 @@
 Firenado Framework {{ firenado_version }}
 {% if usage %}
-Usage: {{ parser.prog }} {%raw usage_message %}
+Usage: {{ parser.prog }} [-h] {%raw usage_message %}
 {% end %}

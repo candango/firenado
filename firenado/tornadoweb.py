@@ -220,7 +220,6 @@ class TornadoLauncher(FirenadoLauncher):
                 logger.info("Firenado listening at ""http://%s:%s" % (address,
                                                                       port))
         tornado.ioloop.IOLoop.instance().start()
-        exit(0)
 
     def sig_handler(self, sig, frame):
         logger.warning('Caught signal: %s', sig)
