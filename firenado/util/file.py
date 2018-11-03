@@ -29,6 +29,7 @@ def create_module(module, target):
             touch(os.path.join(target, cur_path, '__init__.py'))
     return cur_path
 
+
 def file_has_extension(filename):
     """ Return True if the informed filename was extension on it.
 

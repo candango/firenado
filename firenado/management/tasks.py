@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 #
-# Copyright 2015-2016 Flavio Garcia
+# Copyright 2015-2018 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -104,14 +104,28 @@ class InstallProjectTask(ManagementTask):
 
 
 class RunApplicationTask(ManagementTask):
+
+    def add_arguments(self, parser):
+        parser.add_argument("-a", "--addresses", default=None)
+        parser.add_argument("-d", "--dir", default=None)
+        parser.add_argument("-P", "--port", type=int)
+
     """ Runs a Firenado Tornado Application based
     on the it's project configuration
     """
     def run(self, namespace):
         #TODO throw a custom error when type is not found
         from firenado.config import get_class_from_config
+        parameters = {}
+        if namespace.addresses is not None:
+            parameters['addresses'] = namespace.addresses.split(",")
+        if namespace.dir is not None:
+            parameters['dir'] = namespace.dir
+        if namespace.port is not None:
+            parameters['port'] = namespace.port
+
         app_type = firenado.conf.app['types'][firenado.conf.app['type']]
-        launcher = get_class_from_config(app_type['launcher'])()
+        launcher = get_class_from_config(app_type['launcher'])(**parameters)
         launcher.launch()
 
 

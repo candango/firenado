@@ -17,29 +17,44 @@
 from __future__ import (absolute_import, division, print_function,
                         with_statement)
 
+import tornado.web
+import firenado.conf
+from . import data
+from . import session
+from . import uimodules
+from .config import get_class_from_config, load_yaml_config_file
 import inspect
 import logging
-import sys
-
-import os
-import tornado.httpserver
-import tornado.web
-import tornado.websocket
-from six import iteritems, string_types
 from tornado.escape import json_encode
-
-import firenado.conf
-from . import session
-from .config import get_class_from_config, load_yaml_config_file
-from . import data
-from . import uimodules
+import tornado.httpserver
 from tornado.template import Loader
+import tornado.websocket
+import os
+import sys
+import six
+from six import iteritems, string_types
 
+if six.PY3:
+    try:
+        import importlib
+        reload = importlib.reload
+    except AttributeError:
+        # PY33
+        import imp
+        reload = imp.reload
 
 logger = logging.getLogger(__name__)
 
 
 class FirenadoLauncher(object):
+
+    def __init__(self, addresses=None, dir=None, port=None):
+        self.addresses = addresses
+        self.dir = dir
+        self.port = port
+        if self.dir is not None:
+            os.chdir(self.dir)
+            reload(firenado.conf)
 
     def launch(self):
         return None
@@ -169,7 +184,8 @@ class TornadoApplication(tornado.web.Application, data.DataConnectedMixin,
 
 class TornadoLauncher(FirenadoLauncher):
 
-    def __init__(self):
+    def __init__(self, addresses=None, dir=None, port=None):
+        super(TornadoLauncher, self).__init__(addresses, dir, port)
         self.http_server = None
         self.MAX_WAIT_SECONDS_BEFORE_SHUTDOWN = firenado.conf.app[
             'wait_before_shutdown']
@@ -193,14 +209,18 @@ class TornadoLauncher(FirenadoLauncher):
             socket = bind_unix_socket(firenado.conf.app['socket'])
             self.http_server.add_socket(socket)
         else:
-            addresses = firenado.conf.app['addresses']
-            port = firenado.conf.app['port']
+            addresses = self.addresses
+            if addresses is None:
+                addresses = firenado.conf.app['addresses']
+            port = self.port
+            if port is None:
+                port = firenado.conf.app['port']
             for address in addresses:
                 self.http_server.listen(port, address)
                 logger.info("Firenado listening at ""http://%s:%s" % (address,
                                                                       port))
         tornado.ioloop.IOLoop.instance().start()
-
+        exit(0)
 
     def sig_handler(self, sig, frame):
         logger.warning('Caught signal: %s', sig)
