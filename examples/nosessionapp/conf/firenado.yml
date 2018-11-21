@@ -1,0 +1,40 @@
+app:
+  component: 'nosessionapp'
+  data:
+    sources:
+        # Set here references from sources defined on data.sources
+        - 'session'
+  #pythonpath: '..'
+  #type: 'tornado'
+  socket: /tmp/buga
+  #port: 8888
+
+data:
+  sources:
+    - name: session
+      connector: redis
+      # host: localhost
+      # port: 6379
+      # db: 0
+components:
+  - id: nosessionapp
+    class: nosessionapp.app.NosessionappComponent
+    enabled: true
+  #- id: admin
+  #  enabled: true
+  #- id: info
+  #  enabled: true
+
+log:
+  level: DEBUG
+
+# Session types could be:
+# file or redis.
+session:
+  type: redis
+  enabled: false
+  # Redis session handler configuration
+  data:
+    source: session
+  # File session handler related configuration
+  # path: /tmp

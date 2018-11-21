@@ -208,6 +208,8 @@ class TornadoLauncher(FirenadoLauncher):
             from tornado.netutil import bind_unix_socket
             socket = bind_unix_socket(firenado.conf.app['socket'])
             self.http_server.add_socket(socket)
+            logger.info("Firenado listening at socket ""%s" %
+                        socket.getsockname())
         else:
             addresses = self.addresses
             if addresses is None:
@@ -343,6 +345,7 @@ class TornadoHandler(tornado.web.RequestHandler):
     """
     def __init__(self, application, request, **kwargs):
         self.component = None
+        self.session = None
         self.__template_variables = dict()
         super(TornadoHandler, self).__init__(application, request, **kwargs)
 
