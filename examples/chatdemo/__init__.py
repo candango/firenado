@@ -62,9 +62,9 @@ class MessageBuffer(object):
 
 class ChatdemoComponent(firenado.tornadoweb.TornadoComponent):
 
-    def __init__(self, name, application, config={}):
+    def __init__(self, name, application):
         self.message_buffer = MessageBuffer()
-        super(ChatdemoComponent, self).__init__(name, application, config)
+        super(ChatdemoComponent, self).__init__(name, application)
 
     def get_handlers(self):
         return [

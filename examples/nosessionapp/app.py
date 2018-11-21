@@ -1,8 +1,8 @@
-from {{module}} import handlers
+from nosessionapp import handlers
 from firenado import tornadoweb
 
 
-class {{component}}Component(tornadoweb.TornadoComponent):
+class NosessionappComponent(tornadoweb.TornadoComponent):
 
     def get_handlers(self):
         return [

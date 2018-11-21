@@ -1,0 +1,22 @@
+What's new in Firenado 0.1.7.3
+==============================
+
+Nov 10, 2018
+------------
+
+We are pleased to announce the release of Firenado 0.1.7.3.
+
+The system configuration file was implemented and improvements to session and
+components were added to the framework.
+
+Here are the highlights:
+
+New Features
+~~~~~~~~~~~~
+
+* Service by decorator must only create the service if not defined. `#228 <https://github.com/candango/firenado/issues/228>`_
+
+Bug Fixes
+~~~~~~~~~
+
+* Handle manager help better. `#217 <https://github.com/candango/firenado/issues/217>`_

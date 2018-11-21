@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright 2015-2017 Flavio Garcia
+# Copyright 2015-2018 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
 # limitations under the License.
 
 import skell.handlers
+import skell.services
 import firenado.tornadoweb
 from firenado import service
 from skell import uimodules
@@ -22,7 +23,14 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 class SkellComponent(firenado.tornadoweb.TornadoComponent):
+
+    user_service: skell.services.LoginService
+
+    def __init__(self, name, application):
+        super(SkellComponent, self).__init__(name, application)
+        self.user_service = None
 
     def get_handlers(self):
         import firenado.conf
@@ -43,7 +51,7 @@ class SkellComponent(firenado.tornadoweb.TornadoComponent):
         import firenado.conf
         firenado.conf.app['login']['urls']['buga'] = 'buga'
 
-    @service.served_by("skell.services.UserService")
+    @service.served_by(skell.services.UserService)
     def install(self):
         """  Installing test database
         """

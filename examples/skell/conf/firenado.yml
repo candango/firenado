@@ -18,7 +18,7 @@ app:
   xsrf_cookies: true
   addresses:
     - localhost
-  port: 8888
+  #port: 8888
 
 data:
   sources:

@@ -4,3 +4,5 @@ Commands are:
 
     {% for command in command_categories[category] %}{{ command_template.format(command) }}
     {% end %}{% end %}
+Optional arguments:
+  -h, --help  show this help message and exit
