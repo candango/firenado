@@ -539,7 +539,7 @@ class TornadoWebSocketHandler(tornado.websocket.WebSocketHandler):
             self, 'user_agent') else None
         kwargs['credential'] = self.credential if hasattr(
             self, 'credential') else None
-        for name, variable in self.__template_variables.iteritems():
+        for name, variable in iteritems(self.__template_variables):
             kwargs[name] = variable
         if self.ui:
             return super(TornadoWebSocketHandler, self).render_string(
