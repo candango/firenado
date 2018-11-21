@@ -23,7 +23,6 @@ import uuid
 class MainHandler(firenado.tornadoweb.TornadoHandler):
 
     def get(self):
-        print self.component.message_buffer
         self.render("index.html",
                     messages=self.component.message_buffer.cache)
 

@@ -53,7 +53,7 @@ class IndexHandler(firenado.tornadoweb.TornadoHandler):
         #if regexp.search(word) is not None:
         #    print
         #    'matched'
-        if self.is_browser_mobile():
+        if self.is_mobile():
             print("buu")
         else:
             print(self.request.headers["User-Agent"])
