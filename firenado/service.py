@@ -103,7 +103,14 @@ def served_by(service, attribute_name=None):
                     first = False
             else:
                 service_attribute = attribute_name
-            setattr(self, service_attribute, service_class(self))
+            must_set_service = False
+            if not hasattr(self, service_attribute):
+                must_set_service = True
+            else:
+                if getattr(self, service_attribute) is None:
+                    must_set_service = True
+            if must_set_service:
+                setattr(self, service_attribute, service_class(self))
             return method(self, *args, **kwargs)
 
         return wrapper
