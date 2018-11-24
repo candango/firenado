@@ -179,4 +179,8 @@ if HAS_APP_CONFIG_FILE:
     _config.process_app_config(sys.modules[__name__], app_config)
 
 # Set logging basic configurations
+for handler in logging.root.handlers[:]:
+    # clearing loggers, solution from: https://bit.ly/2yTchyx
+    logging.root.removeHandler(handler)
+
 logging.basicConfig(level=log['level'], format=log['format'])

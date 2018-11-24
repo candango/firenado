@@ -121,6 +121,8 @@ class SessionEngine(object):
                         )
                 else:
                     # Generating a new session
+                    logger.debug("Dispatching session %s destruction to the "
+                                 "session handler." % session_id)
                     self.session_handler.destroy_stored_session(session_id)
 
     def encode_session_data(self, data):
@@ -341,9 +343,10 @@ def create_session_engine(obj, session_engine_attribute, session_engine_class):
 def read(method):
     @functools.wraps(method)
     def wrapper(self, *args, **kwargs):
-        session = self.application.session_engine.get_session(self)
-        self.session = session
-        logging.debug("Reading session %s." % self.session.id)
+        if firenado.conf.session['enabled']:
+            session = self.application.session_engine.get_session(self)
+            self.session = session
+            logging.debug("Reading session %s." % self.session.id)
         return method(self, *args, **kwargs)
     return wrapper
 
@@ -352,8 +355,9 @@ def write(method):
     @functools.wraps(method)
     def wrapper(self, *args, **kwargs):
         retval = method(self, *args, **kwargs)
-        logging.debug("Writing session %s." % self.session.id)
-        self.application.session_engine.store_session(self)
+        if firenado.conf.session['enabled']:
+            logging.debug("Writing session %s." % self.session.id)
+            self.application.session_engine.store_session(self)
         return retval
     return wrapper
 
@@ -402,12 +406,14 @@ class FileSessionHandler(SessionHandler):
         _file.write(session_file, timed_data)
 
     def destroy_stored_session(self, session_id):
+        logger.debug("Destroying session %s." % session_id)
         try:
             session_file = os.path.join(
                 self.path,
                 self.__get_filename(session_id)
             )
             os.remove(session_file)
+            logger.debug("Session %s destroyed." % session_id)
         except OSError:
             # TODO Why we are deleting the session file twice?
             pass
@@ -438,7 +444,7 @@ class FileSessionHandler(SessionHandler):
                                   "from the session path." % sess_id)
                     os.remove(file_path)
                     purge_count += 1
-            if purge_count == firenado.session['purge_limit']:
+            if purge_count == firenado.conf.session['purge_limit']:
                 purge_hiccup = True
                 logger.warning(
                     "Expired 500 sessions. Exiting the call and waiting for "
@@ -466,7 +472,7 @@ class RedisSessionHandler(SessionHandler):
     Session handler that deals with file data stored  in a redis database.
     """
     def __init__(self, engine):
-        SessionHandler.__init__(self,engine)
+        SessionHandler.__init__(self, engine)
         self.data_source = None
 
     def configure(self):
@@ -488,8 +494,10 @@ class RedisSessionHandler(SessionHandler):
         self.data_source.get_connection().expire(key, self.life_time)
 
     def destroy_stored_session(self, session_id):
+        logger.debug("Destroying session %s." % session_id)
         key = self.__get_key(session_id)
         self.data_source.get_connection().delete(key)
+        logger.debug("Session %s destroyed." % session_id)
 
     def purge_expired_sessions(self):
         """ On Redis we don't destroy expired sessions per-se.
@@ -504,13 +512,13 @@ class RedisSessionHandler(SessionHandler):
         purge_hiccup = False
         for key in keys:
             ttl = self.data_source.get_connection().ttl(key)
-            if ttl is None:
+            if ttl == -1:
                 logger.warning(
                     "Session %s without ttl. Setting expiration now." % key
                 )
                 self.data_source.get_connection().expire(key, self.life_time)
                 purge_count += 1
-                if purge_count == firenado.session['purge_limit']:
+                if purge_count == firenado.conf.session['purge_limit']:
                     purge_hiccup = True
                     logger.warning(
                         "Set ttl to 500 sessions. Exiting the call and waiting"

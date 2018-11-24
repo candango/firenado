@@ -20,9 +20,11 @@ from __future__ import (absolute_import, division, print_function,
 import firenado.conf
 from firenado.tornadoweb import TornadoApplication
 from firenado.tornadoweb import TornadoHandler
+from firenado.tornadoweb import FirenadoLauncher
 from firenado.tornadoweb import TornadoComponent
 import unittest
 from tests import chdir_app
+import os
 
 
 class MainHandler(TornadoHandler):
@@ -53,6 +55,7 @@ class FakeConnection:
 
     def set_close_callback(self, callback):
         pass
+
 
 class DisabledTestComponent(TornadoComponent):
     """ Disabled component referenced at the application configuration file
@@ -110,3 +113,27 @@ class TornadoHandlerTestCase(unittest.TestCase):
         self.assertFalse(handler.authenticated())
         handler.current_user = "a user"
         self.assertTrue(handler.authenticated())
+
+
+class TornadoLaucherTestCase(unittest.TestCase):
+    """ TornadoLaucher tests
+    """
+
+    def test_parameters_none(self):
+        """ Test if launcher parameters will be none if not informed
+        """
+        launcher = FirenadoLauncher()
+        self.assertIsNone(launcher.addresses)
+        self.assertIsNone(launcher.dir)
+        self.assertIsNone(launcher.port)
+
+    def test_parameters_set(self):
+        """ Test if launcher parameters were set correctly if informed
+        """
+        addresses = "localhost"
+        dir = os.path.dirname(os.path.abspath(__file__))
+        port = 80
+        launcher = FirenadoLauncher(addresses=addresses, dir=dir, port=port)
+        self.assertEqual(addresses, launcher.addresses)
+        self.assertEqual(dir, launcher.dir)
+        self.assertEqual(port, launcher.port)

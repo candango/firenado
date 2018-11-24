@@ -1,0 +1,33 @@
+What's new in Firenado 0.1.7.3
+==============================
+
+Nov 23, 2018
+------------
+
+We are pleased to announce the release of Firenado 0.1.7.3.
+
+Now it is possible to change the address and port the application will listen
+and the application directory using parameters with app run command.
+
+Fixed some bugs and upgraded redis-py to 3.0.1.
+
+Here are the highlights:
+
+Refactory
+~~~~~~~~~
+
+* Upgrade redis to 3.x. `#232 <https://github.com/candango/firenado/issues/232>`_
+
+New Features
+~~~~~~~~~~~~
+
+* Service by decorator must only create the service if not defined. `#228 <https://github.com/candango/firenado/issues/228>`_
+* Add addresses, application directory and port parameters to the app run command. `#231 <https://github.com/candango/firenado/issues/231>`_
+
+Bug Fixes
+~~~~~~~~~
+
+* Handle manager help better. `#217 <https://github.com/candango/firenado/issues/217>`_
+* Session purge limit check is broken. `#233 <https://github.com/candango/firenado/issues/233>`_
+* Session read and write breaking when session is disabled. `#234 <https://github.com/candango/firenado/issues/234>`_
+* Tornado Web Socket handler breaking on python 3. `#235 <https://github.com/candango/firenado/issues/235>`_
