@@ -63,8 +63,13 @@ class FirenadoService(object):
 
         :return: The data connected object in the top of the hierarchy.
         """
+        from firenado.data import DataConnectedMixin
+
         if self.consumer is None:
             return None
+
+        if isinstance(self.consumer, DataConnectedMixin):
+            return self.consumer
         invert_op = getattr(self.consumer, "get_data_connected", None)
         if callable(invert_op):
             return self.consumer.get_data_connected()
