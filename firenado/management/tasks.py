@@ -126,6 +126,7 @@ class RunApplicationTask(ManagementTask):
 
         app_type = firenado.conf.app['types'][firenado.conf.app['type']]
         launcher = get_class_from_config(app_type['launcher'])(**parameters)
+        launcher.load()
         launcher.launch()
 
 

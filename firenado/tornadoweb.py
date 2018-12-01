@@ -56,6 +56,9 @@ class FirenadoLauncher(object):
             os.chdir(self.dir)
             reload(firenado.conf)
 
+    def load(self):
+        return None
+
     def launch(self):
         return None
 
@@ -187,23 +190,23 @@ class TornadoLauncher(FirenadoLauncher):
     def __init__(self, addresses=None, dir=None, port=None):
         super(TornadoLauncher, self).__init__(addresses, dir, port)
         self.http_server = None
+        self.application = None
         self.MAX_WAIT_SECONDS_BEFORE_SHUTDOWN = firenado.conf.app[
             'wait_before_shutdown']
 
-    def launch(self):
-        import signal
-
+    def load(self):
         # TODO: Resolve module if doesn't exists
         if firenado.conf.app['pythonpath']:
             sys.path.append(firenado.conf.app['pythonpath'])
+        self.application = TornadoApplication(debug=firenado.conf.app['debug'])
 
+    def launch(self):
+        import signal
         signal.signal(signal.SIGTERM, self.sig_handler)
         signal.signal(signal.SIGINT, self.sig_handler)
         if os.name == "posix":
             signal.signal(signal.SIGTSTP, self.sig_handler)
-        self.application = TornadoApplication(debug=firenado.conf.app['debug'])
-        self.http_server = tornado.httpserver.HTTPServer(
-            self.application)
+        self.http_server = tornado.httpserver.HTTPServer(self.application)
         if firenado.conf.app['socket']:
             from tornado.netutil import bind_unix_socket
             socket = bind_unix_socket(firenado.conf.app['socket'])

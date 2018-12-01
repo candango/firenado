@@ -23,6 +23,14 @@ from firenado.data import DataConnectedMixin
 from firenado.service import served_by, FirenadoService
 
 
+class MockServiceDataConnected(FirenadoService):
+    """ Serves a data connected method directly.
+    When decorating a data connected directly the service must return the
+    consumer.
+    """
+    pass
+
+
 class MockDataConnected(DataConnectedMixin):
     """ Data connected mock object. This object holds the data sources to be
     used in the test cases.
@@ -32,6 +40,9 @@ class MockDataConnected(DataConnectedMixin):
         self.data_sources['datasource1'] = 'DataSource1'
         self.data_sources['datasource2'] = 'DataSource2'
 
+    @served_by(MockServiceDataConnected)
+    def get_service_data_sources_directly(self):
+        return self.mock_service_data_connected.get_data_sources()
 
 class MockTestService(FirenadoService):
     """ Service that decorates the instance to be served directly and
@@ -152,6 +163,13 @@ class ServiceTestCase(unittest.TestCase):
 
     def test_get_data_source_from_service(self):
         data_sources = self.served_by_instance.get_service_data_sources()
+        self.assertTrue(len(data_sources) == 2)
+        self.assertEqual(data_sources['datasource1'], "DataSource1")
+        self.assertEqual(data_sources['datasource2'], "DataSource2")
+
+    def test_get_data_source_from_data_connected(self):
+        data_sources = self.data_connected_instance.\
+            get_service_data_sources_directly()
         self.assertTrue(len(data_sources) == 2)
         self.assertEqual(data_sources['datasource1'], "DataSource1")
         self.assertEqual(data_sources['datasource2'], "DataSource2")

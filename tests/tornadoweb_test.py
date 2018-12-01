@@ -20,7 +20,7 @@ from __future__ import (absolute_import, division, print_function,
 import firenado.conf
 from firenado.tornadoweb import TornadoApplication
 from firenado.tornadoweb import TornadoHandler
-from firenado.tornadoweb import FirenadoLauncher
+from firenado.tornadoweb import FirenadoLauncher, TornadoLauncher
 from firenado.tornadoweb import TornadoComponent
 import unittest
 from tests import chdir_app
@@ -137,3 +137,9 @@ class TornadoLaucherTestCase(unittest.TestCase):
         self.assertEqual(addresses, launcher.addresses)
         self.assertEqual(dir, launcher.dir)
         self.assertEqual(port, launcher.port)
+
+    def test_load(self):
+        chdir_app('tornadoweb')
+        launcher = TornadoLauncher()
+        launcher.load()
+        self.assertTrue(isinstance(launcher.application, TornadoApplication))

@@ -1,0 +1,36 @@
+What's new in Firenado 0.1.7.4
+==============================
+
+Dec 01, 2018
+------------
+
+We are pleased to announce the release of Firenado 0.1.7.4.
+
+With launcher loading separately from the launch method we can use it to
+retrieve applications in management tasks and tests.
+
+Services will retrieve a data connected consumer when calling the get data
+connected method.
+
+Fixed an attempt to write a none session. This is happening when we have a
+handler with error set by tornado. The error was noticed in a post method
+without xsrf argument/cookie. The handler was set with a 403 and other
+exception as raised because we were waiting for a valid session. Now a warning
+will be logged regarding the issue of a none session in this case.
+
+Here are the highlights:
+
+Refactory
+~~~~~~~~~
+
+* Launcher should load the application before launch. `#243 <https://github.com/candango/firenado/issues/243>`_
+
+New Features
+~~~~~~~~~~~~
+
+* Service should return the consumer if it is a data connected. `#152 <https://github.com/candango/firenado/issues/152>`_
+
+Bug Fixes
+~~~~~~~~~
+
+* When xsrf argument is missing from post we try to write an empty session. `#241 <https://github.com/candango/firenado/issues/241>`_
