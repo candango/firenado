@@ -65,6 +65,9 @@ class FirenadoService(object):
         """
         if self.consumer is None:
             return None
+        from firenado.data import DataConnectedMixin
+        if isinstance(self.consumer, DataConnectedMixin):
+            return self.consumer
         invert_op = getattr(self.consumer, "get_data_connected", None)
         if callable(invert_op):
             return self.consumer.get_data_connected()

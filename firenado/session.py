@@ -356,8 +356,14 @@ def write(method):
     def wrapper(self, *args, **kwargs):
         retval = method(self, *args, **kwargs)
         if firenado.conf.session['enabled']:
-            logging.debug("Writing session %s." % self.session.id)
-            self.application.session_engine.store_session(self)
+            if self.session is None:
+                logging.error("The handler session is None. Something wrong"
+                              " happened during the handler execution. The"
+                              " current handler status is: %s." %
+                              self.get_status())
+            else:
+                logging.debug("Writing session %s." % self.session.id)
+                self.application.session_engine.store_session(self)
         return retval
     return wrapper
 
