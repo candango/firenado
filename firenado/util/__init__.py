@@ -17,8 +17,8 @@
 from __future__ import (absolute_import, division, print_function,
                         with_statement)
 
-import random
 import string
+import sys
 
 
 # Used implementations described on: http://bit.ly/2gHlH9z
@@ -28,7 +28,7 @@ import string
 # TODO: Use that after 3.6 https://bit.ly/2wvubJ6
 def random_string(length=5, upper_chars=True, punctuation=False):
     """
-    Generates a random string with the size equal to the given length.
+    Generate a random string with the size equal to the given length.
 
     The string is based on random choices from a sequence of ascii lower case
     characters and digits.
@@ -40,4 +40,11 @@ def random_string(length=5, upper_chars=True, punctuation=False):
         chars += string.ascii_uppercase
     if punctuation:
         chars += string.punctuation
-    return ''.join(random.SystemRandom().choice(chars) for _ in range(length))
+    if sys.version_info < (3, 6):
+        import random
+        return ''.join(
+            random.SystemRandom().choice(chars) for _ in range(length)
+        )
+    else:
+        import secrets
+        return ''.join(secrets.choice(chars) for _ in range(length))
