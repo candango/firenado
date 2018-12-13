@@ -48,10 +48,11 @@ logger = logging.getLogger(__name__)
 
 class FirenadoLauncher(object):
 
-    def __init__(self, addresses=None, dir=None, port=None):
+    def __init__(self, addresses=None, dir=None, port=None, socket=None):
         self.addresses = addresses
         self.dir = dir
         self.port = port
+        self.socket = socket
         if self.dir is not None:
             os.chdir(self.dir)
             reload(firenado.conf)
@@ -187,8 +188,8 @@ class TornadoApplication(tornado.web.Application, data.DataConnectedMixin,
 
 class TornadoLauncher(FirenadoLauncher):
 
-    def __init__(self, addresses=None, dir=None, port=None):
-        super(TornadoLauncher, self).__init__(addresses, dir, port)
+    def __init__(self, addresses=None, dir=None, port=None, socket=None):
+        super(TornadoLauncher, self).__init__(addresses, dir, port, socket)
         self.http_server = None
         self.application = None
         self.MAX_WAIT_SECONDS_BEFORE_SHUTDOWN = firenado.conf.app[
@@ -207,9 +208,12 @@ class TornadoLauncher(FirenadoLauncher):
         if os.name == "posix":
             signal.signal(signal.SIGTSTP, self.sig_handler)
         self.http_server = tornado.httpserver.HTTPServer(self.application)
-        if firenado.conf.app['socket']:
+        if firenado.conf.app['socket'] or self.socket:
             from tornado.netutil import bind_unix_socket
-            socket = bind_unix_socket(firenado.conf.app['socket'])
+            socket_path = firenado.conf.app['socket']
+            if self.socket:
+                socket_path = self.socket
+            socket = bind_unix_socket(socket_path)
             self.http_server.add_socket(socket)
             logger.info("Firenado listening at socket ""%s" %
                         socket.getsockname())
