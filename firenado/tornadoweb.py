@@ -26,42 +26,13 @@ from .config import get_class_from_config, load_yaml_config_file
 import inspect
 import logging
 from tornado.escape import json_encode
-import tornado.httpserver
 from tornado.template import Loader
 import tornado.websocket
 import os
-import sys
-import six
 from six import iteritems, string_types
 
-if six.PY3:
-    try:
-        import importlib
-        reload = importlib.reload
-    except AttributeError:
-        # PY33
-        import imp
-        reload = imp.reload
 
 logger = logging.getLogger(__name__)
-
-
-class FirenadoLauncher(object):
-
-    def __init__(self, addresses=None, dir=None, port=None, socket=None):
-        self.addresses = addresses
-        self.dir = dir
-        self.port = port
-        self.socket = socket
-        if self.dir is not None:
-            os.chdir(self.dir)
-            reload(firenado.conf)
-
-    def load(self):
-        return None
-
-    def launch(self):
-        return None
 
 
 class TornadoApplication(tornado.web.Application, data.DataConnectedMixin,
@@ -183,84 +154,10 @@ class TornadoApplication(tornado.web.Application, data.DataConnectedMixin,
                                         key, firenado.conf.APP_CONFIG_PATH,
                                         self.components[key].get_config_file())
                                      )
+        # Initializing enabled components after the load.
+        for key, value in iteritems(firenado.conf.components):
+            if value['enabled']:
                 self.components[key].initialize()
-
-
-class TornadoLauncher(FirenadoLauncher):
-
-    def __init__(self, addresses=None, dir=None, port=None, socket=None):
-        super(TornadoLauncher, self).__init__(addresses, dir, port, socket)
-        self.http_server = None
-        self.application = None
-        self.MAX_WAIT_SECONDS_BEFORE_SHUTDOWN = firenado.conf.app[
-            'wait_before_shutdown']
-
-    def load(self):
-        # TODO: Resolve module if doesn't exists
-        if firenado.conf.app['pythonpath']:
-            sys.path.append(firenado.conf.app['pythonpath'])
-        self.application = TornadoApplication(debug=firenado.conf.app['debug'])
-
-    def launch(self):
-        import signal
-        signal.signal(signal.SIGTERM, self.sig_handler)
-        signal.signal(signal.SIGINT, self.sig_handler)
-        if os.name == "posix":
-            signal.signal(signal.SIGTSTP, self.sig_handler)
-        self.http_server = tornado.httpserver.HTTPServer(self.application)
-        if firenado.conf.app['socket'] or self.socket:
-            from tornado.netutil import bind_unix_socket
-            socket_path = firenado.conf.app['socket']
-            if self.socket:
-                socket_path = self.socket
-            socket = bind_unix_socket(socket_path)
-            self.http_server.add_socket(socket)
-            logger.info("Firenado listening at socket ""%s" %
-                        socket.getsockname())
-        else:
-            addresses = self.addresses
-            if addresses is None:
-                addresses = firenado.conf.app['addresses']
-            port = self.port
-            if port is None:
-                port = firenado.conf.app['port']
-            for address in addresses:
-                self.http_server.listen(port, address)
-                logger.info("Firenado listening at ""http://%s:%s" % (address,
-                                                                      port))
-        tornado.ioloop.IOLoop.instance().start()
-
-    def sig_handler(self, sig, frame):
-        logger.warning('Caught signal: %s', sig)
-        tornado.ioloop.IOLoop.instance().add_callback(self.shutdown)
-
-    def shutdown(self):
-        import time
-        logger.info('Stopping http server')
-        for key, component in iteritems(self.application.components):
-            component.shutdown()
-        self.http_server.stop()
-
-        io_loop = tornado.ioloop.IOLoop.instance()
-
-        if self.MAX_WAIT_SECONDS_BEFORE_SHUTDOWN == 0:
-            io_loop.stop()
-            logger.info('Application is down.')
-        else:
-
-            logger.info('Will shutdown in %s seconds ...',
-                        self.MAX_WAIT_SECONDS_BEFORE_SHUTDOWN)
-            deadline = time.time() + self.MAX_WAIT_SECONDS_BEFORE_SHUTDOWN
-
-            def stop_loop():
-                now = time.time()
-                if now < deadline and (io_loop._callbacks or
-                                           io_loop._timeouts):
-                    io_loop.add_timeout(now + 1, stop_loop)
-                else:
-                    io_loop.stop()
-                    logger.info('Application is down.')
-            stop_loop()
 
 
 class TornadoComponent(object):

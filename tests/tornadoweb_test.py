@@ -20,7 +20,7 @@ from __future__ import (absolute_import, division, print_function,
 import firenado.conf
 from firenado.tornadoweb import TornadoApplication
 from firenado.tornadoweb import TornadoHandler
-from firenado.tornadoweb import FirenadoLauncher, TornadoLauncher
+from firenado.launcher import FirenadoLauncher, TornadoLauncher
 from firenado.tornadoweb import TornadoComponent
 import unittest
 from tests import chdir_app
