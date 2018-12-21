@@ -20,6 +20,8 @@ from __future__ import (absolute_import, division, print_function,
 import functools
 from tornado.web import HTTPError
 import os
+import string
+import sys
 
 try:
     import urlparse  # py2
@@ -158,6 +160,35 @@ def permissions(roles=None):
             return method(self, *args, **kwargs)
         return wrapper
     return f_wrapper
+
+
+# Used implementations described on: http://bit.ly/2gHlH9z
+# Recommended here: http://bit.ly/2fm97H3
+# Confirmed here:
+# https://docs.python.org/2/library/random.html#random.SystemRandom
+# TODO: Use that after 3.6 https://bit.ly/2wvubJ6
+def random_string(length=5, upper_chars=True, punctuation=False):
+    """
+    Generate a random string with the size equal to the given length.
+
+    The string is based on random choices from a sequence of ascii lower case
+    characters and digits.
+
+    If length is not informed the string size will be 5.
+    """
+    chars = string.ascii_lowercase + string.digits
+    if upper_chars:
+        chars += string.ascii_uppercase
+    if punctuation:
+        chars += string.punctuation
+    if sys.version_info < (3, 6):
+        import random
+        return ''.join(
+            random.SystemRandom().choice(chars) for _ in range(length)
+        )
+    else:
+        import secrets
+        return ''.join(secrets.choice(chars) for _ in range(length))
 
 
 class KeyManager(object):
