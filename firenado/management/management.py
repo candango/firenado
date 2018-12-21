@@ -75,7 +75,7 @@ def get_command_header(parser, usage_message="", usage=False):
         firenado.conf.ROOT, 'management', 'templates', 'help'))
     return loader.load("header.txt").generate(
         parser=parser, usage_message=usage_message, usage=usage,
-        firenado_version=".".join(map(str,firenado.__version__))).decode(
+        firenado_version=".".join(map(str, firenado.__version__))).decode(
         sys.stdout.encoding)
 
 
@@ -161,7 +161,7 @@ class ManagementCommand(object):
         return self.help
 
     def match(self, command):
-        return command in self.name
+        return command in self.commands
 
     def run(self, args):
         has_sub_commands = False
