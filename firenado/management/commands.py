@@ -28,10 +28,7 @@ ManagementCommand(
         ManagementCommand("install", "Install a Firenado application", "",
                           tasks=tasks.InstallProjectTask),
         ManagementCommand("run", "Runs a Firenado application", "",
-                          tasks=tasks.RunApplicationTask),
-        ManagementCommand("cookie_secret_gen",
-                          "Generates a random cookie secret", "",
-                          tasks=tasks.GenerateCookieSecretTask),
+                          tasks=tasks.RunApplicationTask)
     ])
 ManagementCommand(
     "proj(ect)", "Project related commands",
@@ -39,4 +36,12 @@ ManagementCommand(
     sub_commands=[
         ManagementCommand("init", "Initiates a new Firenado project", "",
                           tasks=tasks.CreateProjectTask)
+    ])
+ManagementCommand(
+    "rand(om)", "Random related commands", loader.load("app_command_help.txt"),
+    category="Firenado", sub_commands=[
+        ManagementCommand("string", "Generates a random string", "",
+                          tasks=tasks.GenerateCookieSecretTask),
+        ManagementCommand("uuid", "Generates a random uuid", "",
+                          tasks=tasks.GenerateUuidTask)
     ])

@@ -17,6 +17,7 @@ class LauncherComponent(tornadoweb.TornadoComponent):
         return [
             (r'/', handlers.IndexHandler),
         ]
+
     @gen.coroutine
     def initialize(self):
         self.launcher = ProcessLauncher(dir=self.charge_path)

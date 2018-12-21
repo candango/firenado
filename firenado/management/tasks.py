@@ -140,3 +140,11 @@ class GenerateCookieSecretTask(ManagementTask):
     def run(self, namespace):
         from firenado.util import random_string
         print(random_string(64))
+
+
+class GenerateUuidTask(ManagementTask):
+    """ Generates an uuid string
+    """
+    def run(self, namespace):
+        from uuid import uuid4
+        print(uuid4())
