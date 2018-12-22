@@ -14,7 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import importlib
 import yaml
 import logging
 
@@ -56,17 +55,58 @@ def get_config_from_package(package):
     return package_conf
 
 
-def get_class_from_config(config, index="class"):
-    """ Returns a class from a config dict bit containing the module
-    and class references.
+def get_class_from_name(name):
+    """ Return a class reference from the class name provided as a parameter.
+    Class name must be the full class reference, in another words, the module
+    with the class absolute reference.
 
-    :param
-        config: The config bit with module and class references.
-        index:
-    :return: The class located at the module referred by the config.
+    Example:
+    >>> get_class_from_name("my.module.Myclass")
+
+    :param basestring name: Class absolute reference.
+    :return: The class resolved from the absolute reference name provided.
     """
-    module = importlib.import_module(config['module'])
-    return getattr(module, config[index])
+    return get_class_from_module(
+        ".".join(name.split(".")[:-1]),
+        name.split(".")[-1]
+    )
+
+
+def get_class_from_module(module, class_name):
+    """ Returns a class from a module and a class name parameters.
+    This function is used by get_class_from_config and get_class_from_name.
+
+    Example:
+    >>> get_class_from_module("my.module", "MyClass")
+
+    :param basestring module: The module name.
+    :param basestring class_name: The class name.
+    :return: The class resolved by the module and class name provided.
+    """
+    import importlib
+    module = importlib.import_module(module)
+    return getattr(module, class_name)
+
+
+def get_class_from_config(config, index="class"):
+    """ Return a class from a config dict bit containing the indexes module and
+    class.
+
+    Examples:
+
+    When class name index into the config is class:
+    >>> config = {'module': "my.module", 'class': "MyClass"}
+    >>> get_class_from_config(config)
+
+    When class name index into config is custom:
+    >>> config = {'module': "my.module", 'my_class': "MyClass"}
+    >>> get_class_from_config(config, index="my_class")
+
+    :param dict config: Config containing index and module information.
+    :param basestring index: Index to be used to get the class name
+    :return: The class resolved at the module referred into the config.
+    """
+    return get_class_from_module(config['module'], config[index])
 
 
 def load_yaml_config_file(path):

@@ -117,7 +117,7 @@ app['types']['tornado'] = {}
 app['types']['tornado']['name'] = "tornado"
 app['types']['tornado']['launcher'] = {}
 app['types']['tornado']['launcher']['class'] = "TornadoLauncher"
-app['types']['tornado']['launcher']['module'] = "firenado.tornadoweb"
+app['types']['tornado']['launcher']['module'] = "firenado.launcher"
 app['url_root_path'] = None
 # Wait before shutdown is on seconds
 app['wait_before_shutdown'] = 0

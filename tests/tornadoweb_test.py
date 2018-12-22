@@ -20,7 +20,7 @@ from __future__ import (absolute_import, division, print_function,
 import firenado.conf
 from firenado.tornadoweb import TornadoApplication
 from firenado.tornadoweb import TornadoHandler
-from firenado.tornadoweb import FirenadoLauncher, TornadoLauncher
+from firenado.launcher import FirenadoLauncher, TornadoLauncher
 from firenado.tornadoweb import TornadoComponent
 import unittest
 from tests import chdir_app
@@ -127,8 +127,9 @@ class TornadoLaucherTestCase(unittest.TestCase):
         self.assertIsNone(launcher.dir)
         self.assertIsNone(launcher.port)
 
-    def test_parameters_set(self):
+    def test_parameters_addresses_and_port(self):
         """ Test if launcher parameters were set correctly if informed
+        addresses, dir and port
         """
         addresses = "localhost"
         dir = os.path.dirname(os.path.abspath(__file__))
@@ -137,6 +138,16 @@ class TornadoLaucherTestCase(unittest.TestCase):
         self.assertEqual(addresses, launcher.addresses)
         self.assertEqual(dir, launcher.dir)
         self.assertEqual(port, launcher.port)
+
+    def test_parameters_socket(self):
+        """ Test if launcher parameters were set correctly if informed dir and
+        socket
+        """
+        dir = os.path.dirname(os.path.abspath(__file__))
+        socket = "/tmp/a_socket_file"
+        launcher = FirenadoLauncher(dir=dir, socket=socket)
+        self.assertEqual(dir, launcher.dir)
+        self.assertEqual(socket, launcher.socket)
 
     def test_load(self):
         chdir_app('tornadoweb')

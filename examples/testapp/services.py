@@ -31,7 +31,7 @@ class LoginService(service.FirenadoService):
     def __init__(self, handler, data_source=None):
         service.FirenadoService.__init__(self, handler, data_source)
 
-    @service.served_by("skell.services.UserService")
+    @service.served_by("testapp.services.UserService")
     def is_valid(self, username, password):
         """ Checks if challenge username and password matches
         username and password defined on the service constructor..
