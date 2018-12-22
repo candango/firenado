@@ -73,12 +73,15 @@ def get_class_from_name(name):
 
 
 def get_class_from_module(module, class_name):
-    """ Returns a class from a config dict bit containing the module
-    and class references.
+    """ Returns a class from a module and a class name parameters.
+    This function is used by get_class_from_config and get_class_from_name.
+
+    Example:
+    >>> get_class_from_module("my.module", "MyClass")
 
     :param basestring module: The module name.
     :param basestring class_name: The class name.
-    :return: The class located at the module referred by the config.
+    :return: The class resolved by the module and class name provided.
     """
     import importlib
     module = importlib.import_module(module)
@@ -92,7 +95,7 @@ def get_class_from_config(config, index="class"):
     Examples:
 
     When class name index into the config is class:
-    >>> config = {'module': "my.module", 'index': "MyClass"}
+    >>> config = {'module': "my.module", 'class': "MyClass"}
     >>> get_class_from_config(config)
 
     When class name index into config is custom:
