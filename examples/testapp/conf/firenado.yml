@@ -13,7 +13,7 @@ app:
         value: test_login
       - name: custom
         value: custom_login
-  #url_root_path: "skell"
+  #url_root_path: "testapp"
   cookie_secret: "rebfcrj1qc81j76pxhb10pbrewe7exmjghftll93jh6sgporsc7igvrgk9l9oy9u"
   xsrf_cookies: true
   addresses:
@@ -33,10 +33,10 @@ data:
 
 components:
   - id: testapp
-    class: testapp.app.SkellComponent
+    class: testapp.app.TestappComponent
     enabled: true
   - id: internal
-    class: testapp.components.internal.component.SkellInternalComponent
+    class: testapp.components.internal.component.TestappInternalComponent
     enabled: true
   #- id: admin
   #  enabled: true

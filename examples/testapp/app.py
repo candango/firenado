@@ -22,12 +22,12 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class SkellComponent(firenado.tornadoweb.TornadoComponent):
+class TestappComponent(firenado.tornadoweb.TornadoComponent):
 
     user_service: services.LoginService
 
     def __init__(self, name, application):
-        super(SkellComponent, self).__init__(name, application)
+        super(TestappComponent, self).__init__(name, application)
         self.user_service = None
 
     def get_handlers(self):
