@@ -15,22 +15,21 @@
 # limitations under the License.
 
 import firenado.conf
-import firenado.tornadoweb
-from firenado import security, service
+from firenado import security, service, tornadoweb
 from firenado.components.toolbox.pagination import Paginator
 
 
-class AuthenticatedHandler(firenado.tornadoweb.TornadoHandler):
+class AuthHandler:
 
     def get_current_user(self):
         from tornado.escape import json_decode
-        user_cookie = self.session.get("user")
-        if user_cookie:
-            return json_decode(user_cookie)
+        user_data = self.session.get("user")
+        if user_data:
+            return json_decode(user_data)
         return None
 
 
-class IndexHandler(firenado.tornadoweb.TornadoHandler):
+class IndexHandler(AuthHandler, tornadoweb.TornadoHandler):
 
     def get(self):
         import firenado.conf
@@ -39,14 +38,14 @@ class IndexHandler(firenado.tornadoweb.TornadoHandler):
                     login_url=default_login)
 
 
-class SessionTimeoutHandler(firenado.tornadoweb.TornadoHandler):
+class SessionConfigHandler(tornadoweb.TornadoHandler):
 
     def get(self):
         self.render("session_timeout.html",
                     session_conf=firenado.conf.session)
 
 
-class SessionCounterHandler(firenado.tornadoweb.TornadoHandler):
+class SessionCounterHandler(tornadoweb.TornadoHandler):
 
     def get(self):
         reset = self.get_argument("reset", False, True)
@@ -62,11 +61,14 @@ class SessionCounterHandler(firenado.tornadoweb.TornadoHandler):
         self.render("session.html", session_value=counter)
 
 
-class LoginHandler(firenado.tornadoweb.TornadoHandler):
+class LoginHandler(AuthHandler, tornadoweb.TornadoHandler):
 
     def get(self):
         default_login = firenado.conf.app['login']['urls']['default']
         errors = {}
+        if self.authenticated():
+            self.redirect(self.get_rooted_path("private"))
+            return
         if self.session.has('login_errors'):
             errors = self.session.get('login_errors')
         self.render("login.html", errors=errors,
@@ -99,14 +101,26 @@ class LoginHandler(firenado.tornadoweb.TornadoHandler):
             self.redirect(self.get_rooted_path(default_login))
 
 
-class PrivateHandler(AuthenticatedHandler):
+class LogoutHandler(AuthHandler, tornadoweb.TornadoHandler):
+
+    def get(self):
+        default_login = firenado.conf.app['login']['urls']['default']
+        if self.authenticated():
+            self.session.delete("user")
+            self.redirect(self.get_rooted_path("private"))
+        else:
+            self.redirect(self.get_rooted_path(default_login))
+        return
+
+
+class PrivateHandler(AuthHandler, tornadoweb.TornadoHandler):
 
     @security.authenticated
     def get(self):
         self.render("private.html")
 
 
-class PaginationHandler(firenado.tornadoweb.TornadoHandler):
+class PaginationHandler(tornadoweb.TornadoHandler):
 
     def get(self):
         pag_argument = "pag"
