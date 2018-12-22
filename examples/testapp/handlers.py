@@ -41,8 +41,7 @@ class IndexHandler(AuthHandler, tornadoweb.TornadoHandler):
 class SessionConfigHandler(tornadoweb.TornadoHandler):
 
     def get(self):
-        self.render("session_timeout.html",
-                    session_conf=firenado.conf.session)
+        self.render("session_config.html", session_conf=firenado.conf.session)
 
 
 class SessionCounterHandler(tornadoweb.TornadoHandler):
