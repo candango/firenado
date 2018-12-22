@@ -14,11 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import skell.handlers
-import skell.services
+from . import handlers, services, uimodules
 import firenado.tornadoweb
 from firenado import service
-from skell import uimodules
 import logging
 
 logger = logging.getLogger(__name__)
@@ -26,7 +24,7 @@ logger = logging.getLogger(__name__)
 
 class SkellComponent(firenado.tornadoweb.TornadoComponent):
 
-    user_service: skell.services.LoginService
+    user_service: services.LoginService
 
     def __init__(self, name, application):
         super(SkellComponent, self).__init__(name, application)
@@ -36,14 +34,14 @@ class SkellComponent(firenado.tornadoweb.TornadoComponent):
         import firenado.conf
         default_login = firenado.conf.app['login']['urls']['default']
         return [
-            (r"/", skell.handlers.IndexHandler),
-            (r"/session/counter", skell.handlers.SessionCounterHandler),
-            (r"/session/config", skell.handlers.SessionConfigHandler),
-            (r"/pagination", skell.handlers.PaginationHandler),
-            (r"/%s" % default_login, skell.handlers.LoginHandler),
-            (r"/%s" % default_login, skell.handlers.LoginHandler),
-            (r"/logout", skell.handlers.LogoutHandler),
-            (r"/private", skell.handlers.PrivateHandler),
+            (r"/", handlers.IndexHandler),
+            (r"/session/counter", handlers.SessionCounterHandler),
+            (r"/session/config", handlers.SessionConfigHandler),
+            (r"/pagination", handlers.PaginationHandler),
+            (r"/%s" % default_login, handlers.LoginHandler),
+            (r"/%s" % default_login, handlers.LoginHandler),
+            (r"/logout", handlers.LogoutHandler),
+            (r"/private", handlers.PrivateHandler),
         ]
 
     def get_ui_modules(self):
@@ -53,7 +51,7 @@ class SkellComponent(firenado.tornadoweb.TornadoComponent):
         import firenado.conf
         firenado.conf.app['login']['urls']['buga'] = 'buga'
 
-    @service.served_by(skell.services.UserService)
+    @service.served_by(services.UserService)
     def install(self):
         """  Installing test database
         """

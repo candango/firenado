@@ -74,8 +74,8 @@ class LoginHandler(AuthHandler, tornadoweb.TornadoHandler):
         self.render("login.html", errors=errors,
                     login_url=default_login)
 
-    @service.served_by("skell.services.LoginService")
-    @service.served_by("skell.services.UserService")
+    @service.served_by("testapp.services.LoginService")
+    @service.served_by("testapp.services.UserService")
     def post(self):
         from tornado.escape import json_encode
         self.session.delete('login_errors')

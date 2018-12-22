@@ -1,6 +1,6 @@
 app:
   id: firenado-test-app
-  component: skell
+  component: testapp
   data:
     sources:
         # Set here references from sources defined on data.sources
@@ -10,7 +10,7 @@ app:
   login:
     urls:
       - name: default
-        value: skell_login
+        value: test_login
       - name: custom
         value: custom_login
   #url_root_path: "skell"
@@ -32,11 +32,11 @@ data:
       url: mysql+pymysql://root:rootpass@localhost:3306/test
 
 components:
-  - id: skell
-    class: skell.app.SkellComponent
+  - id: testapp
+    class: testapp.app.SkellComponent
     enabled: true
   - id: internal
-    class: skell.components.internal.component.SkellInternalComponent
+    class: testapp.components.internal.component.SkellInternalComponent
     enabled: true
   #- id: admin
   #  enabled: true

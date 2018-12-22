@@ -15,7 +15,7 @@
 # limitations under the License.
 
 import firenado.tornadoweb
-from skell.components.internal import uimodules
+from testapp.components.internal import uimodules
 
 
 class SkellInternalComponent(firenado.tornadoweb.TornadoComponent):
