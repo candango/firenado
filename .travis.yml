@@ -8,6 +8,7 @@ python:
 install:
   - "pip install -r requirements/basic.txt"
   - "pip install -r requirements/redis.txt"
+  - "pip install -r requirements/pexpect.txt"
   - "pip install -r requirements/sqlalchemy.txt"
 script:
   - "PYTHONPATH=$PYTHONPATH:. python tests/runtests.py"
