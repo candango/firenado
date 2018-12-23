@@ -1,4 +1,4 @@
-from launcher import handlers
+from . import handlers
 from firenado import tornadoweb
 from firenado.launcher import ProcessLauncher
 from tornado import gen
@@ -20,10 +20,11 @@ class LauncherComponent(tornadoweb.TornadoComponent):
 
     @gen.coroutine
     def initialize(self):
-        self.launcher = ProcessLauncher(dir=self.charge_path)
+        import sys
+        self.launcher = ProcessLauncher(dir=self.charge_path,
+                                        logfile=sys.stderr)
         self.launcher.load()
         yield self.launcher.launch()
-        print(self.launcher.process.isalive())
 
     def shutdown(self):
         self.launcher.shutdown()

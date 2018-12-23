@@ -1,0 +1,32 @@
+What's new in Firenado 0.1.7.5
+==============================
+
+Dec 22, 2018
+------------
+
+We are pleased to announce the release of Firenado 0.1.7.5.
+
+A new launcher were added to spawn an application in another process and the
+socket parameter was added to the firenado launcher to overrides the
+configuration file.
+
+
+Here are the highlights:
+
+Refactory
+~~~~~~~~~
+
+* Move random_string to the security module. `#247 <https://github.com/candango/firenado/issues/247>`_
+* Provide a function to return the class reference by it's name. `#251 <https://github.com/candango/firenado/issues/251>`_
+* Rename skell to testapp. `#252 <https://github.com/candango/firenado/issues/252>`_
+
+New Features
+~~~~~~~~~~~~
+
+* Add socket parameter to the app run command. `#248 <https://github.com/candango/firenado/issues/248>`_
+* Add a process launcher. `#249 <https://github.com/candango/firenado/issues/249>`_
+
+Bug Fixes
+~~~~~~~~~
+
+* Fix command match with parenthesis. `#250 <https://github.com/candango/firenado/issues/250>`_
