@@ -1,5 +1,6 @@
 include LICENSE
 include requirements/basic.txt
+include requirements/pexpect.txt
 include requirements/redis.txt
 include requirements/sqlalchemy.txt
 include firenado/conf/*.yml
