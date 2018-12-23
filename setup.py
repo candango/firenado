@@ -55,6 +55,7 @@ setup(
     install_requires=resolve_requires("requirements/basic.txt"),
     extras_require={
         'redis': resolve_requires("requirements/redis.txt"),
+        'pexpect': resolve_requires("requirements/pexpect.txt"),
         'sqlalchemy': resolve_requires("requirements/sqlalchemy.txt"),
     },
     url="https://github.com/candango/firenado",
