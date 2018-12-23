@@ -54,10 +54,12 @@ class ProcessLauncher(FirenadoLauncher):
 
     process = None  # type: pexpect.spawn
 
-    def __init__(self, addresses=None, dir=None, port=None, socket=None):
+    def __init__(self, addresses=None, dir=None, port=None, socket=None,
+                 logfile=None):
         super(ProcessLauncher, self).__init__(addresses, dir, port, socket)
         self.process = None
         self.process_callback = None
+        self.logfile = logfile
         self.command = None
         self.response = None
 
@@ -85,34 +87,36 @@ class ProcessLauncher(FirenadoLauncher):
     def read_process(self):
         import pexpect
         self.process_callback.stop()
-        #try:
-        #    yield self.process.read()
-        #except pexpect.TIMEOUT
+        try:
+            yield self.process.expect(r"[C|I|W|D|E].*", async_=True)
+        except pexpect.TIMEOUT:
+            pass
+        self.process_callback.start()
 
     @gen.coroutine
     def launch(self):
         import pexpect
         import tornado.ioloop
         logger.info("Launching %s" % self.command)
-        self.process = pexpect.spawn(self.command, encoding="utf-8")
-        self.process.stderr = sys.stderr
-        self.process.stdout = sys.stdout
-        yield self.process.expect("Firenado server started successfully.", async=True)
-        #self.process.read()
-        #self.process_callback = tornado.ioloop.PeriodicCallback(
-        #    self.read_process,
-        #    400
-        #)
-        #self.process_callback.start()
-
-        #logger.info("Process launcher response:\n\n%s%s\n" % (self.process.before, self.process.after))
+        parameters = {
+            'command': self.command,
+            'encoding': "utf-8"
+        }
+        if self.logfile is not None:
+            parameters['logfile'] = self.logfile
+        self.process = pexpect.spawn(**parameters)
+        yield self.process.expect("Firenado server started successfully.",
+                                  async_=True)
+        self.process_callback = tornado.ioloop.PeriodicCallback(
+            self.read_process,
+            400
+        )
+        self.process_callback.start()
 
     @gen.coroutine
     def shutdown(self):
-        import signal
         import pexpect
         yield self.process.expect(pexpect.EOF)
-        print(self.process.signalstatus)
 
 
 class TornadoLauncher(FirenadoLauncher):
@@ -193,7 +197,7 @@ class TornadoLauncher(FirenadoLauncher):
             def stop_loop():
                 now = time.time()
                 if now < deadline and (io_loop._callbacks or
-                                           io_loop._timeouts):
+                                       io_loop._timeouts):
                     io_loop.add_timeout(now + 1, stop_loop)
                 else:
                     io_loop.stop()
