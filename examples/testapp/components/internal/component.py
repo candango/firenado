@@ -14,11 +14,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import firenado.tornadoweb
-from skell.components.internal import uimodules
+from firenado import tornadoweb
+from . import uimodules
 
 
-class SkellInternalComponent(firenado.tornadoweb.TornadoComponent):
+class TestappInternalComponent(tornadoweb.TornadoComponent):
     """ This component just adds another ui modules package to the application
     ui modules stack.
     """

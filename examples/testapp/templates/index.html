@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "testapp:base.html" %}
 
     {% block content %}
     {% module Header1(message) %}
@@ -7,13 +7,17 @@
 
     {% module Header1("Session") %}
     <ul>
+        <li><a href="{% module RootedPath('/session/config') %}">Session Configuration</a></li>
         <li><a href="{% module RootedPath('/session/counter') %}">Session Counter</a></li>
-        <li><a href="{% module RootedPath('/session/timeout') %}">Session Timeout</a></li>
     </ul>
 
     {% module Header1("Security") %}
     <ul>
+        {% if handler.authenticated() %}
+        <li><a href="{% module RootedPath("/logout") %}">Logout</a></li>
+        {% else %}
         <li><a href="{% module RootedPath(login_url) %}">Login</a></li>
+        {% end %}
         <li><a href="{% module RootedPath('/private') %}">Not Public</a></li>
     </ul>
 

@@ -109,6 +109,7 @@ class RunApplicationTask(ManagementTask):
         parser.add_argument("-a", "--addresses", default=None)
         parser.add_argument("-d", "--dir", default=None)
         parser.add_argument("-P", "--port", type=int)
+        parser.add_argument("-s", "--socket", default=None)
 
     """ Runs a Firenado Tornado Application based
     on the it's project configuration
@@ -117,13 +118,15 @@ class RunApplicationTask(ManagementTask):
         #TODO throw a custom error when type is not found
         from firenado.config import get_class_from_config
         parameters = {}
-        if namespace.addresses is not None:
-            parameters['addresses'] = namespace.addresses.split(",")
         if namespace.dir is not None:
             parameters['dir'] = namespace.dir
-        if namespace.port is not None:
-            parameters['port'] = namespace.port
-
+        if namespace.socket is None:
+            if namespace.addresses is not None:
+                parameters['addresses'] = namespace.addresses.split(",")
+            if namespace.port is not None:
+                parameters['port'] = namespace.port
+        else:
+            parameters['socket'] = namespace.socket
         app_type = firenado.conf.app['types'][firenado.conf.app['type']]
         launcher = get_class_from_config(app_type['launcher'])(**parameters)
         launcher.load()
@@ -137,3 +140,11 @@ class GenerateCookieSecretTask(ManagementTask):
     def run(self, namespace):
         from firenado.util import random_string
         print(random_string(64))
+
+
+class GenerateUuidTask(ManagementTask):
+    """ Generates an uuid string
+    """
+    def run(self, namespace):
+        from uuid import uuid4
+        print(uuid4())

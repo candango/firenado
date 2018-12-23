@@ -29,4 +29,4 @@ class Header2(tornado.web.UIModule):
         :param header: The header string to be rendered by the module.
         :return: A header string
         """
-        return self.render_string('skell:header2.html', header=header)
+        return self.render_string('testapp:header2.html', header=header)

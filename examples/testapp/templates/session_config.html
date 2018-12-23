@@ -1,0 +1,24 @@
+{% extends "testapp:base.html" %}
+
+{% block content %}
+    <h1>Session Configuration</h1>
+    <p>Enabled: {{ session_conf['enabled'] }}</p>
+    <p>Encoder: {{ session_conf['encoder'] }}</p>
+
+    <p>Encoders:</p>
+    <ul>
+    {% for encoder in session_conf['encoders'] %}
+        <li><b>{{ encoder }}:</b> {{ session_conf['encoders'][encoder]['module'] }}.{{ session_conf['encoders'][encoder]['class'] }}</li>
+    {% end %}
+    </ul>
+
+    <p>Type: {{ session_conf['type'] }}</p>
+    <h2>Timeout</h2>
+    <p>Callback Time: {{ session_conf['callback_time'] }} seconds</p>
+    <p>Callback Hiccup: {{ session_conf['callback_hiccup'] }} seconds</p>
+    <p>Life time: {{ session_conf['life_time'] }} seconds</p>
+    <p>Purge limit: {{ session_conf['purge_limit'] }} sessions</p>
+    <ul>
+        <li><a href="/">Index</a></li>
+    </ul>
+{% end %}
