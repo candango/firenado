@@ -1,0 +1,18 @@
+What's new in Firenado 0.1.7.6
+==============================
+
+Dec 22, 2018
+------------
+
+We are pleased to announce the release of Firenado 0.1.7.6.
+
+Firenado 0.1.7.5 pip package was not correct use this release instead.
+
+
+Here are the highlights:
+
+
+Bug Fixes
+~~~~~~~~~
+
+* Cannot install 0.1.7.5 because the pexpect is missing on the manifest. `#258 <https://github.com/candango/firenado/issues/258>`_
