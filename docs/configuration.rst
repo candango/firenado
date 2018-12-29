@@ -4,23 +4,29 @@ Configuration
 Firenado extends the Tornado web framework which uses ini files to help
 developers to configure theirs applications.
 
-As the ini configuration from Tornado is pretty easy and straight forward to
-use, ini files(specially the one Tornado offers) just define key/value
-structures.
+Besides the fact the ini configuration from Tornado is pretty easy and straight
+forward to use, it just define key/value structures.
 
-If someone wants to define hierarchical configuration structures it is
-necessary create indexes that represent the hierarchy(i.e.
-my.hierarchical.index) but the file will be read as key/value. Either the
-developer assumes the index is structured hierarchically or some extra
-development is needed to represent this data as should be in memory.
+Let's assume that someone wants to define hierarchical configuration structures
+. It is necessary create indexes that represent the hierarchy(i.e.
+my.hierarchical.index) and the file will be organized in a key/value manner.
+In this case the developer assumes the index is structured hierarchically or
+some extra development is needed to represent this data as should be in memory.
 
-This is not a problem if the application configuration is simple but if the
-project requires lots of configurable parameters than you need a better option.
+A key/value structure isn't a problem if the application configuration is
+simple. When a project requires lots of configurable parameters ini files can
+be overwhelming.
 
-Firenado uses yaml files instead. TODO give the yaml benefits.
+Firenado uses yaml files instead that are organized in a hierarchical structure
+and can define lists and dictionaries values instead of only strings. With yaml
+boolean and numeric values are resolved with the same time when we consume them
+in the python side.
 
-The app is bootstraped using the app configuration file. This file will
-overload default parameters defined by the framework and system levels.
+A Firenado application is defined by a configuration file. This file will
+define application aspects like session, data sources or the port to listen.
+The application file will overload configuration set by framework and system
+levels.
+
 
 The framework config file will define the framework parts like:
 
@@ -51,5 +57,10 @@ the application
 .. toctree::
    :maxdepth: 2
 
-   configuration/firenado
-   configuration/component
+   configuration/app
+   configuration/components
+   configuration/data
+   configuration/data
+   configuration/management
+   configuration/log
+   configuration/session
