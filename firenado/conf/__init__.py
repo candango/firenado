@@ -92,6 +92,7 @@ app = {}
 app['addresses'] = ["::", "0.0.0.0"]
 app['component'] = None
 app['cookie_secret'] = None
+#TODO: Are we using current_user_key?
 app['current_user_key'] = "__FIRENADO_CURRENT_USER_KEY__"
 app['data'] = {}
 app['data']['sources'] = []
