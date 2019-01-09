@@ -23,7 +23,6 @@ from firenado.config import (get_class_from_config, get_class_from_module,
 from firenado.session import SessionEngine
 
 
-
 class GetClassTestCase(unittest.TestCase):
     """ Case that test all get class functions.
     """

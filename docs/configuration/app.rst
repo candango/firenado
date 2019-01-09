@@ -1,8 +1,11 @@
 Application
 ===========
 
-The application configuration section properties to the tornado application to
-be launched by the
+The application configuration section set properties to the application to be
+launched by Firenado.
+
+The configuration items will set aspects like application data sources or
+addresses and ports to listen for requests.
 
 
 Here is an example of an app section:
