@@ -1,8 +1,8 @@
-Application Configuration
-=========================
+Application
+===========
 
-The application configuration section set's what component will be launched by
-Firenado and other properties like addresses and port to listen.
+The application configuration section properties to the tornado application to
+be launched by the
 
 
 Here is an example of an app section:
@@ -46,23 +46,6 @@ in the app.py file and set as in the conf/firenado.yml file.
    app:
     component: "myapp"
 
-cookie_secret
-~~~~~~~~~~~~~
-
-Set the tornado application cookie_cookie secret parameter.
-
-- Type: string
-- Default value: None
-- See:
-
- - https://www.tornadoweb.org/en/stable/web.html
- - https://www.tornadoweb.org/en/stable/guide/security.html
-
-.. code-block:: yaml
-
-   app:
-    cookie_secret: "kljasdf;lkasjdf;lasdkfjasd;lfkjasdf;lkasdjfasd"
-
 data
 ~~~~
 
@@ -94,6 +77,9 @@ pythonpath
 Paths to be added to PYTHONPATH environment variable during the application
 launch process.
 
+- Type: string
+- Default value: None
+
 .. code-block:: yaml
 
    app:
@@ -113,6 +99,26 @@ Port the application will be listen for requests.
    app:
     port: 9092
 
+
+settings
+~~~~~~~~
+
+Settings to be passed to the Tornado application to be launched by Firenado.
+
+- Type: dictionary
+- Default value: {}
+
+.. code-block:: yaml
+
+   app:
+    settings:
+      cookie_secret: "kljasdf;lkasjdf;lasdkfjasd;lfkjasdf;lkasdjfasd"
+      debug: true
+      xsrf_cookies: true
+
+- See:
+
+ - http://www.tornadoweb.org/en/stable/web.html#tornado.web.Application.settings
 
 socket
 ~~~~~~

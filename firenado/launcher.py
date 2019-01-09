@@ -137,7 +137,7 @@ class TornadoLauncher(FirenadoLauncher):
         # TODO: Resolve module if doesn't exists
         if firenado.conf.app['pythonpath']:
             sys.path.append(firenado.conf.app['pythonpath'])
-        self.application = TornadoApplication(debug=firenado.conf.app['debug'])
+        self.application = TornadoApplication(**firenado.conf.app['settings'])
 
     def launch(self):
         import signal

@@ -14,11 +14,12 @@ app:
       - name: custom
         value: custom_login
   #url_root_path: "testapp"
-  cookie_secret: "rebfcrj1qc81j76pxhb10pbrewe7exmjghftll93jh6sgporsc7igvrgk9l9oy9u"
-  xsrf_cookies: true
   addresses:
     - localhost
   #port: 8888
+  settings:
+    cookie_secret: "rebfcrj1qc81j76pxhb10pbrewe7exmjghftll93jh6sgporsc7igvrgk9l9oy9u"
+    xsrf_cookies: true
 
 data:
   sources:

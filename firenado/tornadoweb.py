@@ -93,10 +93,6 @@ class TornadoApplication(tornado.web.Application, data.DataConnectedMixin,
         settings['static_url_prefix'] = static_url_prefix
         if len(ui_modules) > 0:
             settings['ui_modules'] = ui_modules
-        if firenado.conf.app['cookie_secret']:
-            settings['cookie_secret'] = firenado.conf.app['cookie_secret']
-        if firenado.conf.app['xsrf_cookies']:
-            settings['xsrf_cookies'] = firenado.conf.app['xsrf_cookies']
         if firenado.conf.app['url_root_path'] is not None:
             from .util.url_util import rooted_path
             for idx, handler in enumerate(handlers):
