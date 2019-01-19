@@ -193,6 +193,10 @@ def process_app_config_section(config, app_config):
         config.app['pythonpath'] = app_config['pythonpath']
     if 'port' in app_config:
         config.app['port'] = app_config['port']
+    if 'process' in app_config:
+        if 'num_processes' in app_config['process']:
+            config.app['process']['num_processes'] = app_config[
+                'process']['num_processes']
     if 'url_root_path' in app_config:
         root_url = app_config['url_root_path'].strip()
         if root_url[0] == "/":
@@ -215,6 +219,8 @@ def process_app_config_section(config, app_config):
             app_type['launcher'] = get_config_from_package(
                 app_type['launcher'])
             config.app['types'][app_type['name']] = app_type
+    if 'wait_before_shutdown' in app_config:
+        config.app['wait_before_shutdown'] = app_config['wait_before_shutdown']
 
 
 def process_components_config_section(config, components_config):

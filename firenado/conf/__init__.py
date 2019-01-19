@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright 2015-2018 Flavio Garcia
+# Copyright 2015-2019 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -98,6 +98,10 @@ app['data']['sources'] = []
 app['id'] = None
 app['pythonpath'] = None
 app['port'] = 8888
+app['process'] = {
+    'num_processes': None,
+    'max_restarts': 100
+}
 app['login'] = {}
 app['login']['urls'] = {}
 app['login']['urls']['default'] = "/login"

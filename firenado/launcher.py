@@ -125,15 +125,15 @@ class TornadoLauncher(FirenadoLauncher):
         super(TornadoLauncher, self).__init__(addresses, dir, port, socket)
         self.http_server = None
         self.application = None
+        if self.dir is not None:
+            # TODO: This is a problem we cannot launch an app into the app
+            os.chdir(self.dir)
+            reload(firenado.conf)
         self.MAX_WAIT_SECONDS_BEFORE_SHUTDOWN = firenado.conf.app[
             'wait_before_shutdown']
 
     def load(self):
         from .tornadoweb import TornadoApplication
-        if self.dir is not None:
-            # TODO: This is a problem we cannot launch an app into the app
-            os.chdir(self.dir)
-            reload(firenado.conf)
         # TODO: Resolve module if doesn't exists
         if firenado.conf.app['pythonpath']:
             sys.path.append(firenado.conf.app['pythonpath'])
@@ -170,7 +170,9 @@ class TornadoLauncher(FirenadoLauncher):
             for address in addresses:
                 from socket import gaierror
                 try:
-                    self.http_server.listen(port, address.strip())
+                    from tornado.netutil import bind_sockets
+                    sockets = bind_sockets(port, address.strip())
+                    self.http_server.add_sockets(sockets)
                     listening_count += 1
                     logger.info("Firenado listening at http://%s:%s." %
                                 (address.strip(), port))
@@ -190,21 +192,46 @@ class TornadoLauncher(FirenadoLauncher):
                 listening_what = "%ss" % listening_what
             logger.info("Firenado server started successfully. Listening at %s"
                         " %s." % (listening_count, listening_what))
+            if firenado.conf.app['process']['num_processes'] is not None:
+                import tornado.process
+                num_processes = firenado.conf.app['process']['num_processes']
+                max_restarts = firenado.conf.app['process']['max_restarts']
+                logger.info("Tornado set to start %s processes with %s max "
+                            "restarts." % (num_processes, max_restarts))
+                tornado.process.fork_processes(num_processes, max_restarts)
             tornado.ioloop.IOLoop.current().start()
         else:
             logger.fatal("Firenado unable to start.")
             # As per https://bit.ly/2D2ZFY9
             sys.exit(128)
 
-    def sig_handler(self, sig, frame):
+    def sig_handler(self, sig, _):
+        """ Handle the signal sent to the process
+        :param sig:  Signal set to the process
+        :param _: Frame is not being used
+        """
         import tornado.ioloop
-        logger.warning('Caught signal: %s', sig)
+        from tornado.process import task_id
+        tid = task_id()
+        pid = os.getpid()
+        if tid is None:
+            logger.warning("main process (pid %s) caught signal: %s" %
+                           (pid, sig))
+        else:
+            logger.warning("child %s (pid %s) caught signal: %s" %
+                           (tid, pid, sig))
         tornado.ioloop.IOLoop.current().add_callback(self.shutdown)
 
     def shutdown(self):
         import time
         import tornado.ioloop
-        logger.info('Stopping http server')
+        from tornado.process import task_id
+        tid = task_id()
+        pid = os.getpid()
+        if tid is None:
+            logger.info("main process (pid %s): stopping http server" % pid)
+        else:
+            logger.info("child %s (pid %s): stopping http server" % (tid, pid))
         for key, component in iteritems(self.application.components):
             component.shutdown()
         self.http_server.stop()
@@ -213,18 +240,31 @@ class TornadoLauncher(FirenadoLauncher):
 
         if self.MAX_WAIT_SECONDS_BEFORE_SHUTDOWN == 0:
             io_loop.stop()
-            logger.info('Application is down.')
+            if tid is None:
+                logger.info("main process (pid %s): application is down" % pid)
+            else:
+                logger.info("child %s (pid %s): application is down" %
+                            (tid, pid))
         else:
-            logger.info('Will shutdown in %s seconds ...',
-                        self.MAX_WAIT_SECONDS_BEFORE_SHUTDOWN)
+            if tid is None:
+                logger.info("main process (pid %s): shutdown in %s seconds "
+                            "..." %
+                            (pid, self.MAX_WAIT_SECONDS_BEFORE_SHUTDOWN))
+            else:
+                logger.info("child %s (pid %s): shutdown in %s seconds ..." %
+                            (tid, pid, self.MAX_WAIT_SECONDS_BEFORE_SHUTDOWN))
             deadline = time.time() + self.MAX_WAIT_SECONDS_BEFORE_SHUTDOWN
 
             def stop_loop():
                 now = time.time()
-                if now < deadline and (io_loop._callbacks or
-                                       io_loop._timeouts):
+                if now < deadline:
                     io_loop.add_timeout(now + 1, stop_loop)
                 else:
                     io_loop.stop()
-                    logger.info('Application is down.')
+                    if tid is None:
+                        logger.info("main process (pid %s): application is "
+                                    "down" % pid)
+                    else:
+                        logger.info("child %s (pid %s): application is down" %
+                                    (tid, pid))
             stop_loop()
