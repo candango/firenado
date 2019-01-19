@@ -53,8 +53,8 @@ log:
 
 management:
   commands:
-    - name: skell
-      module: skell.management.commands
+    - name: testapp
+      module: testapp.management.commands
 
 # Session types could be:
 # file or redis.
