@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+# -*- coding: UTF-8 -*-
 #
 # Copyright 2015-2019 Flavio Garcia
 #
@@ -147,6 +147,8 @@ class TornadoLauncher(FirenadoLauncher):
         if os.name == "posix":
             signal.signal(signal.SIGTSTP, self.sig_handler)
         self.http_server = tornado.httpserver.HTTPServer(self.application)
+        listening_count = 0
+        listening_what = "socket"
         if firenado.conf.app['socket'] or self.socket:
             from tornado.netutil import bind_unix_socket
             socket_path = firenado.conf.app['socket']
@@ -156,7 +158,9 @@ class TornadoLauncher(FirenadoLauncher):
             self.http_server.add_socket(socket)
             logger.info("Firenado listening at socket ""%s" %
                         socket.getsockname())
+            listening_count += 1
         else:
+            listening_what = "port"
             addresses = self.addresses
             if addresses is None:
                 addresses = firenado.conf.app['addresses']
@@ -164,16 +168,38 @@ class TornadoLauncher(FirenadoLauncher):
             if port is None:
                 port = firenado.conf.app['port']
             for address in addresses:
-                self.http_server.listen(port, address)
-                logger.info("Firenado listening at ""http://%s:%s" % (address,
-                                                                      port))
-        logger.info("Firenado server started successfully.")
-        tornado.ioloop.IOLoop.instance().start()
+                from socket import gaierror
+                try:
+                    self.http_server.listen(port, address.strip())
+                    listening_count += 1
+                    logger.info("Firenado listening at http://%s:%s." %
+                                (address.strip(), port))
+                except gaierror as error:
+                    logger.error("Firenado failed to listen at http://%s:%s."
+                                 % (address.strip(), port))
+                except OSError as error:
+                    logger.error("Firenado failed to listen at http://%s:%s. "
+                                 "Check if another process is listening at "
+                                 "this port or if you provided a dns name and"
+                                 "the correspondent ip in the addresses"
+                                 "configuration or if the machine owns the ip "
+                                 "Fireando will start to listen." %
+                                 (address, port))
+        if listening_count:
+            if listening_count > 1:
+                listening_what = "%ss" % listening_what
+            logger.info("Firenado server started successfully. Listening at %s"
+                        " %s." % (listening_count, listening_what))
+            tornado.ioloop.IOLoop.current().start()
+        else:
+            logger.fatal("Firenado unable to start.")
+            # As per https://bit.ly/2D2ZFY9
+            sys.exit(128)
 
     def sig_handler(self, sig, frame):
         import tornado.ioloop
         logger.warning('Caught signal: %s', sig)
-        tornado.ioloop.IOLoop.instance().add_callback(self.shutdown)
+        tornado.ioloop.IOLoop.current().add_callback(self.shutdown)
 
     def shutdown(self):
         import time
@@ -183,13 +209,12 @@ class TornadoLauncher(FirenadoLauncher):
             component.shutdown()
         self.http_server.stop()
 
-        io_loop = tornado.ioloop.IOLoop.instance()
+        io_loop = tornado.ioloop.IOLoop.current()
 
         if self.MAX_WAIT_SECONDS_BEFORE_SHUTDOWN == 0:
             io_loop.stop()
             logger.info('Application is down.')
         else:
-
             logger.info('Will shutdown in %s seconds ...',
                         self.MAX_WAIT_SECONDS_BEFORE_SHUTDOWN)
             deadline = time.time() + self.MAX_WAIT_SECONDS_BEFORE_SHUTDOWN
