@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright 2015-2018 Flavio Garcia
+# Copyright 2015-2019 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@ import unittest
 from firenado.config import (get_class_from_config, get_class_from_module,
                              get_class_from_name)
 from firenado.session import SessionEngine
-
 
 
 class GetClassTestCase(unittest.TestCase):

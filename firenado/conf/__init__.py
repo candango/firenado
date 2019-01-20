@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright 2015-2018 Flavio Garcia
+# Copyright 2015-2019 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -91,15 +91,17 @@ app = {}
 # logged user
 app['addresses'] = ["::", "0.0.0.0"]
 app['component'] = None
-app['cookie_secret'] = None
 #TODO: Are we using current_user_key?
 app['current_user_key'] = "__FIRENADO_CURRENT_USER_KEY__"
 app['data'] = {}
 app['data']['sources'] = []
-app['debug'] = False
 app['id'] = None
 app['pythonpath'] = None
 app['port'] = 8888
+app['process'] = {
+    'num_processes': None,
+    'max_restarts': 100
+}
 app['login'] = {}
 app['login']['urls'] = {}
 app['login']['urls']['default'] = "/login"
@@ -122,7 +124,6 @@ app['types']['tornado']['launcher']['module'] = "firenado.launcher"
 app['url_root_path'] = None
 # Wait before shutdown is on seconds
 app['wait_before_shutdown'] = 0
-app['xsrf_cookies'] = False
 
 # Component section
 components = {}
