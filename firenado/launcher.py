@@ -36,11 +36,16 @@ logger = logging.getLogger(__name__)
 
 class FirenadoLauncher(object):
 
-    def __init__(self, addresses=None, dir=None, port=None, socket=None):
-        self.addresses = addresses
-        self.dir = dir
-        self.port = port
-        self.socket = socket
+    def __init__(self, **settings):
+        self.app = settings.get("app", None)
+        if self.app:
+            os.environ["CURRENT_APP"] = self.app
+        if os.environ.get("CURRENT_APP"):
+            self.app = os.environ.get("CURRENT_APP")
+        self.addresses = settings.get("addresses", None)
+        self.dir = settings.get("dir", None)
+        self.port = settings.get("port", None)
+        self.socket = settings.get("socket", None)
 
     def load(self):
         return None
@@ -54,12 +59,11 @@ class ProcessLauncher(FirenadoLauncher):
 
     process = None  # type: pexpect.spawn
 
-    def __init__(self, addresses=None, dir=None, port=None, socket=None,
-                 logfile=None):
-        super(ProcessLauncher, self).__init__(addresses, dir, port, socket)
+    def __init__(self, **settings):
+        super(ProcessLauncher, self).__init__(**settings)
         self.process = None
         self.process_callback = None
-        self.logfile = logfile
+        self.logfile = self.socket = settings.get("logfile", None)
         self.command = None
         self.response = None
 
@@ -121,16 +125,23 @@ class ProcessLauncher(FirenadoLauncher):
 
 class TornadoLauncher(FirenadoLauncher):
 
-    def __init__(self, addresses=None, dir=None, port=None, socket=None):
-        super(TornadoLauncher, self).__init__(addresses, dir, port, socket)
+    def __init__(self, **settings):
+        super(TornadoLauncher, self).__init__(**settings)
         self.http_server = None
         self.application = None
         if self.dir is not None:
-            # TODO: This is a problem we cannot launch an app into the app
             os.chdir(self.dir)
+        if self.app is not None or self.dir is not None:
             reload(firenado.conf)
         self.MAX_WAIT_SECONDS_BEFORE_SHUTDOWN = firenado.conf.app[
             'wait_before_shutdown']
+        if self.addresses is None or self.addresses == ['']:
+            if firenado.conf.app['addresses']:
+                self.addresses = firenado.conf.app['addresses']
+            else:
+                self.addresses = firenado.conf.app['default_addresses']
+        if self.port is None:
+            self.port = firenado.conf.app['port']
 
     def load(self):
         from .tornadoweb import TornadoApplication
@@ -160,33 +171,14 @@ class TornadoLauncher(FirenadoLauncher):
                         socket.getsockname())
             listening_count += 1
         else:
-            listening_what = "port"
-            addresses = self.addresses
-            if addresses is None:
-                addresses = firenado.conf.app['addresses']
-            port = self.port
-            if port is None:
-                port = firenado.conf.app['port']
-            for address in addresses:
-                from socket import gaierror
-                try:
-                    from tornado.netutil import bind_sockets
-                    sockets = bind_sockets(port, address.strip())
-                    self.http_server.add_sockets(sockets)
+            listening_what = "addresses:port"
+            if len(self.addresses):
+                for address in self.addresses:
+                    if self.add_sockets(self.port, address):
+                        listening_count += 1
+            else:
+                if self.add_sockets(self.port):
                     listening_count += 1
-                    logger.info("Firenado listening at http://%s:%s." %
-                                (address.strip(), port))
-                except gaierror as error:
-                    logger.error("Firenado failed to listen at http://%s:%s."
-                                 % (address.strip(), port))
-                except OSError as error:
-                    logger.error("Firenado failed to listen at http://%s:%s. "
-                                 "Check if another process is listening at "
-                                 "this port or if you provided a dns name and"
-                                 "the correspondent ip in the addresses"
-                                 "configuration or if the machine owns the ip "
-                                 "Fireando will start to listen." %
-                                 (address, port))
         if listening_count:
             if listening_count > 1:
                 listening_what = "%ss" % listening_what
@@ -196,14 +188,18 @@ class TornadoLauncher(FirenadoLauncher):
                 import tornado.process
                 num_processes = firenado.conf.app['process']['num_processes']
                 max_restarts = firenado.conf.app['process']['max_restarts']
+                num_processes_alert = num_processes
+                if num_processes == 0:
+                    num_processes_alert = ("0 (assuming %s as cpu count)" %
+                                           tornado.process.cpu_count())
                 logger.info("Tornado set to start %s processes with %s max "
-                            "restarts." % (num_processes, max_restarts))
+                            "restarts." % (num_processes_alert, max_restarts))
                 tornado.process.fork_processes(num_processes, max_restarts)
             tornado.ioloop.IOLoop.current().start()
         else:
-            logger.fatal("Firenado unable to start.")
-            # As per https://bit.ly/2D2ZFY9
-            sys.exit(128)
+            from .util import sysexits
+            logger.critical("Firenado unable to start.")
+            sysexits.exit_fatal(sysexits.EX_SOFTWARE)
 
     def sig_handler(self, sig, _):
         """ Handle the signal sent to the process
@@ -221,6 +217,32 @@ class TornadoLauncher(FirenadoLauncher):
             logger.warning("child %s (pid %s) caught signal: %s" %
                            (tid, pid, sig))
         tornado.ioloop.IOLoop.current().add_callback(self.shutdown)
+
+    def add_sockets(self, port, address=None):
+        from socket import gaierror
+        try:
+            from tornado.netutil import bind_sockets
+            if address:
+                sockets = bind_sockets(port, address.strip())
+            else:
+                sockets = bind_sockets(port)
+                address = "127.0.0.1"
+            self.http_server.add_sockets(sockets)
+            logger.info("Firenado listening at http://%s:%s." %
+                        (address.strip(), port))
+            return True
+        except gaierror as error:
+            logger.error("Firenado failed to listen at http://%s:%s."
+                         % (address.strip(), port))
+        except OSError as error:
+            logger.error("Firenado failed to listen at http://%s:%s. "
+                         "Check if another process is listening at "
+                         "this port or if you provided a dns name and"
+                         "the correspondent ip in the addresses"
+                         "configuration or if the machine owns the ip "
+                         "Fireando will start to listen." %
+                         (address, port))
+        return False
 
     def shutdown(self):
         import time
