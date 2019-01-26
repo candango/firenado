@@ -11,14 +11,37 @@
 
 ## Introduction
 
+Firenado is a Python web framework that encapsulates and extends
+[Tornado](http://www.tornadoweb.org) organizing the application in
+components also adding a server side session layer, yaml based configuration
+files as other features common that will help developers building web
+applications and services.
+
 Firenado is a web framework that extends the original Tornado Web framework
 adding new features like loose couple components, server side session layer, 
 yaml based configuration files and more.
 
 ## Installation
 
+Installing Firenado will only force the installation of pyyaml, Tornado and
+six. We call it the basic installation:
+
 ```
 pip install firenado
+```
+
+It is possible to install extra packages as redis-py, sqlalchemy and pexpect.
+
+To install only redis-py:
+
+```
+pip install firenado[redis]
+```
+
+Complete installation:
+
+```
+pip install firenado[pexpect, redis, sqlalchemy]
 ```
 
 ## Usage
@@ -31,14 +54,15 @@ cd helloworld
 firenado app run
 ```
 
-By default an application will be created with a redis based session and a 
-redis data source defied and linked to the session.
+An application will be created with the redis based session engine
+and a redis data source linked to the session.
 
-Firenado don't install redispy so it is necessary to either install it or turn
-the session as file based. You can disable the session engine too.
+Firenado won't install redis-py so it is necessary to inform the extra
+requirement parameter or install it separately. It is possible to change 
+the session to a file based engine or disable the session engine completely.
 
-To change the session type to file go to helloworld/conf/firenado.yml and
-change the session definition to:
+In order to change the session type to file go to helloworld/conf/firenado.yml
+and change the session definition to:
 
 ```yaml
 # Session types could be:
@@ -53,8 +77,8 @@ session:
   path: /tmp
 ```
 
-If your helloworld project isn't on the python path just go 
-helloworld/conf/firenado.yml and configure the application settings:
+If your helloworld project isn't located in the python path just go 
+helloworld/conf/firenado.yml and changed it to:
 
 ```yaml
 app:
