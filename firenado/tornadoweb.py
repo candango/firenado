@@ -179,6 +179,14 @@ class TornadoComponent(object):
         """
         pass
 
+    def is_current_app(self):
+        if not firenado.conf.is_multi_app:
+            return True
+        else:
+            if firenado.conf.current_app_name == self.name:
+                return True
+        return False
+
     def get_handlers(self):
         """ Returns handlers being added by the component to the application.
         :return: A list of handlers the component provides.
