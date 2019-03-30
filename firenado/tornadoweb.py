@@ -161,6 +161,7 @@ class TornadoComponent(object):
     an application or something that can be distributed as an add-on or a
     plugin.
     """
+
     def __init__(self, name, application):
         self.name = name
         self.application = application
@@ -272,7 +273,7 @@ class TornadoHandler(tornado.web.RequestHandler):
 
         :return: bool True is current user is set
         """
-        return self.current_user is not None;
+        return self.current_user is not None
 
     def is_mobile(self):
         from .util import browser
