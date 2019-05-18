@@ -250,10 +250,10 @@ class MultiAppTestCase(unittest.TestCase):
         """ Checks if the application is multi app
         """
         chdir_app("multiapp")
-        self.assertTrue(firenado.conf.app['multi'])
+        self.assertTrue(firenado.conf.is_multi_app)
 
     def test_multi_app_false(self):
         """ Checks if the application isn't multi app
         """
         chdir_app("tornadoweb")
-        self.assertFalse(firenado.conf.app['multi'])
+        self.assertFalse(firenado.conf.is_multi_app)
