@@ -22,7 +22,7 @@ from six import iteritems
 
 import firenado.conf
 from firenado.management import ManagementTask
-from firenado.util import file as _file
+from firenado.util import file as _file, argparse_util
 
 logger = logging.getLogger(__name__)
 
@@ -83,7 +83,13 @@ class CreateProjectTask(ManagementTask):
         parser.add_argument("module", help="The project module")
 
     def get_error_message(self, parser, exception):
-        return exception.message
+        """
+
+        :param parser:
+        :param argparse_util.FirenadoArgumentError exception:
+        :return:
+        """
+        return str(exception)
 
 
 class InstallProjectTask(ManagementTask):
