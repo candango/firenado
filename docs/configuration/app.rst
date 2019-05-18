@@ -102,6 +102,34 @@ Port the application will be listen for requests.
    app:
     port: 9092
 
+process
+~~~~~~~
+
+Configuration to fork the Tornado process to be launched by Firenado.
+
+If the num_processes value is set to None the ioloop will be started without
+forking.
+
+If num_processes is set to a value bigger than 0 the ioloop will be forked with
+this amount as number of child processes. If num_processes is set to zero the
+number of cpu will be used to fork the main process.
+
+The max_restarts value will only be used if num_processes is not none.
+
+- Type: dictionary
+- Default value: {'num_processes': None, 'max_restarts': 100}
+
+.. code-block:: yaml
+
+   app:
+    process:
+      num_processes: 4
+      max_restarts: 150
+
+- See:
+
+ - https://www.tornadoweb.org/en/stable/process.html#tornado.process.fork_processes
+ - https://www.tornadoweb.org/en/stable/httpserver.html#tornado.httpserver.HTTPServer
 
 settings
 ~~~~~~~~
@@ -136,3 +164,16 @@ addresses and port are ignored.
 
    app:
     pythonpath: "/tmp/myapp_socket"
+
+wait_before_shutdown
+~~~~~~~~~~~~~~~~~~~~
+
+Time in seconds to wait before trigger the application shutdown.
+
+- Type: int
+- Default value: 0
+
+.. code-block:: yaml
+
+   app:
+    wait_before_shutdown: 5

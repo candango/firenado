@@ -161,6 +161,7 @@ class TornadoComponent(object):
     an application or something that can be distributed as an add-on or a
     plugin.
     """
+
     def __init__(self, name, application):
         self.name = name
         self.application = application
@@ -178,6 +179,14 @@ class TornadoComponent(object):
         execution.
         """
         pass
+
+    def is_current_app(self):
+        if not firenado.conf.is_multi_app:
+            return True
+        else:
+            if firenado.conf.current_app_name == self.name:
+                return True
+        return False
 
     def get_handlers(self):
         """ Returns handlers being added by the component to the application.
@@ -264,7 +273,7 @@ class TornadoHandler(tornado.web.RequestHandler):
 
         :return: bool True is current user is set
         """
-        return self.current_user is not None;
+        return self.current_user is not None
 
     def is_mobile(self):
         from .util import browser

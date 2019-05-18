@@ -7,10 +7,11 @@
 Firenado Framework
 ==================
 
-Firenado is a Python web framework that extends
-`Tornado <http://www.tornadoweb.org>`_ adding new features such as but not
-limited to application loose couple components, server side session layer,
-yaml based configuration files.
+Firenado is a Python web framework that encapsulates and extends
+`Tornado <http://www.tornadoweb.org>`_ organizing the application in
+components also adding a server side session layer, yaml based configuration
+files as other features common that will help developers building web
+applications and services.
 
 
 Contents:
