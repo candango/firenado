@@ -30,6 +30,6 @@ class LoginErrorMessage(tornado.web.UIModule):
         if self.handler.session.has('login_errors'):
             errors = self.handler.session.get('login_errors')
             if key in errors:
-                template = "skell:uimodules/login_error_message.html"
+                template = "testapp:uimodules/login_error_message.html"
                 return self.render_string(template, message=errors[key])
         return ""
