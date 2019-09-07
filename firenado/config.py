@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+# -*- coding: UTF-8 -*-
 #
 # Copyright 2015-2019 Flavio Garcia
 #
