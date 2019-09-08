@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 #
-# Copyright 2015-2018 Flavio Garcia
+# Copyright 2015-2019 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -206,7 +206,7 @@ class ManagementCommand(object):
             for task in self.tasks:
                 error_message = task.get_error_message(cmd_parser, error)
                 if error_message:
-                    command_help += '\n'.join([command_help, error_message])
+                    command_help += "\n".join([command_help, error_message])
             print(command_help)
 
 
@@ -233,7 +233,9 @@ class ManagementTask(object):
         return None
 
     def get_error_message(self, parser, error):
-        return error.message
+        if hasattr(error, "message"):
+            return error.message
+        return str(error)
 
     def run(self, namespace=None):
         """

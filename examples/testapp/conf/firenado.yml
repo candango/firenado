@@ -14,11 +14,15 @@ app:
       - name: custom
         value: custom_login
   #url_root_path: "testapp"
-  cookie_secret: "rebfcrj1qc81j76pxhb10pbrewe7exmjghftll93jh6sgporsc7igvrgk9l9oy9u"
-  xsrf_cookies: true
   addresses:
     - localhost
   #port: 8888
+  #wait_before_shutdown: 3
+  #process:
+  #  num_processes: 4
+  settings:
+    cookie_secret: "rebfcrj1qc81j76pxhb10pbrewe7exmjghftll93jh6sgporsc7igvrgk9l9oy9u"
+    xsrf_cookies: true
 
 data:
   sources:
@@ -52,8 +56,8 @@ log:
 
 management:
   commands:
-    - name: skell
-      module: skell.management.commands
+    - name: testapp
+      module: testapp.management.commands
 
 # Session types could be:
 # file or redis.

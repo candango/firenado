@@ -1,24 +1,22 @@
 Components
 ==========
 
-Firenado is organized in components. A component is a unit that will provide
-additional to an application.
+Firenado is organized in components that could be distributed as a full
+application or loose-coupled parts made to be shared between applications.
 
-The idea behind a component is that we can create a full application or
-loose-coupled parts of logic that could be shared between applications.
+A component could provide new handlers, templates, services, models as other
+resources to an application in an organized manner.
 
-A component could provide new handlers and mappings, templates, services,
-models and other resources to an application in an organized manner.
-
-A Firenado application is defined in the app.component parameter in the
-application configuration file:
+An application is a component and it is defined into the app.component
+parameter in the app application configuration file:
 
 .. code-block:: yaml
 
    app:
      component: skell
 
-Components are mapped into the application configuration file:
+Components are mapped into the framework, system or application configuration
+files. They are defined by the component section:
 
 .. code-block:: yaml
 
@@ -52,7 +50,7 @@ Disabled components are not available at run time.
 
 
 Before and after handler methods
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+--------------------------------
 
 For all handler returned by the component it is possible to implement the
 methods before_handler and after_handler that will be executed before and after

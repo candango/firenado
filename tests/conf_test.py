@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright 2015-2018 Flavio Garcia
+# Copyright 2015-2019 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -163,6 +163,23 @@ class ApplicationComponentTestCase(unittest.TestCase):
         self.assertEqual("yml", _file.get_file_extension(
                 firenado.conf.APP_CONFIG_FILE))
 
+    def test_settings_empty(self):
+        """ If no app settings is defined an empty dict is set.
+        """
+        chdir_app("yml", "conf")
+        self.assertDictEqual({}, firenado.conf.app['settings'])
+
+    def test_settings(self):
+        """ If no app settings is defined an empty dict is set.
+        """
+        chdir_app("settings", "conf")
+        settings_dict = {
+            'cookie_secret': "cookie---secret",
+            'debug': True,
+            'xsrf_cookies': True
+        }
+        self.assertDictEqual(settings_dict, firenado.conf.app['settings'])
+
     def test_static_path(self):
         """ If static path is defined on the app configuration.
         """
@@ -233,10 +250,10 @@ class MultiAppTestCase(unittest.TestCase):
         """ Checks if the application is multi app
         """
         chdir_app("multiapp")
-        self.assertTrue(firenado.conf.app['multi'])
+        self.assertTrue(firenado.conf.is_multi_app)
 
     def test_multi_app_false(self):
         """ Checks if the application isn't multi app
         """
         chdir_app("tornadoweb")
-        self.assertFalse(firenado.conf.app['multi'])
+        self.assertFalse(firenado.conf.is_multi_app)

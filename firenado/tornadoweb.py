@@ -1,6 +1,6 @@
-#!/usr/bin/env python
+# -*- coding: UTF-8 -*-
 #
-# Copyright 2015-2018 Flavio Garcia
+# Copyright 2015-2019 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -93,10 +93,6 @@ class TornadoApplication(tornado.web.Application, data.DataConnectedMixin,
         settings['static_url_prefix'] = static_url_prefix
         if len(ui_modules) > 0:
             settings['ui_modules'] = ui_modules
-        if firenado.conf.app['cookie_secret']:
-            settings['cookie_secret'] = firenado.conf.app['cookie_secret']
-        if firenado.conf.app['xsrf_cookies']:
-            settings['xsrf_cookies'] = firenado.conf.app['xsrf_cookies']
         if firenado.conf.app['url_root_path'] is not None:
             from .util.url_util import rooted_path
             for idx, handler in enumerate(handlers):
@@ -165,6 +161,7 @@ class TornadoComponent(object):
     an application or something that can be distributed as an add-on or a
     plugin.
     """
+
     def __init__(self, name, application):
         self.name = name
         self.application = application
@@ -182,6 +179,14 @@ class TornadoComponent(object):
         execution.
         """
         pass
+
+    def is_current_app(self):
+        if not firenado.conf.is_multi_app:
+            return True
+        else:
+            if firenado.conf.current_app_name == self.name:
+                return True
+        return False
 
     def get_handlers(self):
         """ Returns handlers being added by the component to the application.
@@ -268,7 +273,7 @@ class TornadoHandler(tornado.web.RequestHandler):
 
         :return: bool True is current user is set
         """
-        return self.current_user is not None;
+        return self.current_user is not None
 
     def is_mobile(self):
         from .util import browser

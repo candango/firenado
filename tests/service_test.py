@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright 2015-2018 Flavio Garcia
+# Copyright 2015-2019 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -43,6 +43,7 @@ class MockDataConnected(DataConnectedMixin):
     @served_by(MockServiceDataConnected)
     def get_service_data_sources_directly(self):
         return self.mock_service_data_connected.get_data_sources()
+
 
 class MockTestService(FirenadoService):
     """ Service that decorates the instance to be served directly and
@@ -98,8 +99,8 @@ class ServedByInstance(object):
 
     @served_by(MockTestServiceRecursion)
     def get_service_data_connected_recursively(self):
-        return self.mock_test_service_recursion.\
-            get_data_connected_recursively()
+        return (self.mock_test_service_recursion.
+                get_data_connected_recursively())
 
     @served_by(MockTestService)
     def get_service_data_sources(self):
@@ -115,8 +116,8 @@ class ServedByInstance(object):
         """ Same as get_service_data_sources but the a service will be serving
         the service defined here and then access the data sources
         """
-        return self.mock_test_service_recursion.\
-            get_service_data_sources_recursively()
+        return (self.mock_test_service_recursion.
+                get_service_data_sources_recursively())
 
     def get_data_connected(self):
         return self.data_connected
@@ -152,8 +153,8 @@ class ServiceTestCase(unittest.TestCase):
         self.assertEqual(data_connected, self.data_connected_instance)
 
     def test_data_connected_from_service_recursively(self):
-        data_connected = self.served_by_instance.\
-            get_service_data_connected_recursively()
+        data_connected = (self.served_by_instance.
+                          get_service_data_connected_recursively())
         self.assertEqual(data_connected, self.data_connected_instance)
 
     def test_data_connected_from_service_none(self):
@@ -168,15 +169,15 @@ class ServiceTestCase(unittest.TestCase):
         self.assertEqual(data_sources['datasource2'], "DataSource2")
 
     def test_get_data_source_from_data_connected(self):
-        data_sources = self.data_connected_instance.\
-            get_service_data_sources_directly()
+        data_sources = (self.data_connected_instance.
+                        get_service_data_sources_directly())
         self.assertTrue(len(data_sources) == 2)
         self.assertEqual(data_sources['datasource1'], "DataSource1")
         self.assertEqual(data_sources['datasource2'], "DataSource2")
 
     def test_get_data_source_from_service_recursively(self):
-        data_sources = self.served_by_instance.\
-            get_service_data_sources_recursively()
+        data_sources = (self.served_by_instance.
+                        get_service_data_sources_recursively())
         self.assertTrue(len(data_sources) == 2)
         self.assertEqual(data_sources['datasource1'], "DataSource1")
         self.assertEqual(data_sources['datasource2'], "DataSource2")

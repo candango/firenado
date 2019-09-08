@@ -1,6 +1,6 @@
-#!/usr/bin/env python
+# -*- coding: UTF-8 -*-
 #
-# Copyright 2015-2018 Flavio Garcia
+# Copyright 2015-2019 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,6 +16,49 @@
 
 import yaml
 import logging
+
+
+def get_app_defaults():
+    """ Return the application configuration defaults
+    :return:
+    """
+    app = dict()
+    app['default_addresses'] = ["::", "0.0.0.0"]
+    app['addresses'] = app['default_addresses']
+    app['component'] = None
+    # TODO: Are we using current_user_key?
+    app['current_user_key'] = "__FIRENADO_CURRENT_USER_KEY__"
+    app['data'] = {}
+    app['data']['sources'] = []
+    app['id'] = None
+    app['pythonpath'] = None
+    app['port'] = 8888
+    app['process'] = {
+        'num_processes': None,
+        'max_restarts': 100
+    }
+    app['login'] = {}
+    app['login']['urls'] = {}
+    app['login']['urls']['default'] = "/login"
+    app['is_on_dir'] = False
+    app['session'] = {
+        'id_generator': "default",
+    }
+    app['settings'] = {}
+    app['socket'] = None
+    app['static_path'] = None
+    app['static_url_prefix'] = "/static"
+    app['type'] = "tornado"
+    app['types'] = {}
+    app['types']['tornado'] = {}
+    app['types']['tornado']['name'] = "tornado"
+    app['types']['tornado']['launcher'] = {}
+    app['types']['tornado']['launcher']['class'] = "TornadoLauncher"
+    app['types']['tornado']['launcher']['module'] = "firenado.launcher"
+    app['url_root_path'] = None
+    # Wait before shutdown is on seconds
+    app['wait_before_shutdown'] = 0
+    return app
 
 
 def log_level_from_string(str_level):
@@ -156,17 +199,68 @@ def process_app_config(config, config_data):
 
     # If apps is on config data, this is running o multi app mode
     if 'apps' in config_data:
-        config.app['multi'] = True
+        config.is_multi_app = True
         process_apps_config_session(config, config_data['apps'])
+        if 'app' in config_data:
+            from .util import sysexits
+            logger = logging.getLogger(__name__)
+            logger.critical("Firenado is running in multi application mode. "
+                            "The app section is only allowed in simple "
+                            "applicaiton mode.")
+            sysexits.exit_fatal(sysexits.EX_CONFIG)
     else:
         # If not the app definition is on the firenado config file
         if 'app' in config_data:
             process_app_config_section(config, config_data['app'])
 
+
 # TODO: This is being used for the multi app configuration
 def process_apps_config_session(config, apps_config):
-    pass
-    #print(apps_config)
+    from .util import sysexits
+    import os
+    logger = logging.getLogger(__name__)
+
+    class AppConf:
+        def __init__(self):
+            self.app = {}
+
+    for app_config in apps_config:
+        config.is_multi_app = True
+        if 'name' in app_config:
+            name = app_config['name']
+            config.apps[name] = AppConf()
+            config.apps[name].app = get_app_defaults()
+            if 'file' in app_config:
+                file = app_config['file']
+                if not os.path.isabs(file):
+                    file = os.path.abspath(
+                        os.path.join(config.APP_CONFIG_PATH, file)
+                    )
+                if not os.path.exists(file):
+                    logger.critical("The file %s doesn't exists. Please check"
+                                    "your apps definition and inform a valid "
+                                    "file." % file)
+                    sysexits.exit_fatal(sysexits.EX_CONFIG)
+                file_app_config = load_yaml_config_file(file)
+                if "app" in file_app_config:
+                    process_app_config_section(config.apps[name],
+                                               file_app_config['app'])
+            else:
+                process_app_config_section(config.apps[name], app_config)
+        else:
+            logger.critical("When defining an app in the apps section the name"
+                            " parameter is mandatory.")
+            sysexits.exit_fatal(sysexits.EX_CONFIG)
+    if config.current_app_name is None:
+        for app in config.apps:
+            config.current_app_name = app
+            break
+    if config.current_app_name in config.apps:
+        config.app = config.apps[config.current_app_name].app
+    else:
+        logger.critical("The application %s is not defined." %
+                        config.current_app_name)
+        sysexits.exit_fatal(sysexits.EX_CONFIG)
 
 
 def process_app_config_section(config, app_config):
@@ -180,13 +274,9 @@ def process_app_config_section(config, app_config):
         config.app['addresses'] = app_config['addresses']
     if 'component' in app_config:
         config.app['component'] = app_config['component']
-    if 'cookie_secret' in app_config:
-        config.app['cookie_secret'] = app_config['cookie_secret']
     if 'data' in app_config:
         if 'sources' in app_config['data']:
             config.app['data']['sources'] = app_config['data']['sources']
-    if 'debug' in app_config:
-        config.app['debug'] = app_config['debug']
     if 'id' in app_config:
         config.app['id'] = app_config['id']
     if 'login' in app_config:
@@ -197,6 +287,10 @@ def process_app_config_section(config, app_config):
         config.app['pythonpath'] = app_config['pythonpath']
     if 'port' in app_config:
         config.app['port'] = app_config['port']
+    if 'process' in app_config:
+        if 'num_processes' in app_config['process']:
+            config.app['process']['num_processes'] = app_config[
+                'process']['num_processes']
     if 'url_root_path' in app_config:
         root_url = app_config['url_root_path'].strip()
         if root_url[0] == "/":
@@ -219,8 +313,8 @@ def process_app_config_section(config, app_config):
             app_type['launcher'] = get_config_from_package(
                 app_type['launcher'])
             config.app['types'][app_type['name']] = app_type
-    if 'xsrf_cookies' in app_config:
-        config.app['xsrf_cookies'] = app_config['xsrf_cookies']
+    if 'wait_before_shutdown' in app_config:
+        config.app['wait_before_shutdown'] = app_config['wait_before_shutdown']
 
 
 def process_components_config_section(config, components_config):
