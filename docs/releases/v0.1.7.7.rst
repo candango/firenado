@@ -1,18 +1,30 @@
 What's new in Firenado 0.1.7.7
 ==============================
 
-Jan 26, 2019
+Sep 07, 2019
 ------------
 
 We are pleased to announce the release of Firenado 0.1.7.7.
 
-Firenado 0.1.7.5 pip package was not correct use this release instead.
-
+Introduced multi app and multi process configurations. Now its is possible to
+define and launch more than one applications in the same project with more than
+one processes.
 
 Here are the highlights:
 
+Refactory
+~~~~~~~~~
+
+* Move tornado app configurations to app settings. `#263 <https://github.com/candango/firenado/issues/263>`_
+
+New Features
+~~~~~~~~~~~~
+* Use bind instead listen when starting a Tornado Application. `#94 <https://github.com/candango/firenado/issues/94>`_
+* Multiapp configuration. `#177 <https://github.com/candango/firenado/issues/177>`_
+* Multi process configuration. `#264 <https://github.com/candango/firenado/issues/264>`_
 
 Bug Fixes
 ~~~~~~~~~
-
-* Cannot install 0.1.7.5 because the pexpect is missing on the manifest. `#258 <https://github.com/candango/firenado/issues/258>`_
+* Using localhost and 127.0.0.1 in the addresses will break the application execution. `#229 <https://github.com/candango/firenado/issues/229>`_
+* Command project init will throw an error if no module name is informed. `#268 <https://github.com/candango/firenado/issues/268>`_
+* Pexpect is being imported when process launcher is still being resolved bug. `#273 <https://github.com/candango/firenado/issues/273>`_
