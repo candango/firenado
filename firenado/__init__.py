@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+# -*- coding: UTF-8 -*-
 #
 # Copyright 2015-2019 Flavio Garcia
 #
@@ -20,4 +20,5 @@
 from __future__ import (absolute_import, division, print_function,
                         with_statement)
 
-__version__ = (0, 1, 7, 6)
+__version__ = (0, 1, 7, 7)
+

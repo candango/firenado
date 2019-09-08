@@ -18,8 +18,8 @@ import firenado.conf
 import logging
 import os
 import six
-import sys
 from six import iteritems
+import sys
 from tornado import gen
 
 if six.PY3:
@@ -55,9 +55,13 @@ class FirenadoLauncher(object):
 
 
 class ProcessLauncher(FirenadoLauncher):
-    import pexpect
-
-    process = None  # type: pexpect.spawn
+    try:
+        import pexpect
+        process = None  # type: pexpect.spawn
+    except ImportError:
+        logger.debug("The pexpect module ins't isn't installed. Consider "
+                     "installing it in order to launch applications using "
+                     "ProcessLauncher.")
 
     def __init__(self, **settings):
         super(ProcessLauncher, self).__init__(**settings)
@@ -90,9 +94,16 @@ class ProcessLauncher(FirenadoLauncher):
     @gen.coroutine
     def read_process(self):
         import pexpect
+        import re
         self.process_callback.stop()
         try:
-            yield self.process.expect(r"[C|I|W|D|E].*", async_=True)
+            # Getting everithing but this line, this is a workaround
+            # TODO: Get everything and remove workaround.
+            # Don't know if pexpect support that currently.
+            # See: https://bit.ly/2Zt2sFZ
+            line = "[-!-!-EVERYTHING_BUT_THIS-!-!-]"
+            yield self.process.expect(
+                [r'^((?!' + re.escape(line) + ').)*$'], async_=True)
         except pexpect.TIMEOUT:
             pass
         self.process_callback.start()
