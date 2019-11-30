@@ -24,11 +24,13 @@ except ImportError:
 import firenado
 import os
 
+
 # Solution from http://bit.ly/29Yl8VN
 def resolve_requires(requirements_file):
     requirements = parse_requirements("./%s" % requirements_file,
             session=False)
     return [str(ir.req) for ir in requirements]
+
 
 # Utility function to read the README file.
 # Used for the long_description.  It's nice, because now 1) we have a top level
@@ -37,6 +39,7 @@ def resolve_requires(requirements_file):
 # Solution from: http://bit.ly/2mig8RT
 def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
+
 
 # We still running: python setup.py sdist upload --repository=testpypi
 # Twine isn't handling long_descriptions as per:
@@ -54,6 +57,7 @@ setup(
     maintainer_email="piraz@candango.org",
     install_requires=resolve_requires("requirements/basic.txt"),
     extras_require={
+        'all': resolve_requires("requirements/all.txt"),
         'redis': resolve_requires("requirements/redis.txt"),
         'pexpect': resolve_requires("requirements/pexpect.txt"),
         'sqlalchemy': resolve_requires("requirements/sqlalchemy.txt"),

@@ -26,5 +26,6 @@ class LauncherComponent(tornadoweb.TornadoComponent):
         self.launcher.load()
         yield self.launcher.launch()
 
+    @gen.coroutine
     def shutdown(self):
         self.launcher.shutdown()
