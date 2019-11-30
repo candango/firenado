@@ -67,7 +67,7 @@ class ProcessLauncher(FirenadoLauncher):
         super(ProcessLauncher, self).__init__(**settings)
         self.process = None
         self.process_callback = None
-        self.logfile = self.socket = settings.get("logfile", None)
+        self.logfile = settings.get("logfile", None)
         self.command = None
         self.response = None
 
