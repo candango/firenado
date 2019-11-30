@@ -94,17 +94,13 @@ class ProcessLauncher(FirenadoLauncher):
     @gen.coroutine
     def read_process(self):
         import pexpect
-        import re
         self.process_callback.stop()
         try:
-            # Getting everithing but this line, this is a workaround
-            # TODO: Get everything and remove workaround.
-            # Don't know if pexpect support that currently.
-            # See: https://bit.ly/2Zt2sFZ
-            line = "[-!-!-EVERYTHING_BUT_THIS-!-!-]"
-            yield self.process.expect(
-                [r'^((?!' + re.escape(line) + ').)*$'], async_=True)
+            # Simple way to catch everything is wait for a new line:
+            #
+            yield self.process.expect("\n", async_=True)
         except pexpect.TIMEOUT:
+            logger.warning("Reached timeout")
             pass
         self.process_callback.start()
 
@@ -120,18 +116,23 @@ class ProcessLauncher(FirenadoLauncher):
         if self.logfile is not None:
             parameters['logfile'] = self.logfile
         self.process = pexpect.spawn(**parameters)
-        yield self.process.expect("Firenado server started successfully.",
-                                  async_=True)
+        yield self.process.expect(
+            [r"[Firenado server started successfully].*"], async_=True)
         self.process_callback = tornado.ioloop.PeriodicCallback(
             self.read_process,
             400
         )
         self.process_callback.start()
 
+    def send(self, line):
+        logger.info("Sending line {}".format(line))
+        self.process.sendline(line)
+
     @gen.coroutine
     def shutdown(self):
-        import pexpect
-        yield self.process.expect(pexpect.EOF)
+        logger.warning("Shutting down process launcher.")
+        self.send("^C")
+        yield self.process.expect("^C", async_=True)
 
 
 class TornadoLauncher(FirenadoLauncher):
