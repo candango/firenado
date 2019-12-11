@@ -5,10 +5,9 @@ python:
   - "3.4"
   - "3.5"
   - "3.6"
+  - "3.7"
 install:
   - "pip install -r requirements/basic.txt"
-  - "pip install -r requirements/redis.txt"
-  - "pip install -r requirements/pexpect.txt"
-  - "pip install -r requirements/sqlalchemy.txt"
+  - "pip install -r requirements/all.txt"
 script:
   - "PYTHONPATH=$PYTHONPATH:. python tests/runtests.py"
