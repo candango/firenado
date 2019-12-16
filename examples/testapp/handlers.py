@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright 2015-2018 Flavio Garcia
+# Copyright 2015-2019 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,8 +15,12 @@
 # limitations under the License.
 
 import firenado.conf
-from firenado import security, service, tornadoweb
+from firenado import security, service, tornadogen, tornadoweb
 from firenado.components.toolbox.pagination import Paginator
+from tornado import gen
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class AuthHandler:
@@ -27,6 +31,22 @@ class AuthHandler:
         if user_data:
             return json_decode(user_data)
         return None
+
+
+class AsyncTimeoutHandler(tornadoweb.TornadoHandler):
+
+    def timed_out(self):
+        self.render("async_timeout.html")
+
+    @gen.coroutine
+    def get(self):
+        from tornado.util import TimeoutError
+        try:
+            yield tornadogen.with_timeout(2, gen.sleep(5))
+            self.write("This will never be reached!!")
+        except TimeoutError as te:
+            logger.warning(te.__repr__())
+            self.timed_out()
 
 
 class IndexHandler(AuthHandler, tornadoweb.TornadoHandler):

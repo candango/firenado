@@ -35,6 +35,7 @@ class TestappComponent(firenado.tornadoweb.TornadoComponent):
         default_login = firenado.conf.app['login']['urls']['default']
         return [
             (r"/", handlers.IndexHandler),
+            (r"/async/timeout", handlers.AsyncTimeoutHandler),
             (r"/session/counter", handlers.SessionCounterHandler),
             (r"/session/config", handlers.SessionConfigHandler),
             (r"/pagination", handlers.PaginationHandler),
