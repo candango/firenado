@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright 2015-2019 Flavio Garcia
+# Copyright 2015-2020 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -46,15 +46,15 @@ def read(fname):
 # https://github.com/pypa/twine/issues/262
 setup(
     name="Firenado",
-    version=".".join(map(str, firenado.__version__)),
+    version=firenado.get_version(),
     description="Firenado is a python web framework based on "
                 "Tornado web framework/server.",
     long_description=read("README.rst"),
-    license="Apache License V2.0",
-    author="Flavio Garcia",
-    author_email="piraz@candango.org",
-    maintainer="Flavio Garcia",
-    maintainer_email="piraz@candango.org",
+    license=firenado.__licence__,
+    author=firenado.get_author(),
+    author_email=firenado.get_author_email(),
+    maintainer=firenado.get_author(),
+    maintainer_email=firenado.get_author_email(),
     install_requires=resolve_requires("requirements/basic.txt"),
     extras_require={
         'all': resolve_requires("requirements/all.txt"),
