@@ -1,0 +1,9 @@
+rand(om) <sub-command>
+
+Sub-commands are:
+
+      string         Print a random string.
+                     Inform a interger size to change the string size.
+                     Default size is 64.
+
+      uuid           Print a random uuid.

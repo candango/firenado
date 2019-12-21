@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 #
-# Copyright 2015-2019 Flavio Garcia
+# Copyright 2015-2020 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -483,8 +483,11 @@ class RedisSessionHandler(SessionHandler):
 
     def configure(self):
         self.life_time = firenado.conf.session['life_time']
-        self.data_source = self.engine.get_session_aware_instance().\
-            get_data_source(firenado.conf.session['redis']['data']['source'])
+        self.data_source = (
+            self.engine.get_session_aware_instance().get_data_source(
+                firenado.conf.session['redis']['data']['source']
+            )
+        )
 
     def create_session(self, session_id, data):
         self.write_stored_session(session_id, data)
