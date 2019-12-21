@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright 2015-2018 Flavio Garcia
+# Copyright 2015-2019 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -38,10 +38,11 @@ ManagementCommand(
                           tasks=tasks.CreateProjectTask)
     ])
 ManagementCommand(
-    "rand(om)", "Random related commands", loader.load("app_command_help.txt"),
+    "rand(om)", "Random related commands", loader.load(
+        "random_command_help.txt"),
     category="Firenado", sub_commands=[
         ManagementCommand("string", "Generates a random string", "",
-                          tasks=tasks.GenerateCookieSecretTask),
+                          tasks=tasks.GenerateRandomStringTask),
         ManagementCommand("uuid", "Generates a random uuid", "",
                           tasks=tasks.GenerateUuidTask)
     ])

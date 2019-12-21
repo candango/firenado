@@ -483,8 +483,11 @@ class RedisSessionHandler(SessionHandler):
 
     def configure(self):
         self.life_time = firenado.conf.session['life_time']
-        self.data_source = self.engine.get_session_aware_instance().\
-            get_data_source(firenado.conf.session['redis']['data']['source'])
+        self.data_source = (
+            self.engine.get_session_aware_instance().get_data_source(
+                firenado.conf.session['redis']['data']['source']
+            )
+        )
 
     def create_session(self, session_id, data):
         self.write_stored_session(session_id, data)

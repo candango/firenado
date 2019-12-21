@@ -7,8 +7,9 @@ commands.
 
 The framework provides a category called Firenado with the following commands:
 
- - app
- - projec(ect)
+ - app            Application related commands
+ - projec(ect)    Project related commands
+ - rand(om)       Random related commands
 
 Firenado has a command line program that helps to create a new project, run an
 application and other things.
