@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 #
-# Copyright 2015-2019 Flavio Garcia
+# Copyright 2015-2020 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -141,18 +141,31 @@ class RunApplicationTask(ManagementTask):
         launcher.launch()
 
 
-class GenerateCookieSecretTask(ManagementTask):
-    """ Generates a radom string to serve as the cookie secret for an
+class GenerateRandomStringTask(ManagementTask):
+    """ Generates a random string to serve as the cookie secret for an
     application.
     """
+
+    def add_arguments(self, parser):
+        parser.add_argument("size", nargs='?', default=64, type=int)
+
     def run(self, namespace):
         from firenado.util import random_string
-        print(random_string(64))
+        size = namespace.size
+        if size > 1000000:
+            logger.error("The size {} has reached this command "
+                         "limit.".format(size))
+            sys.exit(1)
+        logger.debug("Displaying a random string with size {}".format(size))
+        print(random_string(size))
+        sys.exit(0)
 
 
 class GenerateUuidTask(ManagementTask):
-    """ Generates an uuid string
+    """ Generates an uuid4 string
     """
     def run(self, namespace):
         from uuid import uuid4
+        logger.debug("Displaying a random uuid4 string.")
         print(uuid4())
+        sys.exit(0)

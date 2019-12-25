@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright 2015-2019 Flavio Garcia
+# Copyright 2015-2020 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,11 +24,13 @@ except ImportError:
 import firenado
 import os
 
+
 # Solution from http://bit.ly/29Yl8VN
 def resolve_requires(requirements_file):
     requirements = parse_requirements("./%s" % requirements_file,
             session=False)
     return [str(ir.req) for ir in requirements]
+
 
 # Utility function to read the README file.
 # Used for the long_description.  It's nice, because now 1) we have a top level
@@ -38,22 +40,24 @@ def resolve_requires(requirements_file):
 def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
+
 # We still running: python setup.py sdist upload --repository=testpypi
 # Twine isn't handling long_descriptions as per:
 # https://github.com/pypa/twine/issues/262
 setup(
     name="Firenado",
-    version=".".join(map(str, firenado.__version__)),
+    version=firenado.get_version(),
     description="Firenado is a python web framework based on "
                 "Tornado web framework/server.",
     long_description=read("README.rst"),
-    license="Apache License V2.0",
-    author="Flavio Garcia",
-    author_email="piraz@candango.org",
-    maintainer="Flavio Garcia",
-    maintainer_email="piraz@candango.org",
+    license=firenado.__licence__,
+    author=firenado.get_author(),
+    author_email=firenado.get_author_email(),
+    maintainer=firenado.get_author(),
+    maintainer_email=firenado.get_author_email(),
     install_requires=resolve_requires("requirements/basic.txt"),
     extras_require={
+        'all': resolve_requires("requirements/all.txt"),
         'redis': resolve_requires("requirements/redis.txt"),
         'pexpect': resolve_requires("requirements/pexpect.txt"),
         'sqlalchemy': resolve_requires("requirements/sqlalchemy.txt"),

@@ -1,0 +1,36 @@
+What's new in Firenado 0.1.7.8
+==============================
+
+Dec 25, 2019
+------------
+
+We are pleased to announce the release of Firenado 0.1.7.8.
+
+Last Firenado supporting python 2.7 in the main development we will move
+Tornado 5.x codebase to a legacy state and only fixing bugs if needed.
+
+Next release we're moving to Tornado 6.x.
+
+We added an extra options to install all extra dependencies and random string
+and uuid commands to the command line program.
+
+We fixed bugs with processes launcher and added interface to send lines to the
+process running.
+
+
+Here are the highlights:
+
+New Features
+~~~~~~~~~~~~
+
+* Add to setup.py an extra option to install all extras. `#280 <https://github.com/candango/firenado/issues/280>`_
+* Random string and uuid command line tasks #284. `#284 <https://github.com/candango/firenado/issues/284>`_
+
+Bug Fixes
+~~~~~~~~~
+* ProcessLauncher logfile parameter assignment overrides socket. `#279 <https://github.com/candango/firenado/issues/279>`_
+* Control ProcessLauncher shutdown properly. `#281 <https://github.com/candango/firenado/issues/281>`_
+
+Examples
+~~~~~~~~~
+* Async timeout example. `#283 <https://github.com/candango/firenado/issues/283>`_

@@ -4,14 +4,21 @@ Introduction
 Firenado is a Python web framework that primarily extends the
 `Tornado <http://www.tornadoweb.org>`_ framework and runs over it's web server.
 
-A Firenado application is organized in loose couple components and it is wired
-using yaml config files. The framework makes possible to develop components
-that can be shared between applications and distributed separately.
+A Firenado application is organized in components wired by yaml config files.
+This design makes it possible to develop shareable components between
+applications and be distributed separately.
 
-When you develop with Firenado you can use the our server side session layer
-based on files or redis, and you can develop a custom storage.
+Firenado also provides a server side session layer based on files or redis. If
+you prefer it is also possible to create a new backend to the session layer or
+disable it.
 
-Other features are offered shiped at the framework   core or via components.
+Other features shipped with the framework are configurable data sources, a
+service layer that could be injected to handles via decorators, a command line
+that helps start a project and run an application.
+
+Firenado provides many other features and resources that will help a developer
+to create and manage Tornado applications.
+
 
 Instalation
 -----------
