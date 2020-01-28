@@ -1,2 +1,2 @@
-feedgen==0.4.0
+feedgen==0.9.0
 pytz==2016.6.1
