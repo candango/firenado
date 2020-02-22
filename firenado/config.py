@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 #
-# Copyright 2015-2019 Flavio Garcia
+# Copyright 2015-2020 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,8 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from cartola import sysexits
 import yaml
 import logging
+import os
 
 
 def get_app_defaults():
@@ -202,7 +204,7 @@ def process_app_config(config, config_data):
         config.is_multi_app = True
         process_apps_config_session(config, config_data['apps'])
         if 'app' in config_data:
-            from .util import sysexits
+
             logger = logging.getLogger(__name__)
             logger.critical("Firenado is running in multi application mode. "
                             "The app section is only allowed in simple "
@@ -216,8 +218,6 @@ def process_app_config(config, config_data):
 
 # TODO: This is being used for the multi app configuration
 def process_apps_config_session(config, apps_config):
-    from .util import sysexits
-    import os
     logger = logging.getLogger(__name__)
 
     class AppConf:
