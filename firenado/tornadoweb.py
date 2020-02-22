@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 #
-# Copyright 2015-2019 Flavio Garcia
+# Copyright 2015-2020 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -31,13 +31,12 @@ import tornado.websocket
 import os
 from six import iteritems, string_types
 
-
 logger = logging.getLogger(__name__)
 
 
 class TornadoApplication(tornado.web.Application, data.DataConnectedMixin,
                          session.SessionEnginedMixin):
-    """Firenado basic Tornado application.
+    """ Firenado basic Tornado application.
     """
 
     def __init__(self, default_host="", transforms=None, **settings):
@@ -276,9 +275,11 @@ class TornadoHandler(tornado.web.RequestHandler):
         return self.current_user is not None
 
     def is_mobile(self):
-        from .util import browser
+        from mobiledetect import MobileDetect
         if 'User-Agent' in self.request.headers:
-            return browser.is_mobile(self.request.headers['User-Agent'])
+            return MobileDetect(
+                useragent=self.request.headers['User-Agent']
+            ).is_mobile()
         return False
 
     @session.read
