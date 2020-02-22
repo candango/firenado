@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 #
-# Copyright 2015-2019 Flavio Garcia
+# Copyright 2015-2020 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from cartola import sysexits
 import firenado.conf
 import logging
 import os
@@ -209,7 +210,6 @@ class TornadoLauncher(FirenadoLauncher):
                 tornado.process.fork_processes(num_processes, max_restarts)
             tornado.ioloop.IOLoop.current().start()
         else:
-            from .util import sysexits
             logger.critical("Firenado unable to start.")
             sysexits.exit_fatal(sysexits.EX_SOFTWARE)
 
