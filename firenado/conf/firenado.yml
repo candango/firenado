@@ -36,6 +36,8 @@ session:
     - name: redis
       class: firenado.session.RedisSessionHandler
   encoders:
+    - name: json
+      class: firenado.session.JsonSessionEncoder
     - name: pickle
       class: firenado.session.PickeSessionEncoder
   id_generators:

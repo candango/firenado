@@ -17,9 +17,9 @@
 from __future__ import (absolute_import, division, print_function,
                         with_statement)
 
+from cartola import fs, security
 import firenado.conf
 from firenado.config import get_class_from_config
-from firenado.util import file as _file, random_string
 
 import functools
 import logging
@@ -394,13 +394,13 @@ class FileSessionHandler(SessionHandler):
         if os.path.exists(firenado.conf.session['file']['path']):
             session_file = os.path.join(self.path,
                                         self.__get_filename(session_id))
-            _file.touch(session_file)
+            fs.touch(session_file)
             self.write_stored_session(session_id, data)
 
     def read_stored_session(self, session_id):
         import binascii
         session_file = os.path.join(self.path, self.__get_filename(session_id))
-        timed_data = _file.read(session_file)
+        timed_data = fs.read(session_file)
         return binascii.unhexlify(timed_data.split("--")[0])
 
     def write_stored_session(self, session_id, data):
@@ -409,7 +409,7 @@ class FileSessionHandler(SessionHandler):
         timed_data = "%s--%s" % (binascii.hexlify(data).decode("ascii"),
                                  int(time.time()))
         session_file = os.path.join(self.path, self.__get_filename(session_id))
-        _file.write(session_file, timed_data)
+        fs.write(session_file, timed_data)
 
     def destroy_stored_session(self, session_id):
         logger.debug("Destroying session %s." % session_id)
@@ -442,7 +442,7 @@ class FileSessionHandler(SessionHandler):
             for filename in filenames:
                 file_path = os.path.join(self.path, filename)
                 sess_id = filename.split(".")[0].split("_")[-1]
-                timed_data = _file.read(file_path)
+                timed_data = fs.read(file_path)
                 last_write = timed_data.split("--")[1]
                 age = int(time.time()) - int(last_write)
                 if age > self.life_time:
@@ -579,6 +579,17 @@ class PickeSessionEncoder(SessionEncoder):
         return pickle.loads(data)
 
 
+class JsonSessionEncoder(SessionEncoder):
+
+    def encode(self, data):
+        from tornado import escape
+        return escape.json_encode(data)
+
+    def decode(self, data):
+        from tornado import escape
+        return escape.json_decode(data)
+
+
 def generate_session_id():
     """
     Default firenado session id generator
@@ -586,4 +597,4 @@ def generate_session_id():
     Returns:
         A random string containing digits, upper and lower characters
     """
-    return random_string(64)
+    return security.random_string(64)

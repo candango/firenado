@@ -442,3 +442,11 @@ def process_session_config_section(config, session_config):
         config.session['callback_time'] = session_config['callback_time']
     if 'purge_limit' in session_config:
         config.session['purge_limit'] = session_config['purge_limit']
+    if 'encoder' in session_config:
+        if session_config['encoder'] in config.session['encoders']:
+            config.session['encoder'] = session_config['encoder']
+        else:
+            logger = logging.getLogger(__name__)
+            logger.critical("The session encoder \"{}\" is not defined."
+                            "".format(session_config['encoder']))
+            sysexits.exit_fatal(sysexits.EX_CONFIG)
