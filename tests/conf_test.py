@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright 2015-2019 Flavio Garcia
+# Copyright 2015-2020 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,9 +17,9 @@
 from __future__ import (absolute_import, division, print_function,
                         with_statement)
 
+from cartola import fs
 import unittest
 import firenado.conf
-import firenado.util.file as _file
 from tests import chdir_app
 import logging
 import os
@@ -116,7 +116,8 @@ class ApplicationComponentTestCase(unittest.TestCase):
                           firenado.conf.LIB_CONFIG_FILE)
         self.assertEqual(firenado.conf.stack[1],
                           firenado.conf.SYS_CONFIG_FILE)
-        self.assertEqual("sys_log_format", firenado.conf.log['format'])
+        self.assertEqual("%(asctime)s - %(message)s",
+                         firenado.conf.log['format'])
         self.assertEqual(logging.DEBUG, firenado.conf.log['level'])
         del os.environ['FIRENADO_SYS_CONFIG_PATH']
         reload(firenado.conf)
@@ -160,7 +161,7 @@ class ApplicationComponentTestCase(unittest.TestCase):
         be loaded.
         """
         chdir_app("yml", "conf")
-        self.assertEqual("yml", _file.get_file_extension(
+        self.assertEqual("yml", fs.get_file_extension(
                 firenado.conf.APP_CONFIG_FILE))
 
     def test_settings_empty(self):

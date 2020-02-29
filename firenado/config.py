@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 #
-# Copyright 2015-2019 Flavio Garcia
+# Copyright 2015-2020 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,8 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from cartola import sysexits
 import yaml
 import logging
+import os
 
 
 def get_app_defaults():
@@ -202,7 +204,7 @@ def process_app_config(config, config_data):
         config.is_multi_app = True
         process_apps_config_session(config, config_data['apps'])
         if 'app' in config_data:
-            from .util import sysexits
+
             logger = logging.getLogger(__name__)
             logger.critical("Firenado is running in multi application mode. "
                             "The app section is only allowed in simple "
@@ -216,8 +218,6 @@ def process_app_config(config, config_data):
 
 # TODO: This is being used for the multi app configuration
 def process_apps_config_session(config, apps_config):
-    from .util import sysexits
-    import os
     logger = logging.getLogger(__name__)
 
     class AppConf:
@@ -442,3 +442,11 @@ def process_session_config_section(config, session_config):
         config.session['callback_time'] = session_config['callback_time']
     if 'purge_limit' in session_config:
         config.session['purge_limit'] = session_config['purge_limit']
+    if 'encoder' in session_config:
+        if session_config['encoder'] in config.session['encoders']:
+            config.session['encoder'] = session_config['encoder']
+        else:
+            logger = logging.getLogger(__name__)
+            logger.critical("The session encoder \"{}\" is not defined."
+                            "".format(session_config['encoder']))
+            sysexits.exit_fatal(sysexits.EX_CONFIG)

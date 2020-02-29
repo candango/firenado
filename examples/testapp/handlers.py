@@ -17,6 +17,7 @@
 import firenado.conf
 from firenado import security, service, tornadogen, tornadoweb
 from firenado.components.toolbox.pagination import Paginator
+import hashlib
 from tornado import gen
 import logging
 
@@ -112,6 +113,9 @@ class LoginHandler(AuthHandler, tornadoweb.TornadoHandler):
                 errors['fail'] = "Invalid login"
             else:
                 user = self.user_service.by_username(username)
+                # Shhhhh!!!! this is a secret.
+                user['pass'] = hashlib.sha256(
+                    "_".join(user['pass']).encode('ascii')).hexdigest()
                 self.session.set("user", json_encode(user))
                 self.redirect(self.get_rooted_path("private"))
 

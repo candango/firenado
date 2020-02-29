@@ -69,6 +69,7 @@ session:
   # Scan interval by default is 2 minutes = 120 seconds
   # scan_interval: 120
   # Redis session handler configuration
+  encoder: json
   data:
     source: session
   # File session handler related configuration

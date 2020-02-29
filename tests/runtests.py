@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright 2015-2019 Flavio Garcia
+# Copyright 2015-2020 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ from __future__ import (absolute_import, division, print_function,
 import unittest
 from tests import (components_test, conf_test, config_test, security_test,
                    service_test, session_test, tornadoweb_test)
-from tests.util import file_test, url_util_test
+from tests.util import url_util_test
 
 
 def suite():
@@ -33,7 +33,6 @@ def suite():
     alltests.addTests(testLoader.loadTestsFromModule(service_test))
     alltests.addTests(testLoader.loadTestsFromModule(session_test))
     alltests.addTests(testLoader.loadTestsFromModule(tornadoweb_test))
-    alltests.addTests(testLoader.loadTestsFromModule(file_test))
     alltests.addTests(testLoader.loadTestsFromModule(url_util_test))
     return alltests
 
