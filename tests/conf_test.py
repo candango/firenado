@@ -116,7 +116,8 @@ class ApplicationComponentTestCase(unittest.TestCase):
                           firenado.conf.LIB_CONFIG_FILE)
         self.assertEqual(firenado.conf.stack[1],
                           firenado.conf.SYS_CONFIG_FILE)
-        self.assertEqual("sys_log_format", firenado.conf.log['format'])
+        self.assertEqual("%(asctime)s - %(message)s",
+                         firenado.conf.log['format'])
         self.assertEqual(logging.DEBUG, firenado.conf.log['level'])
         del os.environ['FIRENADO_SYS_CONFIG_PATH']
         reload(firenado.conf)
