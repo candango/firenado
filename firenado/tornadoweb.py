@@ -17,6 +17,7 @@
 from __future__ import (absolute_import, division, print_function,
                         with_statement)
 
+from cartola import fs
 import tornado.web
 import firenado.conf
 from . import data
@@ -121,10 +122,9 @@ class TornadoApplication(tornado.web.Application, data.DataConnectedMixin,
                 component_class = get_class_from_config(value)
                 self.components[key] = component_class(key, self)
                 if self.components[key].get_config_file():
-                    from firenado.util.file import file_has_extension
                     filename = self.components[key].get_config_file()
                     comp_config_file = None
-                    if file_has_extension(filename):
+                    if fs.file_has_extension(filename):
                         if os.path.isfile(os.path.join(
                                 firenado.conf.APP_CONFIG_PATH, filename)):
                             comp_config_file = os.path.join(

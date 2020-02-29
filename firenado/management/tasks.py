@@ -14,15 +14,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
-import sys
-
-import os
-from six import iteritems
-
+from cartola import fs
 import firenado.conf
 from firenado.management import ManagementTask
-from firenado.util import file as _file, argparse_util
+from firenado.util import argparse_util
+import logging
+import os
+from six import iteritems
+import sys
 
 logger = logging.getLogger(__name__)
 
@@ -37,7 +36,7 @@ class CreateProjectTask(ManagementTask):
             module = namespace.module
             component = module.replace(".", " ").title().replace(" ", "")
             project_name = module.replace(".", "_").lower()
-            project_directory = _file.create_module(module, os.getcwd())
+            project_directory = fs.create_module(module, os.getcwd())
             #TODO: Check if project exists
             #TODO: If doesn't exists create project
             #TODO: If exists throw an error
@@ -47,24 +46,24 @@ class CreateProjectTask(ManagementTask):
             project_init_content = loader.load("app.py.txt").generate(
                 project_name=project_name, module=module, component=component)
             # Generating application firenado component and handlers
-            _file.write(os.path.join(project_directory, "__init__.py"), "")
-            _file.write(os.path.join(project_directory, "app.py"),
+            fs.write(os.path.join(project_directory, "__init__.py"), "")
+            fs.write(os.path.join(project_directory, "app.py"),
                         project_init_content.decode(sys.stdout.encoding))
             handlers_file_name = os.path.join(project_directory, "handlers.py")
-            _file.touch(handlers_file_name)
+            fs.touch(handlers_file_name)
             project_handlers_content = loader.load("handlers.py.txt").generate(
                 handlers=["Index"])
-            _file.write(handlers_file_name,
+            fs.write(handlers_file_name,
                         project_handlers_content.decode(sys.stdout.encoding))
             # Generating configuration
             project_conf_directory = os.path.join(project_directory, "conf")
             os.mkdir(project_conf_directory)
             project_conf_file = os.path.join(project_conf_directory,
                                              "firenado.yml")
-            _file.touch(project_conf_file)
+            fs.touch(project_conf_file)
             project_init_content = loader.load("firenado.yml.txt").generate(
                 app_name=project_name, module=module, component=component)
-            _file.write(project_conf_file,
+            fs.write(project_conf_file,
                         project_init_content.decode(sys.stdout.encoding))
         else:
             #TODO: This thing has to go. The parameter validation should be
@@ -150,14 +149,14 @@ class GenerateRandomStringTask(ManagementTask):
         parser.add_argument("size", nargs='?', default=64, type=int)
 
     def run(self, namespace):
-        from firenado.util import random_string
+        from cartola import security
         size = namespace.size
         if size > 1000000:
             logger.error("The size {} has reached this command "
                          "limit.".format(size))
             sys.exit(1)
         logger.debug("Displaying a random string with size {}".format(size))
-        print(random_string(size))
+        print(security.random_string(size))
         sys.exit(0)
 
 
