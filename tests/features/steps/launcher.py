@@ -26,26 +26,26 @@ import sys
 @given("We launch {application} application using process launcher at {port} "
        "port")
 @async_run_until_complete
-async def step_we_launch_application_using_process_launcher(context,
-                                                            application, port):
+@gen.coroutine
+def step_we_launch_application_using_process_launcher(context, application,
+                                                      port):
     application_dir = chdir_fixture_app(application)
-    context.launcher = ProcessLauncher(
-        dir=application_dir, port=port, logfile=sys.stderr)
+    context.launcher = ProcessLauncher(dir=application_dir, port=port,
+                                       logfile=sys.stderr)
     context.launcher.load()
-    await context.launcher.launch()
-    await gen.sleep(1)
+    yield context.launcher.launch()
+    yield gen.sleep(1)
     context.tester.assertTrue(context.launcher.is_alive())
 
 
 @when("The application is running correctly at {port} port")
 @async_run_until_complete
-async def step_we_launch_application_using_process_launcher(context, port):
+@gen.coroutine
+def step_we_launch_application_using_process_launcher(context, port):
     http_client = AsyncHTTPClient()
     try:
-        response = await http_client.fetch("http://localhost:%s" %
-                                           port)
+        response = yield http_client.fetch("http://localhost:%s" % port)
     except Exception as e:
-        print("Error: %s" % e)
         context.tester.assertTrue(False)
     else:
         context.tester.assertEquals(b"IndexHandler output", response.body)
