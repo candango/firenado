@@ -21,13 +21,13 @@ from unittest.case import TestCase
 
 @fixture
 def firenado_app(context, timeout=30, **kwargs):
-    context.launcher: launcher.FirenadoLauncher = launcher.FirenadoLauncher()
+    context.launcher = launcher.FirenadoLauncher()
     yield context.launcher
 
 
 @fixture
 def tester(context, timeout=1, **kwargs):
-    context.tester: TestCase = TestCase()
+    context.tester = TestCase()
     yield context.tester
 
 

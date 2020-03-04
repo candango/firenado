@@ -12,4 +12,4 @@ install:
   - "pip install -r requirements/tests.txt"
 script:
   - "PYTHONPATH=$PYTHONPATH:. python tests/runtests.py"
-  - behave tests/features
+  - "PYTHONPATH=$PYTHONPATH:. behave tests/features"
