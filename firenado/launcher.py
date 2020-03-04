@@ -129,12 +129,12 @@ class ProcessLauncher(FirenadoLauncher):
         logger.info("Sending line {}".format(line))
         self.process.sendline(line)
 
-    @gen.coroutine
     def shutdown(self):
         logger.warning("Shutting down process launcher.")
-        self.send("^C")
-        yield self.process.expect("^C", async_=True)
+        self.process.terminate(force=True)
 
+    def is_alive(self):
+        return self.process.isalive()
 
 class TornadoLauncher(FirenadoLauncher):
 

@@ -30,6 +30,21 @@ if six.PY3:
         reload = imp.reload
 
 
+def chdir_fixture_app(app_name, **kwargs):
+    dir_name = kwargs.get("dir_name", None)
+    fixture_root = kwargs.get("fixture_root", "fixtures")
+
+
+    test_dirname, filename = os.path.split(os.path.abspath(__file__))
+    test_app_dirname = os.path.join(test_dirname, fixture_root, app_name)
+    if dir_name is not None:
+        test_app_dirname = os.path.join(test_dirname, fixture_root,
+                                        dir_name, app_name)
+    os.chdir(test_app_dirname)
+    import firenado.conf
+    return test_app_dirname
+
+
 def chdir_app(app_name, dir_name=None):
     """ Change to the application directory located at the resource directory
     for conf tests.

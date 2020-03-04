@@ -5,8 +5,7 @@ Feature: Launcher
 
   Scenario: Start and stop a Process launcher
     # Enter steps here
-    Given: We have a Firenado Application
-    When: We launch the application using a process launcher
-      And: The application is running correctly
-    Then: We stop the application shutdown the launcher
-      And: The application stops
+    Given We launch launcherapp application using process launcher at 128393 port
+    When The application is running correctly at 128393 port
+    Then We shutdown the process launcher
+      And The application stops successfully
