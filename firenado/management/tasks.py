@@ -113,6 +113,7 @@ class RunApplicationTask(ManagementTask):
         parser.add_argument("-a", "--addresses", default=None)
         parser.add_argument("-A", "--app", default=None)
         parser.add_argument("-d", "--dir", default=None)
+        parser.add_argument("-p", "--path", default=None)
         parser.add_argument("-P", "--port", type=int)
         parser.add_argument("-s", "--socket", default=None)
 
@@ -127,6 +128,8 @@ class RunApplicationTask(ManagementTask):
             parameters['app'] = namespace.app
         if namespace.dir is not None:
             parameters['dir'] = namespace.dir
+        if namespace.path is not None:
+            parameters['path'] = namespace.path
         if namespace.socket is None:
             if namespace.addresses is not None:
                 parameters['addresses'] = namespace.addresses.split(",")

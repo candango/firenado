@@ -75,6 +75,7 @@ def log_level_from_string(str_level):
         'WARNING': logging.WARNING,
         'INFO': logging.INFO,
         'DEBUG': logging.DEBUG,
+        'NOTSET': logging.NOTSET,
     }
     try:
         return levels[str_level.upper()]
