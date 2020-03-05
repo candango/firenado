@@ -39,6 +39,9 @@ class FirenadoLauncher(object):
 
     def __init__(self, **settings):
         self.app = settings.get("app", None)
+        self.path = settings.get("path", None)
+        if self.path is not None:
+            sys.path.append(self.path)
         if self.app:
             os.environ["CURRENT_APP"] = self.app
         if os.environ.get("CURRENT_APP"):
@@ -47,6 +50,23 @@ class FirenadoLauncher(object):
         self.dir = settings.get("dir", None)
         self.port = settings.get("port", None)
         self.socket = settings.get("socket", None)
+
+        # Fixing and cleaning PYTHONPATH and sys.path
+        # This is useful so we can run a process launcher with the same
+        # PYTHONPATH from the parent process
+        real_pythonpaths = []
+        if os.environ['PYTHONPATH'] is not None:
+            current_pythonpaths = os.environ['PYTHONPATH'].split(":")
+            for path in current_pythonpaths:
+                if path.strip() != "":
+                    if path.strip() not in real_pythonpaths:
+                        real_pythonpaths.append(path.strip())
+            for path in sys.path:
+                if path.strip() != "":
+                    if path.strip() not in real_pythonpaths:
+                        real_pythonpaths.append(path.strip())
+        sys.path = real_pythonpaths
+        os.environ['PYTHONPATH'] = ":".join(real_pythonpaths)
 
     def load(self):
         return None
