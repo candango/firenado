@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright 2015-2019 Flavio Garcia
+# Copyright 2015-2020 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -54,10 +54,10 @@ class FileSessionTestCase(unittest.TestCase):
         """ Checks if the session handler loaded is the same the session
         handler defined.
         """
-        app_session_handler_class = \
-            self.application.session_engine.session_handler.__class__
         self.assertEqual(
-            app_session_handler_class, self.session_handler_class)
+            self.application.session_engine.session_handler.__class__,
+            self.session_handler_class
+        )
 
     def test_session_type_file(self):
         """ Checks if test component was loaded correctly by the application
@@ -67,9 +67,8 @@ class FileSessionTestCase(unittest.TestCase):
         session_handler_config = firenado.conf.session[
             'handlers'][firenado.conf.session['type']]
         session_handler_class = get_class_from_config(session_handler_config)
-        app_session_handler_class = \
-            application.session_engine.session_handler.__class__
-        self.assertEqual(app_session_handler_class, session_handler_class)
+        self.assertEqual(application.session_engine.session_handler.__class__,
+                         session_handler_class)
 
 
 class RedisSessionTestCase(unittest.TestCase):
@@ -97,6 +96,9 @@ class RedisSessionTestCase(unittest.TestCase):
         self.assertEqual(firenado.conf.session['life_time'], 1900)
         self.assertEqual(firenado.conf.session['callback_time'], 40)
 
+
+class EncodersSessionTestCase(unittest.TestCase):
+
     def test_pickle_session_encoder(self):
         """ Checks if the pickle session encoder will keep a dict structure
         and values intact after encoding and decoding it.
@@ -113,4 +115,21 @@ class RedisSessionTestCase(unittest.TestCase):
         decoded_data = encoder.decode(encoded_data)
         self.assertEqual(decoded_data['value1'], my_dict['value1'])
         self.assertEqual(decoded_data['value2']['value3'],
-                          my_dict['value2']['value3'])
+                         my_dict['value2']['value3'])
+
+    def test_json_session_encoder(self):
+        """Checks if json session encoder will keep a dict structure and values
+        intact after encoding and decoding it."""
+        from firenado.session import JsonSessionEncoder
+        my_dict = {
+            'value1': "My value1",
+            'value2': {
+                'value3': "My value3",
+            }
+        }
+        encoder = JsonSessionEncoder()
+        encoded_data = encoder.encode(my_dict)
+        decoded_data = encoder.decode(encoded_data)
+        self.assertEqual(decoded_data['value1'], my_dict['value1'])
+        self.assertEqual(decoded_data['value2']['value3'],
+                         my_dict['value2']['value3'])

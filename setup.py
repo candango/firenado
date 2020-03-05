@@ -14,15 +14,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import firenado
 from setuptools import setup, find_packages
+import sys
+
 try:
     # for pip >= 10
     from pip._internal.req import parse_requirements
 except ImportError:
     # for pip <= 9.0.3
-    from pip.req import parse_requirements
-import firenado
-import os
+    print("error: Upgrade to a pip version newer than 10. Run \"pip install "
+          "--upgrade pip\".")
+    sys.exit(1)
 
 
 # Solution from http://bit.ly/29Yl8VN
@@ -32,13 +35,8 @@ def resolve_requires(requirements_file):
     return [str(ir.req) for ir in requirements]
 
 
-# Utility function to read the README file.
-# Used for the long_description.  It's nice, because now 1) we have a top level
-# README file and 2) it's easier to type in the README file than to put a raw
-# string in below ...
-# Solution from: http://bit.ly/2mig8RT
-def read(fname):
-    return open(os.path.join(os.path.dirname(__file__), fname)).read()
+with open("README.md", "r") as fh:
+    long_description = fh.read()
 
 
 # We still running: python setup.py sdist upload --repository=testpypi
@@ -49,7 +47,8 @@ setup(
     version=firenado.get_version(),
     description="Firenado is a python web framework based on "
                 "Tornado web framework/server.",
-    long_description=read("README.rst"),
+    long_description=long_description,
+    long_description_content_type="text/markdown",
     license=firenado.__licence__,
     author=firenado.get_author(),
     author_email=firenado.get_author_email(),
@@ -74,9 +73,10 @@ setup(
         "Operating System :: OS Independent",
         "Programming Language :: Python",
         "Programming Language :: Python :: 2.7",
-        "Programming Language :: Python :: 3.4",
         "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
         "Topic :: Internet :: WWW/HTTP",
         "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
         "Topic :: Internet :: WWW/HTTP :: WSGI",
