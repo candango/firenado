@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright 2015-2019 Flavio Garcia
+# Copyright 2015-2020 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -29,19 +29,25 @@ if six.PY3:
         import imp
         reload = imp.reload
 
+TEST_ROOT = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT = os.path.abspath(os.path.join(TEST_ROOT, ".."))
+
 
 def chdir_fixture_app(app_name, **kwargs):
     dir_name = kwargs.get("dir_name", None)
+    suppress_log = kwargs.get("suppress_log", False)
     fixture_root = kwargs.get("fixture_root", "fixtures")
-
-
-    test_dirname, filename = os.path.split(os.path.abspath(__file__))
-    test_app_dirname = os.path.join(test_dirname, fixture_root, app_name)
+    test_app_dirname = os.path.join(TEST_ROOT, fixture_root, app_name)
     if dir_name is not None:
-        test_app_dirname = os.path.join(test_dirname, fixture_root,
+        test_app_dirname = os.path.join(TEST_ROOT, fixture_root,
                                         dir_name, app_name)
     os.chdir(test_app_dirname)
     import firenado.conf
+    if suppress_log:
+        import logging
+        for handler in logging.root.handlers[:]:
+            # clearing loggers, solution from: https://bit.ly/2yTchyx
+            logging.root.removeHandler(handler)
     return test_app_dirname
 
 
