@@ -35,11 +35,11 @@ def resolve_requires(requirements_file):
     return [str(ir.req) for ir in requirements]
 
 
-def use_legacy_if_required(requirements):
+def use_right_tornado(requirements):
+    tornado_req = "requirements/tornado_new.txt"
     if sys.version[0] == "2":
-        for index in range(0, len(requirements)):
-            if "tornado" in requirements[index]:
-                requirements[index] = "tornado==5.1.1"
+        tornado_req = "requirements/tornado_legacy.txt"
+    requirements.append(resolve_requires(tornado_req)[0])
     return requirements
 
 
@@ -61,7 +61,7 @@ setup(
     author_email=firenado.get_author_email(),
     maintainer=firenado.get_author(),
     maintainer_email=firenado.get_author_email(),
-    install_requires=use_legacy_if_required(resolve_requires(
+    install_requires=use_right_tornado(resolve_requires(
         "requirements/basic.txt"
     )),
     extras_require={
