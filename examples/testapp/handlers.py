@@ -15,7 +15,7 @@
 # limitations under the License.
 
 import firenado.conf
-from firenado import security, service, tornadogen, tornadoweb
+from firenado import security, service, tornadoweb
 from firenado.components.toolbox.pagination import Paginator
 import hashlib
 from tornado import gen
@@ -43,7 +43,7 @@ class AsyncTimeoutHandler(tornadoweb.TornadoHandler):
     def get(self):
         from tornado.util import TimeoutError
         try:
-            yield tornadogen.with_timeout(2, gen.sleep(5))
+            yield gen.with_timeout(2, gen.sleep(5))
             self.write("This will never be reached!!")
         except TimeoutError as te:
             logger.warning(te.__repr__())

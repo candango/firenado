@@ -248,7 +248,7 @@ class TornadoLauncher(FirenadoLauncher):
         else:
             logger.warning("child %s (pid %s) caught signal: %s" %
                            (tid, pid, sig))
-        tornado.ioloop.IOLoop.current().add_callback(self.shutdown)
+        tornado.ioloop.IOLoop.current().add_callback_from_signal(self.shutdown)
 
     def add_sockets(self, port, address=None):
         from socket import gaierror
