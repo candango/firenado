@@ -1,0 +1,15 @@
+What's new in Firenado 0.1.8.2
+==============================
+
+Apr 10, 2020
+------------
+
+Right now python 3.x will install tornado 6 and python 2.7 will keep with
+tornado 5.1.1.
+
+Here are the highlights:
+
+New Features
+~~~~~~~~~~~~
+
+* Install new tornado if python is 3.x. `#303 <https://github.com/candango/firenado/issues/303>`_

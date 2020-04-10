@@ -20,7 +20,7 @@
 from __future__ import (absolute_import, division, print_function,
                         with_statement)
 __author__ = "Flavio Garcia <piraz@candango.org>"
-__version__ = (0, 1, 8, 1)
+__version__ = (0, 1, 8, 2)
 __licence__ = "Apache License V2.0"
 
 
