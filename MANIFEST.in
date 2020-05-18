@@ -5,6 +5,8 @@ include requirements/basic.txt
 include requirements/pexpect.txt
 include requirements/redis.txt
 include requirements/sqlalchemy.txt
+include requirements/tornado_legacy.txt
+include requirements/tornado_new.txt
 include firenado/conf/*.yml
 include firenado/management/templates/*/*.txt
 include firenado/components/*/conf/*.yaml.example
