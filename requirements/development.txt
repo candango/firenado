@@ -1,0 +1,4 @@
+-r all.txt
+-r basic.txt
+-r tests.txt
+pymysql==0.9.3

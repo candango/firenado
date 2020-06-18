@@ -156,6 +156,7 @@ class ProcessLauncher(FirenadoLauncher):
     def is_alive(self):
         return self.process.isalive()
 
+
 class TornadoLauncher(FirenadoLauncher):
 
     def __init__(self, **settings):
