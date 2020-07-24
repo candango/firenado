@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright 2015-2019 Flavio Garcia
+# Copyright 2015-2020 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,9 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from cartola.pagination import Paginator
 import firenado.conf
 from firenado import security, service, tornadoweb
-from firenado.components.toolbox.pagination import Paginator
 import hashlib
 from tornado import gen
 import logging

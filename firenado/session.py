@@ -549,12 +549,12 @@ class RedisSessionHandler(SessionHandler):
     def __get_key(self, session_id):
         if firenado.conf.app['id'] is not None:
             return '%s:%s:%s' % (
-                firenado.conf.session['redis']['prefix'],
+                firenado.conf.session['prefix'],
                 firenado.conf.app['id'],
                 session_id
             )
         return '%s:%s' % (
-            firenado.conf.session['redis']['prefix'],
+            firenado.conf.session['prefix'],
             session_id
         )
 

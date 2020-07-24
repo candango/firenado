@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright 2015-2016 Flavio Garcia
+# Copyright 2015-2020 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from cartola.pagination import Paginator
 import tornado.web
-from .pagination import Paginator
 
 
 class Paginate(tornado.web.UIModule):
@@ -36,5 +36,5 @@ class Paginate(tornado.web.UIModule):
             pages_per_block = 10
         paginator = Paginator(row_count, current_page, rows_per_page,
                               pages_per_block)
-        return self.render_string(template,argument=argument,
+        return self.render_string(template, argument=argument,
                                   paginator=paginator)

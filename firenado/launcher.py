@@ -54,8 +54,8 @@ class FirenadoLauncher(object):
         # Fixing and cleaning PYTHONPATH and sys.path
         # This is useful so we can run a process launcher with the same
         # PYTHONPATH from the parent process
-        real_pythonpaths = []
-        if os.environ['PYTHONPATH'] is not None:
+        real_pythonpaths = sys.path[:]
+        if "PYTHONPATH" in os.environ and os.environ['PYTHONPATH'] is not None:
             current_pythonpaths = os.environ['PYTHONPATH'].split(":")
             for path in current_pythonpaths:
                 if path.strip() != "":
@@ -155,6 +155,7 @@ class ProcessLauncher(FirenadoLauncher):
 
     def is_alive(self):
         return self.process.isalive()
+
 
 class TornadoLauncher(FirenadoLauncher):
 
