@@ -72,5 +72,6 @@ session:
   encoder: json
   data:
     source: session
+  prefix: testapp:session
   # File session handler related configuration
   # path: /tmp
