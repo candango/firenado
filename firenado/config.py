@@ -441,6 +441,8 @@ def process_session_config_section(config, session_config):
         config.session['callback_hiccup'] = session_config['callback_hiccup']
     if 'callback_time' in session_config:
         config.session['callback_time'] = session_config['callback_time']
+    if 'prefix' in session_config:
+        config.session['prefix'] = session_config['prefix']
     if 'purge_limit' in session_config:
         config.session['purge_limit'] = session_config['purge_limit']
     if 'encoder' in session_config:
