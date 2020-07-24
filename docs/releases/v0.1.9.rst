@@ -1,0 +1,26 @@
+What's new in Firenado 0.1.9
+==============================
+
+Jul 23, 2020
+------------
+
+We are pleased to announce the release of Firenado 0.1.9.
+
+That release fixes session, launcher issues and fixes installation under pip
+20.1 up.
+
+The paginator component was moved to cartola 0.7.
+
+Here are the highlights:
+
+Bug Fixes
+~~~~~~~~~
+
+* If PYTHONPATH isn't defined launcher will clean sys.path. `#306 <https://github.com/candango/firenado/issues/306>`_
+* Pip 20.1 will break installation. `#310 <https://github.com/candango/firenado/issues/310>`_
+* Redis session prefix isn't working. `#311 <https://github.com/candango/firenado/issues/311>`_
+
+Refactory
+~~~~~~~~~
+
+* Remove Paginator from the project. `#311 <https://github.com/candango/firenado/issues/309>`_
