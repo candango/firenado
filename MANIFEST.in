@@ -4,6 +4,7 @@ include requirements/all.txt
 include requirements/basic.txt
 include requirements/pexpect.txt
 include requirements/redis.txt
+include requirements/schedule.txt
 include requirements/sqlalchemy.txt
 include requirements/tornado_legacy.txt
 include requirements/tornado_new.txt
