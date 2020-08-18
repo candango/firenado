@@ -1,0 +1,15 @@
+# This is the loop interval where the scheduled component periodic runtime will
+# go trough all defined schedules and define them to the list.
+# Every schedule will manage it's own scheduled jobs and if not defined this
+# loop interval will be used as default schedule loop interval.
+# The loop interval is defined in milliseconds.
+# Default value is 1000 ms.
+interval: 3000
+schedulers:
+  - id: scheduler1
+    name: Scheduler Example 1
+    interval: 1000
+    jobs:
+      - id: job1
+        class: schedapp.jobs.PrintTestJob
+        cron: "*/1 * * * *"
