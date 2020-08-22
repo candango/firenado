@@ -13,3 +13,8 @@ schedulers:
       - id: job1
         class: schedapp.jobs.PrintTestJob
         cron: "*/1 * * * *"
+        custom_property: Custom property from job1.
+      - id: job2
+        class: schedapp.jobs.PrintTestJob
+        cron: "*/5 * * * *"
+        custom_property: Custom property from job2.

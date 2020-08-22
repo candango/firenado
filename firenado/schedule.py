@@ -15,7 +15,7 @@
 # limitations under the License.
 
 from .tornadoweb import TornadoComponent
-from cartola import sysexits
+from cartola import config, sysexits
 from datetime import datetime
 import logging
 from six import iteritems
@@ -42,38 +42,43 @@ except ImportError:
     sys.exit(sysexits.EX_FATAL_ERROR)
 
 
-def next_from_cron(cron_string):
+def next_from_cron(cron):
     """ Return next schedule run offset from now to the time of execution
 
-    :param cron_string: The cron string
+    :param cron: The cron string
     :return:
     """
-    iterator = croniter(cron_string, datetime.now())
+    iterator = croniter(cron, datetime.now())
     return iterator.get_next(datetime)
 
 
 class Scheduler(object):
 
-    def __init__(self, scheduled_component, **kwargs):
+    def __init__(self, component, **kwargs):
         """
         Scheduler constructor. It will receive a scheduled component and
         loop interval as parameters.
 
-        :param basestring scheduled_component: The scheduled component that
+        :param ScheduledTornadoComponent component: The scheduled component
+        that owns the scheduler
         owns the scheduler.
         :param int interval:
         """
         self._can_run = False
         self._id = None
-        self._jobs: {}
+        self._jobs = {}
         self._interval = kwargs.get("interval", 1000)
         self._name = None
-        self._scheduled_component = scheduled_component
+        self.component = component
         self._periodic_callback = None
 
     @property
     def id(self):
         return self._id
+
+    @property
+    def jobs(self):
+        return [job for _, job in iteritems(self._jobs)]
 
     @property
     def name(self):
@@ -83,20 +88,66 @@ class Scheduler(object):
     def can_run(self):
         return self._can_run
 
+    def add_job(self, job):
+        logger.info("Adding job %s into the scheduler [id: %s, name: %s]." %
+                    (job.id, self.id, self.name))
+        self._jobs[job.id] = job
+
+    def get_job(self, job_id):
+        return self._jobs.get(job_id)
+
     def initialize(self, **kwargs):
         self._id = kwargs.get("id")
         self._name = kwargs.get("name")
+        logger.info("Initializing scheduler [id: %s, name: %s]." % (
+            self.id, self.name))
+
+    def load_jobs(self):
+        raise NotImplementedError
+
+    def remove_job(self, job_id):
+        logger.info("Removing job %s from the scheduler [id: %s, name: %s]."
+                    % (job_id, self.id, self.name))
+        job = self.get_job(job_id)
+        if job is None:
+            return None
+        del(self._jobs[job_id])
+        return job.id
 
     def run(self):
+        self.load_jobs()
         logger.info("Scheduler [id: %s, name: %s] interval set to %sms." %
                     (self.id, self.name, self._interval))
         self._periodic_callback = tornado.ioloop.PeriodicCallback(
-            self._manage_schedulers, self._interval)
+            self._manage_jobs, self._interval)
         self._periodic_callback.start()
 
-    def _manage_schedulers(self):
+    def _manage_jobs(self):
+        logger.debug("Scheduler [id: %s, name: %s] managing jobs." %
+                    (self.id, self.name))
+        logger.debug("Scheduler [id: %s, name: %s] stopping periodic callback."
+                     % (self.id, self.name))
         self._periodic_callback.stop()
-        print("Managing schedulers")
+        for job in self.jobs:
+            if not job.already_scheduled:
+                logger.info("Job %s from Scheduler [id: %s, name: %s] isn't "
+                            "scheduled yet." % (job.hard_id, self.id,
+                                                self.name))
+                if job.must_schedule:
+                    logger.info(
+                        "Job %s from Scheduler [id: %s, name: %s] must be "
+                        "scheduled to run at %s." % (
+                            job.hard_id, self.id, self.name, job.next_run))
+                    job.schedule()
+            else:
+                logger.debug("Job %s from Scheduler [id: %s, name: %s] already"
+                             "scheduled." % (job.hard_id, self.id,
+                                                self.name))
+
+        logger.debug("Scheduler [id: %s, name: %s] ending of managing jobs." %
+                    (self.id, self.name))
+        logger.debug("Scheduler [id: %s, name: %s] starting periodic callback."
+                     % (self.id, self.name))
         self._periodic_callback.start()
 
 
@@ -105,6 +156,52 @@ class ConfScheduler(Scheduler):
     def __init__(self, scheduled_component, **kwargs):
         super(ConfScheduler, self).__init__(scheduled_component, **kwargs)
         self._conf = kwargs.get("conf", None)
+
+    def load_jobs(self):
+        if "jobs" in self._conf:
+            for job_conf in self._conf['jobs']:
+                job_id = job_conf.get("id")
+                job_resolved_class = None
+                job_cron = job_conf.get("cron")
+                job_date = job_conf.get("date")
+                if 'class' in job_conf:
+                    job_resolved_class = config.get_from_string(
+                        job_conf['class'])
+                if job_resolved_class is None:
+                    logger.warning("Firenado Scheduled Job Error:\n    The "
+                                   "scheduled class job %s was not found "
+                                   "in the file:\n        %s\n    Job id: %s"
+                                   "\n    Scheduler: [id: %s, name: %s]"
+                                   "\n        Config: %s\n"
+                                   "\n    Please fix this issue.\n" %
+                                   (job_conf['class'],
+                                    self.component.get_complete_config_file(),
+                                    job_id, self.id, self.name, job_conf))
+                else:
+                    if job_id is None:
+                        logger.warning(
+                            "Firenado Scheduled Job Error:\n    The "
+                            "scheduled job id not defined in the "
+                            "file:\n        %s"
+                            "\n    Scheduler: [id: %s, name: %s]"
+                            "\n        Config: %s\n"
+                            "\n    Please fix this issue.\n" %
+                            (self.component.get_complete_config_file(),
+                             self.id, self.name, job_conf))
+                    else:
+                        if job_cron is None and job_date is None:
+                            logger.warning(
+                                "Firenado Scheduled Job Error:\n    The "
+                                "scheduled job cron or date not defined in "
+                                "the file:\n        %s\n    Job id: %s"
+                                "\n    Scheduler: [id: %s, name: %s]"
+                                "\n        Config: %s\n"
+                                "\n    Please define either a cron string or "
+                                "date.\n" %
+                                (self.component.get_complete_config_file(),
+                                 job_id, self.id, self.name, job_conf))
+                        else:
+                            self.add_job(job_resolved_class(self, **job_conf))
 
     def initialize(self):
         has_error = False
@@ -133,30 +230,71 @@ class ConfScheduler(Scheduler):
 
 class ScheduledJob(object):
 
-    def __init__(self, _id, date, cron_string):
-        self._id = _id
-        self._date = date
-        self._cron_string = cron_string
+    def __init__(self, scheduler, **kwargs):
+        self._scheduler = scheduler
+        self._id = kwargs.get('id')
+        self._date = kwargs.get('date')
+        self._cron = kwargs.get('cron')
+        self._periodic_callback = None
 
     @property
     def id(self):
         return self._id
 
     @property
+    def hard_id(self):
+        return "%s:%s:%s" % (self._id, self.__class__.__name__, id(self))
+
+    @property
     def date(self):
         return self._date
 
     @property
-    def cron_string(self):
-        return self._cron_string
+    def cron(self):
+        return self._cron
 
-    def already_scheduled(self, _id, date):
-        return self._id == _id and self._date == date
+    @property
+    def already_scheduled(self):
+        return self._periodic_callback is not None
 
-    def must_run(self):
+    @property
+    def next_run(self):
+        return next_from_cron(self.cron)
+
+    @property
+    def next_interval(self):
         now = datetime.now()
-        delta = self._date - now
-        return delta.total_seconds() < 0
+        delta = self.next_run - now
+        return delta.total_seconds() * 1000
+
+    @property
+    def must_schedule(self):
+        return self.next_interval > 0
+
+    def schedule(self):
+        next_interval = self.next_interval
+        logger.info("Job %s from Scheduler [id: %s, name: %s] scheduled to run"
+                    " at next interval of %sms." % (self.hard_id,
+                                                    self._scheduler.id,
+                                                    self._scheduler.name,
+                                                    self.next_interval))
+        self._periodic_callback = tornado.ioloop.PeriodicCallback(
+            self._run_job, next_interval)
+        self._periodic_callback.start()
+
+    def _run_job(self):
+        self._periodic_callback.stop()
+        logger.info(
+            "Running job %s from Scheduler [id: %s, name: %s]" % (
+                self.hard_id, self._scheduler.id, self._scheduler.name))
+        self.run()
+        logger.info(
+            "Job %s unscheduled from Scheduler [id: %s, name: %s]" % (
+                self.hard_id, self._scheduler.id, self._scheduler.name))
+        self._periodic_callback = None
+
+    def run(self):
+        pass
 
 
 class ScheduledTornadoComponent(TornadoComponent):
