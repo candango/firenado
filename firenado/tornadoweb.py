@@ -114,31 +114,16 @@ class TornadoApplication(tornado.web.Application, data.DataConnectedMixin,
         return self.components[firenado.conf.app['component']]
 
     def __load_components(self):
-        """ Loads all enabled components registered into the components
-        conf.
+        """ Loads all enabled components registered from the components
+        config section.
         """
         for key, value in iteritems(firenado.conf.components):
             if value['enabled']:
                 component_class = get_class_from_config(value)
                 self.components[key] = component_class(key, self)
                 if self.components[key].get_config_file():
-                    filename = self.components[key].get_config_file()
-                    comp_config_file = None
-                    if fs.file_has_extension(filename):
-                        if os.path.isfile(os.path.join(
-                                firenado.conf.APP_CONFIG_PATH, filename)):
-                            comp_config_file = os.path.join(
-                                firenado.conf.APP_CONFIG_PATH, filename)
-                    else:
-                        config_file_extensions = ['yml', 'yaml']
-                        for extension in config_file_extensions:
-                            candidate_filename = os.path.join(
-                                    firenado.conf.APP_CONFIG_PATH,
-                                    "%s.%s" % (filename, extension))
-                            if os.path.isfile(candidate_filename):
-                                comp_config_file = candidate_filename
-                                break
-                    if comp_config_file is not None:
+                    filename = self.components[key].get_complete_config_file()
+                    if filename is not None:
                         self.components[key].conf = load_yaml_config_file(
                             filename)
                         self.components[key].process_config()
@@ -166,6 +151,7 @@ class TornadoComponent(object):
         self.name = name
         self.application = application
         self.conf = {}
+        self._has_conf = False
         self.plugins = dict()
 
     def after_request(self, handler):
@@ -187,6 +173,14 @@ class TornadoComponent(object):
             if firenado.conf.current_app_name == self.name:
                 return True
         return False
+
+    @property
+    def has_conf(self):
+        return self._has_conf
+
+    @has_conf.setter
+    def has_conf(self, value):
+        self._has_conf = value
 
     def get_handlers(self):
         """ Returns handlers being added by the component to the application.
@@ -214,6 +208,25 @@ class TornadoComponent(object):
         filename = self.get_config_filename()
         if filename is not None:
             return filename
+        return None
+
+    def get_complete_config_file(self):
+        """ Return the config file with the correct extension, if
+        get_config_file has no extension.
+
+        :return str: The config file with extension
+        """
+        if fs.file_has_extension(self.get_config_file()):
+            if os.path.isfile(self.get_config_file()):
+                return os.path.join(firenado.conf.APP_CONFIG_PATH,
+                                    self.get_config_file())
+        config_file_extensions = ['yml', 'yaml']
+        for extension in config_file_extensions:
+            candidate_filename = "%s.%s" % (self.get_config_file(), extension)
+            if os.path.isfile(os.path.join(
+                    firenado.conf.APP_CONFIG_PATH, candidate_filename)):
+                return os.path.join(firenado.conf.APP_CONFIG_PATH,
+                                    candidate_filename)
         return None
 
     def get_template_path(self):
