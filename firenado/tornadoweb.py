@@ -26,11 +26,11 @@ from . import uimodules
 from .config import get_class_from_config, load_yaml_config_file
 import inspect
 import logging
+import os
+from six import iteritems, string_types
 from tornado.escape import json_encode
 from tornado.template import Loader
 import tornado.websocket
-import os
-from six import iteritems, string_types
 
 logger = logging.getLogger(__name__)
 
@@ -140,12 +140,13 @@ class TornadoApplication(tornado.web.Application, data.DataConnectedMixin,
                                 break
                     if comp_config_file is not None:
                         self.components[key].conf = load_yaml_config_file(
-                            comp_config_file)
+                            filename)
                         self.components[key].process_config()
+                        self.components[key].has_conf = True
                     else:
                         logger.debug("Failed to find the file for the "
-                                     "component %s at %s. Component filename "
-                                     "returned is %s." % (
+                                     "component %s at %s. Component's "
+                                     "filename returned is %s." % (
                                         key, firenado.conf.APP_CONFIG_PATH,
                                         self.components[key].get_config_file())
                                      )
@@ -167,13 +168,13 @@ class TornadoComponent(object):
         self.conf = {}
         self.plugins = dict()
 
-    def after_handler(self, handler):
+    def after_request(self, handler):
         """ Add a logic to be executed after all component's handlers
         execution.
         """
         pass
 
-    def before_handler(self, handler):
+    def before_request(self, handler):
         """ Add a logic to be executed before all component's handler
         execution.
         """
@@ -284,11 +285,51 @@ class TornadoHandler(tornado.web.RequestHandler):
 
     @session.read
     def prepare(self):
-        self.component.before_handler(self)
+        self.component.before_request(self)
+        self.before_request()
 
     @session.write
     def on_finish(self):
-        self.component.after_handler(self)
+        self.after_request()
+        self.component.after_request(self)
+
+    def after_request(self):
+        """Called after the end of a request.
+
+        Override this method to perform cleanup, logging, etc.
+        This method is a counterpart to `prepare`.  ``on_finish`` may
+        not produce any output, as it is called after the response
+        has been sent to the client.
+
+        Use this method instead of `on_finish` to avoid the session to break
+        and use session features. This method will be called by `on_finish`
+        with a valid session.
+
+        This method is called before it's component's after_request if defined.
+        """
+        pass
+
+    def before_request(self):
+        """Called at the beginning of a request before  `get`/`post`/etc.
+
+        Override this method to perform common initialization regardless
+        of the request method.
+
+        Use this method instead of `prepare` to avoid the session to break and
+        use session features. This method will be called by `prepare` with
+        a valid session.
+
+        This method is called after it's component's before_request if defined.
+
+        Asynchronous support: Use ``async def`` or decorate this method with
+        `.gen.coroutine` to make it asynchronous.
+        If this method returns an  ``Awaitable`` execution will not proceed
+        until the ``Awaitable`` is done.
+
+        .. versionadded:: 0.1.10
+           Asynchronous support.
+        """
+        pass
 
     def render_string(self, template_name, **kwargs):
         ignore_component = False
