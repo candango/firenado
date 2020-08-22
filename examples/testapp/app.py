@@ -78,8 +78,8 @@ class TestappComponent(firenado.tornadoweb.TornadoComponent):
     def get_data_sources(self):
         return self.application.data_sources
 
-    def after_handler(self, handler):
-        logging.info("Doing something after handler: %s" % handler)
+    def after_request(self, handler):
+        logging.info("Doing something after handler's request: %s" % handler)
 
-    def before_handler(self, handler):
-        logging.info("Doing something before handler: %s" % handler)
+    def before_request(self, handler):
+        logging.info("Doing something before handler's request: %s" % handler)

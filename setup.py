@@ -76,6 +76,7 @@ setup(
         'all': resolve_requires("requirements/all.txt"),
         'redis': resolve_requires("requirements/redis.txt"),
         'pexpect': resolve_requires("requirements/pexpect.txt"),
+        'schedule': resolve_requires("requirements/schedule.txt"),
         'sqlalchemy': resolve_requires("requirements/sqlalchemy.txt"),
     },
     url="https://github.com/candango/firenado",
