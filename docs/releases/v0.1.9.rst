@@ -23,4 +23,4 @@ Bug Fixes
 Refactory
 ~~~~~~~~~
 
-* Remove Paginator from the project. `#311 <https://github.com/candango/firenado/issues/309>`_
+* Remove Paginator from the project. `#309 <https://github.com/candango/firenado/issues/309>`_

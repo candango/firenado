@@ -123,6 +123,11 @@ class LoginHandler(AuthHandler, tornadoweb.TornadoHandler):
             self.session.set('login_errors', errors)
             self.redirect(self.get_rooted_path(default_login))
 
+    def after_request(self):
+        logging.info("Doing something after the login handler's request.")
+
+    def before_request(self):
+        logging.info("Doing something before the login handler's request.")
 
 class LogoutHandler(AuthHandler, tornadoweb.TornadoHandler):
 

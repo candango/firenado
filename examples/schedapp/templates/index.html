@@ -1,0 +1,40 @@
+{% extends "schedapp:base.html" %}
+
+{% block content %}
+    <h1>Schedules</h1>
+
+        {% for scheduler in schedulers %}
+        <h2>Schedule {{ scheduler.id }}</h2>
+
+        <table>
+            <tr>
+                <th>Name</th>
+                <td>{{ scheduler.name }}</td>
+            </tr>
+            <tr>
+                <th style="text-align: left" colspan="2">Jobs:</th>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <ul>
+                    {% for job in scheduler.jobs %}
+                        <li>{{ job.id }} - {{ job.cron }} - {{ job.hard_id }}</li>
+                    {% end %}
+                    </ul>
+                </td>
+            </tr>
+        </table>
+        {% end %}
+        {% if len(schedulers) == 0 %}
+        <h2>No Schedules found.</h2>
+        <table>
+            <tr>
+                <td colspan="2">
+                    There are no schedulers configured.
+                </td>
+            </tr>
+        </table>
+        {% end %}
+<br>
+{% end %}
+

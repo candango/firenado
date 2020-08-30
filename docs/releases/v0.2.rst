@@ -1,0 +1,25 @@
+What's new in Firenado 0.2
+==========================
+
+Aug 30, 2020
+------------
+
+We are pleased to announce the release of Firenado 0.2.
+
+This release adds the scheduled component able to run jobs defined in a
+configuration file. Jobs are scheduled using cron strings.
+
+Now before_handler and after_handler methods from application where renamed to
+before_request and after_request and they are also present in the handler.
+
+By now releases will increment the minor. Next release will be 0.3.
+
+Here are the highlights:
+
+New Features
+~~~~~~~~~~~~
+
+* Create scheduled component and module `#45 <https://github.com/candango/firenado/issues/45>`_
+* Implement before and after request methods `#315 <https://github.com/candango/firenado/issues/315>`_
+* Add has conf property to TornadoComponent `#316 <https://github.com/candango/firenado/issues/316>`_
+* Create a method to resolve the config file to TornadoComponent `#317 <https://github.com/candango/firenado/issues/317>`_
