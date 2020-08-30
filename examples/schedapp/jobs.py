@@ -15,6 +15,7 @@
 # limitations under the License.
 
 from firenado.schedule import ScheduledJob
+from tornado.gen import sleep
 
 
 class PrintTestJob(ScheduledJob):
@@ -25,3 +26,15 @@ class PrintTestJob(ScheduledJob):
 
     def run(self):
         print("This is the custom property value: %s" % self._custom_property)
+
+
+class PrintAsyncTestJob(ScheduledJob):
+
+    def __init__(self, scheduler, **kwargs):
+        super(PrintAsyncTestJob, self).__init__(scheduler, **kwargs)
+        self._custom_property = kwargs.get('custom_property', None)
+
+    async def run(self):
+        print("This is the custom property value from async job: %s" %
+              self._custom_property)
+        await sleep(1)

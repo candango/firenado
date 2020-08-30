@@ -282,16 +282,26 @@ class ScheduledJob(object):
             self._run_job, next_interval)
         self._periodic_callback.start()
 
-    def _run_job(self):
+    async def _run_job(self):
+        """ Run the job
+        :return None:
+        """
         self._periodic_callback.stop()
         logger.info(
-            "Running job %s from Scheduler [id: %s, name: %s]" % (
+            "Running job %s from Scheduler [id: %s, name: %s]." % (
                 self.hard_id, self._scheduler.id, self._scheduler.name))
-        self.run()
+        future = self.run()
+        if future is not None:
+            logger.debug(
+                "Running job %s from Scheduler [id: %s, name: %s] "
+                "asynchronously. " % (self.hard_id, self._scheduler.id,
+                                      self._scheduler.name))
+            await future
         logger.info(
-            "Job %s unscheduled from Scheduler [id: %s, name: %s]" % (
+            "Job %s removed from Scheduler [id: %s, name: %s]" % (
                 self.hard_id, self._scheduler.id, self._scheduler.name))
         self._periodic_callback = None
+        return
 
     def run(self):
         pass
