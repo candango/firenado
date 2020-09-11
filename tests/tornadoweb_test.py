@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright 2015-2019 Flavio Garcia
+# Copyright 2015-2020 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,8 +18,7 @@ from __future__ import (absolute_import, division, print_function,
                         with_statement)
 
 import firenado.conf
-from firenado.tornadoweb import TornadoApplication
-from firenado.tornadoweb import TornadoHandler
+from firenado.tornadoweb import get_request, TornadoApplication, TornadoHandler
 from firenado.launcher import FirenadoLauncher, TornadoLauncher
 from firenado.tornadoweb import TornadoComponent
 import unittest
@@ -94,6 +93,36 @@ class ApplicationComponentTestCase(unittest.TestCase):
         """
         static_path_x = self.application.settings['static_path'].split("/")
         self.assertEqual(firenado.conf.app['static_path'], static_path_x[-1])
+
+
+class GetRequestTestCase(unittest.TestCase):
+
+    def test_get_request_simple(self):
+        expected = "http://test"
+        request = get_request(expected)
+        self.assertEqual(expected, request.url)
+        self.assertEqual(0, len(request.headers))
+        self.assertEqual("GET", request.method)
+
+    def test_get_request_with_path(self):
+        expected = "http://test/a_path/informed"
+        base_url = "http://test"
+        request = get_request(url=base_url, path="a_path/informed")
+        self.assertEqual(expected, request.url)
+        base_url = "http://test/"
+        request = get_request(url=base_url, path="a_path/informed")
+        self.assertEqual(expected, request.url)
+
+    def test_get_request_with_method(self):
+        method = "POST"
+        request = get_request(url="http://test", method=method)
+        self.assertEqual(method, request.method)
+
+    def test_get_request_with_form_urlencoded(self):
+        request = get_request(url="http://test", form_urlencoded=True)
+        self.assertEqual(1, len(request.headers))
+        self.assertEqual("application/x-www-form-urlencoded",
+                         request.headers['Content-Type'])
 
 
 class TornadoHandlerTestCase(unittest.TestCase):

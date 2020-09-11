@@ -29,10 +29,41 @@ import logging
 import os
 from six import iteritems, string_types
 from tornado.escape import json_encode
+from tornado.httpclient import HTTPRequest
 from tornado.template import Loader
 import tornado.websocket
 
 logger = logging.getLogger(__name__)
+
+
+def get_request(url, **kwargs):
+    """ Return a HTTPRequest to help with AsyncHTTPClient and HTTPClient
+    execution. The HTTPRequest will use the provided url combined with path
+    if provided. The HTTPRequest method will be GET by default and can be
+    changed if method is informed.
+    If form_urlencoded is defined as True a Content-Type header will be added
+    to the request with application/x-www-form-urlencoded value.
+
+    :param str url: Base url to be set to the HTTPRequest
+    :key form_urlencoded: If the true will add the header Content-Type
+    application/x-www-form-urlencoded to the form. Default is False.
+    :key method: Method to be used by the HTTPRequest. Default it GET.
+    :key path: If informed will add the path to the base url informed. Default
+    is None.
+    :return HTTPRequest:
+    """
+    method = kwargs.get("method", "GET")
+    path = kwargs.get("path", None)
+    form_urlencoded = kwargs.get("form_urlencoded", False)
+    if path is not None:
+        if not url.endswith("/"):
+            url = "%s/" % url
+        url = "%s%s" % (url, path)
+    request = HTTPRequest(url, method=method)
+    if form_urlencoded:
+        request.headers.add("Content-Type",
+                            "application/x-www-form-urlencoded")
+    return request
 
 
 class TornadoApplication(tornado.web.Application, data.DataConnectedMixin,
