@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright 2015-2018 Flavio Garcia
+# Copyright 2015-2020 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,16 +15,30 @@
 # limitations under the License.
 
 import logging
-from sqlalchemy import text
+from sqlalchemy import inspect, text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-# Name as sqlalchemy_util to avoid concurrency with the original
-# sqlalchemy module
+# Named as sqlalchemy_util to avoid conflict with the original sqlalchemy
+# module.
 
 Base = declarative_base()
 Session = sessionmaker()
 logger = logging.getLogger(__name__)
+
+
+def base_to_dict(base, columns=None):
+    """ Returns a dict inherited from Base. If keys is provided it will only
+    add to the dict the columns provided.
+    :param base: An orm object inherited from Base
+    :param columns: Columns to be added to the dict
+    :return dict: A dictionary representing the Base object.
+    """
+    if columns is None:
+        return {c.key: getattr(base, c.key)
+                for c in inspect(base).mapper.column_attrs}
+    return {c.key: getattr(base, c.key)
+            for c in inspect(base).mapper.column_attrs if c.key in columns}
 
 
 def run_script(script_path, session, handle_command=None, handle_line=None):
