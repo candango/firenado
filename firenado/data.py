@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 #
-# Copyright 2015-2019 Flavio Garcia
+# Copyright 2015-2020 Flavio Goncalves Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ from __future__ import (absolute_import, division, print_function,
 
 import errno
 import functools
+import firenado.conf
 import importlib
 import logging
 import sys
@@ -27,42 +28,6 @@ from six import string_types, text_type
 
 
 logger = logging.getLogger(__name__)
-
-
-def configure_data_sources(data_sources, data_connected):
-    """
-    Configures data sources to a data connected object.
-    :param data_sources: List of data sources to be configured
-    :param data_connected: Data connected object where the data sources will
-    be configured.
-    """
-    if isinstance(data_sources, (string_types, text_type)):
-        import firenado.conf
-        if data_sources in firenado.conf.data['sources']:
-            logger.debug("Found data source [%s] in the list. Preceding with "
-                         "the configuration process." % data_sources)
-            config = firenado.conf.data['sources'][data_sources]
-            connection_handler_config = firenado.conf.data['connectors'][
-                config['connector']]
-            module = importlib.import_module(connection_handler_config['module'])
-            handler_class = getattr(module, connection_handler_config['class'])
-            data_source_instance = handler_class(data_connected)
-            config = data_source_instance.process_config(config)
-            data_source_instance.configure(config)
-            data_connected.set_data_source(data_sources, data_source_instance)
-        else:
-            logger.fatal("It was not possible to find [%s] in the list of "
-                         "available data sources. Please fix the firenado "
-                         "configuration file. Sometimes that could be only a "
-                         "typo in one of app data sources to be created. Look "
-                         "at app.data.sources list." % data_sources)
-            sys.exit(errno.ENOKEY)
-        # TODO: Testing the connection
-        # Without that the error will just happen during the handler execution
-    elif isinstance(data_sources, list):
-        for data_source in data_sources:
-            configure_data_sources(data_source, data_connected)
-    # TODO Throw an error here if it is not string or list
 
 
 def configure(data_sources):
@@ -320,3 +285,50 @@ class SqlalchemyConnector(Connector):
         # TODO: Handler errors here
         db_config['backend'] = db_config['url'].split(':')[0].split('+')[0]
         return db_config
+
+
+def config_to_data_source(config, data_connected):
+    """ Convert a data source config to it's respective data source. We need
+    a data connected to use while instantiating the data source.
+    :param config: A data source configuration item
+    :param data_connected: A data connected object
+    :return: Connector
+    """
+    connector_config = firenado.conf.data['connectors'][
+        config['connector']]
+    module = importlib.import_module(connector_config['module'])
+    handler_class = getattr(module, connector_config['class'])
+    data_source_instance = handler_class(data_connected)
+    config = data_source_instance.process_config(config)
+    data_source_instance.configure(config)
+    return data_source_instance
+
+
+def configure_data_sources(data_sources, data_connected):
+    """ Configure all data sources from configuration and set to the data
+    connected.
+    :param data_sources: List of data sources to be configured
+    :param data_connected: Data connected object where the data sources will
+    be configured.
+    """
+    if isinstance(data_sources, (string_types, text_type)):
+        if data_sources in firenado.conf.data['sources']:
+            logger.debug("Found data source [%s] in the list. Preceding with "
+                         "the configuration process." % data_sources)
+            config = firenado.conf.data['sources'][data_sources]
+            data_source_instance = config_to_data_source(config,
+                                                         data_connected)
+            data_connected.set_data_source(data_sources, data_source_instance)
+        else:
+            logger.fatal("It was not possible to find [%s] in the list of "
+                         "available data sources. Please fix the firenado "
+                         "configuration file. Sometimes that could be only a "
+                         "typo in one of app data sources to be created. Look "
+                         "at app.data.sources list." % data_sources)
+            sys.exit(errno.ENOKEY)
+        # TODO: Testing the connection
+        # Without that the error will just happen during the handler execution
+    elif isinstance(data_sources, list):
+        for data_source in data_sources:
+            configure_data_sources(data_source, data_connected)
+    # TODO Throw an error here if it is not string or list

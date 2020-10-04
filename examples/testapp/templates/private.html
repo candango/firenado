@@ -3,6 +3,14 @@
 {% block content %}
     <h1>Private Page</h1>
     <p>This is a private page you can see because you're logged.</p>
+
+    <h2>User</h2>
+
+    <p><b>Username:</b> {{ user_data['username'] }}</p>
+    <p><b>First Name:</b> {{ user_data['first_name'] }}</p>
+    <p><b>Last Name:</b> {{ user_data['last_name'] }}</p>
+    <p><b>Email:</b> {{ user_data['email'] }}</p>
+
     <ul>
         <li><a href="{% module RootedPath('/') %}">Index</a></li>
     </ul>
