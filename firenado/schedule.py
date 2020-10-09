@@ -16,7 +16,7 @@
 
 from .tornadoweb import TornadoComponent
 from cartola import config, sysexits
-from datetime import datetime
+from datetime import datetime, timedelta
 import logging
 from six import iteritems
 import sys
@@ -164,6 +164,7 @@ class ConfScheduler(Scheduler):
                 job_resolved_class = None
                 job_cron = job_conf.get("cron")
                 job_date = job_conf.get("date")
+                job_interval = job_conf.get("interval")
                 if 'class' in job_conf:
                     job_resolved_class = config.get_from_string(
                         job_conf['class'])
@@ -189,13 +190,14 @@ class ConfScheduler(Scheduler):
                             (self.component.get_complete_config_file(),
                              self.id, self.name, job_conf))
                     else:
-                        if job_cron is None and job_date is None:
+                        if (job_cron is None and job_date is None
+                                and job_interval is None):
                             logger.warning(
                                 "Firenado Scheduled Job Error:\n    The "
-                                "scheduled job cron or date not defined in "
-                                "the file:\n        %s\n    Job id: %s"
-                                "\n    Scheduler: [id: %s, name: %s]"
-                                "\n        Config: %s\n"
+                                "scheduled must have a cron or date or "
+                                "interval defined in the file:\n        %s\n  "
+                                "  Job id: %s\n    Scheduler: [id: %s, "
+                                "name: %s]\n        Config: %s\n"
                                 "\n    Please define either a cron string or "
                                 "date.\n" %
                                 (self.component.get_complete_config_file(),
@@ -235,6 +237,7 @@ class ScheduledJob(object):
         self._id = kwargs.get('id')
         self._date = kwargs.get('date')
         self._cron = kwargs.get('cron')
+        self._interval = kwargs.get('interval')
         self._periodic_callback = None
 
     @property
@@ -259,7 +262,12 @@ class ScheduledJob(object):
 
     @property
     def next_run(self):
-        return next_from_cron(self.cron)
+        if self._interval:
+            return datetime.now() + timedelta(milliseconds=self._interval)
+        if self._cron:
+            return next_from_cron(self.cron)
+        # TODO: run if date is defined
+        return datetime.now() + timedelta(days=-356)
 
     @property
     def next_interval(self):

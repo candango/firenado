@@ -16,7 +16,7 @@
 
 from . import handlers, services, uimodules
 import firenado.tornadoweb
-from firenado import service
+from firenado import data, service
 import logging
 
 logger = logging.getLogger(__name__)
@@ -51,14 +51,20 @@ class TestappComponent(firenado.tornadoweb.TornadoComponent):
     def initialize(self):
         import firenado.conf
         firenado.conf.app['login']['urls']['buga'] = 'buga'
+        data_source_conf = {
+            'connector': "sqlalchemy",
+            'url': "mysql+pymysql://root@localhost:3306/test"}
+        data_source = data.config_to_data_source(data_source_conf,
+                                                 self.application)
+        self.application.set_data_source("test", data_source)
 
     @service.served_by(services.UserService)
     def install(self):
         """  Installing test database
         """
         from firenado.util.sqlalchemy_util import Base
-        print('Installing Diasporapy Pod...')
-        print('Creating Pod ...')
+        print('Installing Testapp App...')
+        print('Creating App ...')
         engine = self.application.get_data_source(
             'test').engine
         engine.echo = True
@@ -75,8 +81,9 @@ class TestappComponent(firenado.tornadoweb.TornadoComponent):
             'email': "test@test.ts"
         })
 
-    def get_data_sources(self):
-        return self.application.data_sources
+    @property
+    def data_connected(self):
+        return self.application
 
     def after_request(self, handler):
         logging.info("Doing something after handler's request: %s" % handler)

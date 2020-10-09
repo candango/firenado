@@ -5,7 +5,8 @@ app:
     sources:
         # Set here references from sources defined on data.sources
         - session
-        - test
+        # Test datasource will be loaded from the application initialize method
+        # - test
   pythonpath: ..
   login:
     urls:

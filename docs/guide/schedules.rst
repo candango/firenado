@@ -52,11 +52,23 @@ scheduled task(the file is conf/schedapp_schedule.yml):
            class: schedapp.jobs.PrintTestJob
            cron: "*/1 * * * *"
            custom_property: Custom property from job1.
+         - id: job2
+           class: schedapp.jobs.PrintTestJob
+           interval: 15000
+           custom_property: Custom property from job1.
 
 The configuration file is define the scheduler scheduler1 that manages a job
 identified as job1 that runs every minute and a custom property to be used
 by the the class schedapp.jobs.PrintTestJob. Here is the the job
 implementation:
+
+A scheduled job can be executed by interval and cron string.
+
+The interval is defined in milliseconds and will take priority over the cron
+string.
+
+The cron string will defined intervals using the cron like format and is
+resolved by `croniter <https://github.com/taichino/croniter>`_.
 
 .. code-block:: python
 
