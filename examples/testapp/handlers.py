@@ -17,8 +17,9 @@
 from cartola.pagination import Paginator
 import firenado.conf
 from firenado import security, service, tornadoweb
+from firenado.util.sqlalchemy_util import base_to_dict
 import hashlib
-from tornado import gen
+from tornado import escape, gen
 import logging
 
 logger = logging.getLogger(__name__)
@@ -97,7 +98,6 @@ class LoginHandler(AuthHandler, tornadoweb.TornadoHandler):
     @service.served_by("testapp.services.LoginService")
     @service.served_by("testapp.services.UserService")
     def post(self):
-        from tornado.escape import json_encode
         self.session.delete('login_errors')
         default_login = firenado.conf.app['login']['urls']['default']
         username = self.get_argument('username')
@@ -113,10 +113,14 @@ class LoginHandler(AuthHandler, tornadoweb.TornadoHandler):
                 errors['fail'] = "Invalid login"
             else:
                 user = self.user_service.by_username(username)
+                user_data = base_to_dict(user, ['id', 'username', 'password',
+                                                'first_name', 'last_name',
+                                                'email'])
                 # Shhhhh!!!! this is a secret.
-                user['pass'] = hashlib.sha256(
-                    "_".join(user['pass']).encode('ascii')).hexdigest()
-                self.session.set("user", json_encode(user))
+                user_data['password'] = hashlib.sha256(
+                    "_".join(user_data['password']).encode('ascii')
+                ).hexdigest()
+                self.session.set("user", escape.json_encode(user_data))
                 self.redirect(self.get_rooted_path("private"))
 
         if errors:
@@ -128,6 +132,7 @@ class LoginHandler(AuthHandler, tornadoweb.TornadoHandler):
 
     def before_request(self):
         logging.info("Doing something before the login handler's request.")
+
 
 class LogoutHandler(AuthHandler, tornadoweb.TornadoHandler):
 
@@ -145,7 +150,8 @@ class PrivateHandler(AuthHandler, tornadoweb.TornadoHandler):
 
     @security.authenticated
     def get(self):
-        self.render("private.html")
+        user_data = escape.json_decode(self.session.get("user"))
+        self.render("private.html", user_data=user_data)
 
 
 class PaginationHandler(tornadoweb.TornadoHandler):
