@@ -380,9 +380,9 @@ class TornadoHandler(tornado.web.RequestHandler):
         application_component = None
         for key in ('ignore_component', 'component',):
             if key in kwargs:
-                if key is 'ignore_component':
+                if key == 'ignore_component':
                     ignore_component = kwargs[key]
-                if key is 'component':
+                if key == 'component':
                     pass
         kwargs['user_agent'] = self.user_agent if hasattr(
             self, 'user_agent') else None
@@ -526,9 +526,9 @@ class TornadoWebSocketHandler(tornado.websocket.WebSocketHandler):
         application_component = None
         for key in ('ignore_component', 'component',):
             if key in kwargs:
-                if key is 'ignore_component':
+                if key == 'ignore_component':
                     ignore_component = kwargs[key]
-                if key is 'component':
+                if key == 'component':
                     pass
         kwargs['user_agent'] = self.user_agent if hasattr(
             self, 'user_agent') else None
