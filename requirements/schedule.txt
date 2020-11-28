@@ -1,1 +1,1 @@
-croniter==0.3.34
+croniter==0.3.36
