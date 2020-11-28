@@ -359,9 +359,23 @@ def process_data_config_section(config, data_config):
                 connector['class'])
     if 'sources' in data_config:
         if data_config['sources']:
-            for source in data_config['sources']:
-                config.data['sources'][source['name']] = source
-                del config.data['sources'][source['name']]['name']
+            process_data_sources_config(config, data_config['sources'])
+
+
+def process_data_sources_config_file(config, file):
+    if not os.path.isabs(file):
+        file = os.path.join(config.APP_CONFIG_PATH, file)
+        sources_config = load_yaml_config_file(file)
+        process_data_sources_config(config, sources_config)
+
+
+def process_data_sources_config(config, sources_config):
+    for source_config in sources_config:
+        if "name" in source_config:
+            config.data['sources'][source_config['name']] = source_config
+            del config.data['sources'][source_config['name']]['name']
+        if "file" in source_config:
+            process_data_sources_config_file(config, source_config['file'])
 
 
 def process_log_config_section(config, log_config):

@@ -1,4 +1,5 @@
 -r all.txt
 -r basic.txt
 -r tests.txt
+-r tornado_new.txt
 pymysql==0.10.1
