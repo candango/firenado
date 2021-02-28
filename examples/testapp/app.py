@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright 2015-2018 Flavio Garcia
+# Copyright 2015-2021 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,14 +15,23 @@
 # limitations under the License.
 
 from . import handlers, services, uimodules
-import firenado.tornadoweb
+from firenado import tornadoweb
 from firenado import data, service
 import logging
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
 
-class TestappComponent(firenado.tornadoweb.TornadoComponent):
+class ComponentCustomErrorHandler(tornadoweb.TornadoErrorHandler):
+
+    def handle_error(self, request: tornadoweb.TornadoHandler,
+                     status_code: int, **kwargs: Any) -> None:
+        request.set_status(status_code)
+        request.render("error.html", http_error=kwargs.get('exc_info')[1])
+
+
+class TestappComponent(tornadoweb.TornadoComponent):
 
     user_service: services.LoginService
 
@@ -30,12 +39,17 @@ class TestappComponent(firenado.tornadoweb.TornadoComponent):
         super(TestappComponent, self).__init__(name, application)
         self.user_service = None
 
+    def get_error_handler(self) -> tornadoweb.TornadoErrorHandler:
+        return ComponentCustomErrorHandler(self)
+
     def get_handlers(self):
         import firenado.conf
         default_login = firenado.conf.app['login']['urls']['default']
         return [
             (r"/", handlers.IndexHandler),
             (r"/async/timeout", handlers.AsyncTimeoutHandler),
+            (r"/component/error", handlers.ComponentErrorHandler),
+            (r"/handler/error", handlers.HandlerErrorHandler),
             (r"/session/counter", handlers.SessionCounterHandler),
             (r"/session/config", handlers.SessionConfigHandler),
             (r"/pagination", handlers.PaginationHandler),

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright 2015-2020 Flavio Garcia
+# Copyright 2015-2021 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,6 +20,8 @@ from firenado import security, service, tornadoweb
 from firenado.util.sqlalchemy_util import base_to_dict
 import hashlib
 from tornado import escape, gen
+from tornado.web import HTTPError
+from typing import Any
 import logging
 
 logger = logging.getLogger(__name__)
@@ -33,6 +35,14 @@ class AuthHandler:
         if user_data:
             return json_decode(user_data)
         return None
+
+
+class HandlerCustomErrorHandler(tornadoweb.TornadoErrorHandler):
+
+    def handle_error(self, request: tornadoweb.TornadoHandler,
+                     status_code: int, **kwargs: Any) -> None:
+        request.set_status(status_code)
+        request.render("error.html", http_error=kwargs.get('exc_info')[1])
 
 
 class AsyncTimeoutHandler(tornadoweb.TornadoHandler):
@@ -58,6 +68,28 @@ class IndexHandler(AuthHandler, tornadoweb.TornadoHandler):
         default_login = firenado.conf.app['login']['urls']['default']
         self.render("index.html", message="Hello world!!!",
                     login_url=default_login)
+
+
+class ComponentErrorHandler(tornadoweb.TornadoHandler):
+
+    def get(self):
+        raise HTTPError(400, "This is an error thrown by my handler and "
+                             "handled by the component's error handler.",
+                        reason="ComponentCustomErrorHandler is set at the "
+                               "handler's component and be used by default.")
+
+
+class HandlerErrorHandler(tornadoweb.TornadoHandler):
+
+    def get_error_handler(self) -> tornadoweb.TornadoErrorHandler:
+        return HandlerCustomErrorHandler(self)
+
+    def get(self):
+        raise HTTPError(400, "This is an error thrown by my handler and "
+                             "handled by the handler's error handler.",
+                        reason="HandlerCustomErrorHandler is set at the "
+                               "current handler overwriting the component's "
+                               "custom error handler.")
 
 
 class SessionConfigHandler(tornadoweb.TornadoHandler):
