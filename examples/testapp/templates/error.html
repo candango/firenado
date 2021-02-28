@@ -1,0 +1,14 @@
+{% extends "testapp:base.html" %}
+
+    {% block content %}
+
+    {% module Header1("This is an error Page") %}
+    <b>Error status code: </b> {{http_error.status_code}} <br>
+    <b>Error message: </b> {{http_error.log_message}} <br>
+    <b>Reason: </b> {{http_error.reason}} <br>
+
+    <ul>
+        <li><a href="{% module RootedPath('/') %}">Index</a></li>
+    </ul>
+
+{% end %}
