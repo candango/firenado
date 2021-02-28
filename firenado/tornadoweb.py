@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 #
-# Copyright 2015-2020 Flavio Garcia
+# Copyright 2015-2021 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -27,11 +27,11 @@ from .config import get_class_from_config, load_yaml_config_file
 import inspect
 import logging
 import os
-from six import iteritems, string_types
-from tornado.escape import json_encode
+from six import iteritems
 from tornado.httpclient import HTTPRequest
 from tornado.template import Loader
 import tornado.websocket
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -64,6 +64,30 @@ def get_request(url, **kwargs):
         request.headers.add("Content-Type",
                             "application/x-www-form-urlencoded")
     return request
+
+
+class TornadoErrorHandler(object):
+
+    def __init__(self, host):
+        self._host = host
+
+    @property
+    def host(self):
+        return self._host
+
+    def is_component(self):
+        if isinstance(self.host, TornadoComponent):
+            return True
+        return False
+
+    def is_handler(self):
+        if isinstance(self.host, TornadoHandler):
+            return True
+        return False
+
+    def handle_error(self, request: "TornadoHandler", status_code: int,
+                     **kwargs: Any) -> None:
+        request.write_error(status_code, **kwargs)
 
 
 class TornadoApplication(tornado.web.Application, data.DataConnectedMixin,
@@ -197,12 +221,19 @@ class TornadoComponent(object):
         """
         pass
 
+    def get_error_handler(self) -> TornadoErrorHandler:
+        """Return a `TornadoErrorHandler` here to provide a different error
+        handling than the tornado's default. If the error handler is
+        implemented at the component, all handlers will use it as default. If a
+        handler implements the `get_error_handler` method, it will be used
+        instead of the one implemented at the component."""
+        pass
+
     def is_current_app(self):
         if not firenado.conf.is_multi_app:
             return True
-        else:
-            if firenado.conf.current_app_name == self.name:
-                return True
+        if firenado.conf.current_app_name == self.name:
+            return True
         return False
 
     @property
@@ -327,6 +358,21 @@ class TornadoHandler(tornado.web.RequestHandler):
             ).is_mobile()
         return False
 
+    def write_error(self, status_code: int, **kwargs: Any) -> None:
+        """
+        See: https://tinyurl.com/9t3jrend
+        :param int status_code:
+        :param Any kwargs:
+        :return:
+        """
+        error_handler = self.get_error_handler()
+        if error_handler is None:
+            error_handler = self.component.get_error_handler()
+            if error_handler is None:
+                super(TornadoHandler, self).write_error(status_code, **kwargs)
+        error_handler.handle_error(self, status_code, **kwargs)
+
+
     @session.read
     def prepare(self):
         self.component.before_request(self)
@@ -351,6 +397,13 @@ class TornadoHandler(tornado.web.RequestHandler):
 
         This method is called before it's component's after_request if defined.
         """
+        pass
+
+    def get_error_handler(self) -> TornadoErrorHandler:
+        """Return a `TornadoErrorHandler` here to provide a different error
+        handling than the tornado's default. If the error handler is
+        implemented at the handler, it will be used instead of the one
+        implemented at the component."""
         pass
 
     def before_request(self):
@@ -398,22 +451,6 @@ class TornadoHandler(tornado.web.RequestHandler):
             # Need to figure out what is going on.
             self._finished = False
             return None
-
-    def write_error(self, status_code, **kwargs):
-        error_stack = {'code': status_code}
-
-        exc_info = None
-        for key in kwargs:
-            if key == 'exc_info':
-                exc_info = kwargs[key]
-        error = exc_info[1]
-
-        if type(error) == JSONError:
-            error_stack.update(error.data)
-            response = dict(data=None, error=error_stack)
-            self.write(response)
-        else:
-            raise error
 
     def get_data_connected(self):
         return self.application
@@ -545,22 +582,6 @@ class TornadoWebSocketHandler(tornado.websocket.WebSocketHandler):
             self._finished = False
             return None
 
-    def write_error(self, status_code, **kwargs):
-        error_stack = {'code': status_code}
-
-        exc_info = None
-        for key in kwargs:
-            if key == 'exc_info':
-                exc_info = kwargs[key]
-        error = exc_info[1]
-
-        if type(error) == JSONError:
-            error_stack.update(error.data)
-            response = dict(data=None, error=error_stack)
-            self.write(response)
-        else:
-            raise error
-
     def get_firenado_template_path(self):
         """Override to customize the firenado template path for each handler.
 
@@ -598,17 +619,3 @@ class TornadoWebSocketHandler(tornado.websocket.WebSocketHandler):
             kwargs['autoescape'] = settings['autoescape']
         return FirenadoComponentLoader(
             template_path, component=self.component, **kwargs)
-
-
-#TODO: This is iFlux migration leftover. Is that necessary?.
-class JSONError(tornado.web.HTTPError):
-
-    def __init__(self, status_code, log_message=None, *args, **kwargs):
-        data = {}
-        self.data.update(log_message)
-        if not isinstance(log_message, string_types):
-            json_log_message = self.data
-            json_log_message['code'] = status_code
-            json_log_message = json_encode(json_log_message)
-        super(JSONError, self).__init__(
-            status_code, json_log_message, *args, **kwargs)
