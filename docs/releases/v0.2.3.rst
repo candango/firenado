@@ -8,12 +8,4 @@ We are pleased to announce the release of Firenado 0.2.3.
 
 Here are the highlights:
 
-Bug Fixes
-~~~~~~~~~
 
-* Fix python 3.9 warnings. `#328 <https://github.com/candango/firenado/issues/328>`_
-
-New Features
-~~~~~~~~~~~~
-
-* Reference data sources in different files. `#171 <https://github.com/candango/firenado/issues/171>`_
