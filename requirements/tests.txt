@@ -1,2 +1,2 @@
 behave==1.2.6
-bandit==1.6.2
+bandit==1.7.0
