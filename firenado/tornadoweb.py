@@ -368,10 +368,10 @@ class TornadoHandler(tornado.web.RequestHandler):
         error_handler = self.get_error_handler()
         if error_handler is None:
             error_handler = self.component.get_error_handler()
-            if error_handler is None:
-                super(TornadoHandler, self).write_error(status_code, **kwargs)
-        error_handler.handle_error(self, status_code, **kwargs)
-
+        if error_handler is None:
+            super(TornadoHandler, self).write_error(status_code, **kwargs)
+        else:
+            error_handler.handle_error(self, status_code, **kwargs)
 
     @session.read
     def prepare(self):

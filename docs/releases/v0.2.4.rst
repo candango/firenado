@@ -11,4 +11,4 @@ Here are the highlights:
 New Features
 ~~~~~~~~~~~~
 
-* Add http error handling to the framework #242. `#242 <https://github.com/candango/firenado/issues/242>`_
+* Add http error handling to the framework. `#242 <https://github.com/candango/firenado/issues/242>`_
