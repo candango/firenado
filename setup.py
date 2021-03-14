@@ -43,14 +43,6 @@ def resolve_requires(requirements_file):
         return [str(pr.requirement) for pr in requirements]
 
 
-def use_right_tornado(requirements):
-    tornado_req = "requirements/tornado_new.txt"
-    if sys.version[0] == "2":
-        tornado_req = "requirements/tornado_legacy.txt"
-    requirements.append(resolve_requires(tornado_req)[0])
-    return requirements
-
-
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
@@ -69,9 +61,7 @@ setup(
     author_email=firenado.get_author_email(),
     maintainer=firenado.get_author(),
     maintainer_email=firenado.get_author_email(),
-    install_requires=use_right_tornado(resolve_requires(
-        "requirements/basic.txt"
-    )),
+    install_requires=resolve_requires("requirements/basic.txt"),
     extras_require={
         'all': resolve_requires("requirements/all.txt"),
         'redis': resolve_requires("requirements/redis.txt"),
@@ -90,8 +80,6 @@ setup(
         "License :: OSI Approved :: Apache Software License",
         "Operating System :: OS Independent",
         "Programming Language :: Python",
-        "Programming Language :: Python :: 2.7",
-        "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
