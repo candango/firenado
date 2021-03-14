@@ -1,0 +1,15 @@
+What's new in Firenado 0.2.2
+============================
+
+Oct 09, 2020
+------------
+
+We are pleased to announce the release of Firenado 0.2.2.
+
+Here are the highlights:
+
+New Features
+~~~~~~~~~~~~
+
+* Create and store data sources at run time`#230 <https://github.com/candango/firenado/issues/230>`_
+* Make a scheduled job to be executed by interval `#325 <https://github.com/candango/firenado/issues/325>`_

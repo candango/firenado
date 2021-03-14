@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 #
-# Copyright 2015-2019 Flavio Garcia
+# Copyright 2015-2021 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 from __future__ import (absolute_import, division, print_function,
                         with_statement)
 
+from cartola import fs
 import tornado.web
 import firenado.conf
 from . import data
@@ -25,19 +26,73 @@ from . import uimodules
 from .config import get_class_from_config, load_yaml_config_file
 import inspect
 import logging
-from tornado.escape import json_encode
+import os
+from six import iteritems
+from tornado.httpclient import HTTPRequest
 from tornado.template import Loader
 import tornado.websocket
-import os
-from six import iteritems, string_types
-
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
 
+def get_request(url, **kwargs):
+    """ Return a HTTPRequest to help with AsyncHTTPClient and HTTPClient
+    execution. The HTTPRequest will use the provided url combined with path
+    if provided. The HTTPRequest method will be GET by default and can be
+    changed if method is informed.
+    If form_urlencoded is defined as True a Content-Type header will be added
+    to the request with application/x-www-form-urlencoded value.
+
+    :param str url: Base url to be set to the HTTPRequest
+    :key form_urlencoded: If the true will add the header Content-Type
+    application/x-www-form-urlencoded to the form. Default is False.
+    :key method: Method to be used by the HTTPRequest. Default it GET.
+    :key path: If informed will add the path to the base url informed. Default
+    is None.
+    :return HTTPRequest:
+    """
+    method = kwargs.get("method", "GET")
+    path = kwargs.get("path", None)
+    form_urlencoded = kwargs.get("form_urlencoded", False)
+    if path is not None:
+        if not url.endswith("/"):
+            url = "%s/" % url
+        url = "%s%s" % (url, path)
+    request = HTTPRequest(url, method=method)
+    if form_urlencoded:
+        request.headers.add("Content-Type",
+                            "application/x-www-form-urlencoded")
+    return request
+
+
+class TornadoErrorHandler(object):
+
+    def __init__(self, host):
+        self._host = host
+
+    @property
+    def host(self):
+        return self._host
+
+    def is_component(self):
+        if isinstance(self.host, TornadoComponent):
+            return True
+        return False
+
+    def is_handler(self):
+        if isinstance(self.host, TornadoHandler):
+            return True
+        return False
+
+    def handle_error(self, request: "TornadoHandler", status_code: int,
+                     **kwargs: Any) -> None:
+        request.write_error(status_code, **kwargs)
+
+
 class TornadoApplication(tornado.web.Application, data.DataConnectedMixin,
                          session.SessionEnginedMixin):
-    """Firenado basic Tornado application.
+    """ Firenado basic Tornado application.
     """
 
     def __init__(self, default_host="", transforms=None, **settings):
@@ -114,39 +169,24 @@ class TornadoApplication(tornado.web.Application, data.DataConnectedMixin,
         return self.components[firenado.conf.app['component']]
 
     def __load_components(self):
-        """ Loads all enabled components registered into the components
-        conf.
+        """ Loads all enabled components registered from the components
+        config section.
         """
         for key, value in iteritems(firenado.conf.components):
             if value['enabled']:
                 component_class = get_class_from_config(value)
                 self.components[key] = component_class(key, self)
                 if self.components[key].get_config_file():
-                    from firenado.util.file import file_has_extension
-                    filename = self.components[key].get_config_file()
-                    comp_config_file = None
-                    if file_has_extension(filename):
-                        if os.path.isfile(os.path.join(
-                                firenado.conf.APP_CONFIG_PATH, filename)):
-                            comp_config_file = os.path.join(
-                                firenado.conf.APP_CONFIG_PATH, filename)
-                    else:
-                        config_file_extensions = ['yml', 'yaml']
-                        for extension in config_file_extensions:
-                            candidate_filename = os.path.join(
-                                    firenado.conf.APP_CONFIG_PATH,
-                                    "%s.%s" % (filename, extension))
-                            if os.path.isfile(candidate_filename):
-                                comp_config_file = candidate_filename
-                                break
-                    if comp_config_file is not None:
+                    filename = self.components[key].get_complete_config_file()
+                    if filename is not None:
                         self.components[key].conf = load_yaml_config_file(
-                            comp_config_file)
+                            filename)
                         self.components[key].process_config()
+                        self.components[key].has_conf = True
                     else:
                         logger.debug("Failed to find the file for the "
-                                     "component %s at %s. Component filename "
-                                     "returned is %s." % (
+                                     "component %s at %s. Component's "
+                                     "filename returned is %s." % (
                                         key, firenado.conf.APP_CONFIG_PATH,
                                         self.components[key].get_config_file())
                                      )
@@ -166,27 +206,43 @@ class TornadoComponent(object):
         self.name = name
         self.application = application
         self.conf = {}
+        self._has_conf = False
         self.plugins = dict()
 
-    def after_handler(self, handler):
+    def after_request(self, handler):
         """ Add a logic to be executed after all component's handlers
         execution.
         """
         pass
 
-    def before_handler(self, handler):
+    def before_request(self, handler):
         """ Add a logic to be executed before all component's handler
         execution.
         """
         pass
 
+    def get_error_handler(self) -> TornadoErrorHandler:
+        """Return a `TornadoErrorHandler` here to provide a different error
+        handling than the tornado's default. If the error handler is
+        implemented at the component, all handlers will use it as default. If a
+        handler implements the `get_error_handler` method, it will be used
+        instead of the one implemented at the component."""
+        pass
+
     def is_current_app(self):
         if not firenado.conf.is_multi_app:
             return True
-        else:
-            if firenado.conf.current_app_name == self.name:
-                return True
+        if firenado.conf.current_app_name == self.name:
+            return True
         return False
+
+    @property
+    def has_conf(self):
+        return self._has_conf
+
+    @has_conf.setter
+    def has_conf(self, value):
+        self._has_conf = value
 
     def get_handlers(self):
         """ Returns handlers being added by the component to the application.
@@ -214,6 +270,25 @@ class TornadoComponent(object):
         filename = self.get_config_filename()
         if filename is not None:
             return filename
+        return None
+
+    def get_complete_config_file(self):
+        """ Return the config file with the correct extension, if
+        get_config_file has no extension.
+
+        :return str: The config file with extension
+        """
+        if fs.file_has_extension(self.get_config_file()):
+            if os.path.isfile(self.get_config_file()):
+                return os.path.join(firenado.conf.APP_CONFIG_PATH,
+                                    self.get_config_file())
+        config_file_extensions = ['yml', 'yaml']
+        for extension in config_file_extensions:
+            candidate_filename = "%s.%s" % (self.get_config_file(), extension)
+            if os.path.isfile(os.path.join(
+                    firenado.conf.APP_CONFIG_PATH, candidate_filename)):
+                return os.path.join(firenado.conf.APP_CONFIG_PATH,
+                                    candidate_filename)
         return None
 
     def get_template_path(self):
@@ -276,27 +351,91 @@ class TornadoHandler(tornado.web.RequestHandler):
         return self.current_user is not None
 
     def is_mobile(self):
-        from .util import browser
+        from mobiledetect import MobileDetect
         if 'User-Agent' in self.request.headers:
-            return browser.is_mobile(self.request.headers['User-Agent'])
+            return MobileDetect(
+                useragent=self.request.headers['User-Agent']
+            ).is_mobile()
         return False
+
+    def write_error(self, status_code: int, **kwargs: Any) -> None:
+        """
+        See: https://tinyurl.com/9t3jrend
+        :param int status_code:
+        :param Any kwargs:
+        :return:
+        """
+        error_handler = self.get_error_handler()
+        if error_handler is None:
+            error_handler = self.component.get_error_handler()
+        if error_handler is None:
+            super(TornadoHandler, self).write_error(status_code, **kwargs)
+        else:
+            error_handler.handle_error(self, status_code, **kwargs)
 
     @session.read
     def prepare(self):
-        self.component.before_handler(self)
+        self.component.before_request(self)
+        self.before_request()
 
     @session.write
     def on_finish(self):
-        self.component.after_handler(self)
+        self.after_request()
+        self.component.after_request(self)
+
+    def after_request(self):
+        """Called after the end of a request.
+
+        Override this method to perform cleanup, logging, etc.
+        This method is a counterpart to `prepare`.  ``on_finish`` may
+        not produce any output, as it is called after the response
+        has been sent to the client.
+
+        Use this method instead of `on_finish` to avoid the session to break
+        and use session features. This method will be called by `on_finish`
+        with a valid session.
+
+        This method is called before it's component's after_request if defined.
+        """
+        pass
+
+    def get_error_handler(self) -> TornadoErrorHandler:
+        """Return a `TornadoErrorHandler` here to provide a different error
+        handling than the tornado's default. If the error handler is
+        implemented at the handler, it will be used instead of the one
+        implemented at the component."""
+        pass
+
+    def before_request(self):
+        """Called at the beginning of a request before  `get`/`post`/etc.
+
+        Override this method to perform common initialization regardless
+        of the request method.
+
+        Use this method instead of `prepare` to avoid the session to break and
+        use session features. This method will be called by `prepare` with
+        a valid session.
+
+        This method is called after it's component's before_request if defined.
+
+        Asynchronous support: Use ``async def`` or decorate this method with
+        `.gen.coroutine` to make it asynchronous.
+        If this method returns an  ``Awaitable`` execution will not proceed
+        until the ``Awaitable`` is done.
+
+        .. versionadded:: 0.1.10
+           Asynchronous support.
+        """
+        pass
 
     def render_string(self, template_name, **kwargs):
         ignore_component = False
         application_component = None
         for key in ('ignore_component', 'component',):
             if key in kwargs:
-                if key is 'ignore_component':
+                if key == 'ignore_component':
                     ignore_component = kwargs[key]
-                if key is 'component':
+                if key == 'component':
                     pass
         kwargs['user_agent'] = self.user_agent if hasattr(
             self, 'user_agent') else None
@@ -312,22 +451,6 @@ class TornadoHandler(tornado.web.RequestHandler):
             # Need to figure out what is going on.
             self._finished = False
             return None
-
-    def write_error(self, status_code, **kwargs):
-        error_stack = {'code': status_code}
-
-        exc_info = None
-        for key in kwargs:
-            if key == 'exc_info':
-                exc_info = kwargs[key]
-        error = exc_info[1]
-
-        if type(error) == JSONError:
-            error_stack.update(error.data)
-            response = dict(data=None, error=error_stack)
-            self.write(response)
-        else:
-            raise error
 
     def get_data_connected(self):
         return self.application
@@ -440,9 +563,9 @@ class TornadoWebSocketHandler(tornado.websocket.WebSocketHandler):
         application_component = None
         for key in ('ignore_component', 'component',):
             if key in kwargs:
-                if key is 'ignore_component':
+                if key == 'ignore_component':
                     ignore_component = kwargs[key]
-                if key is 'component':
+                if key == 'component':
                     pass
         kwargs['user_agent'] = self.user_agent if hasattr(
             self, 'user_agent') else None
@@ -458,22 +581,6 @@ class TornadoWebSocketHandler(tornado.websocket.WebSocketHandler):
             # Need to figure out what is going on.
             self._finished = False
             return None
-
-    def write_error(self, status_code, **kwargs):
-        error_stack = {'code': status_code}
-
-        exc_info = None
-        for key in kwargs:
-            if key == 'exc_info':
-                exc_info = kwargs[key]
-        error = exc_info[1]
-
-        if type(error) == JSONError:
-            error_stack.update(error.data)
-            response = dict(data=None, error=error_stack)
-            self.write(response)
-        else:
-            raise error
 
     def get_firenado_template_path(self):
         """Override to customize the firenado template path for each handler.
@@ -512,17 +619,3 @@ class TornadoWebSocketHandler(tornado.websocket.WebSocketHandler):
             kwargs['autoescape'] = settings['autoescape']
         return FirenadoComponentLoader(
             template_path, component=self.component, **kwargs)
-
-
-#TODO: This is iFlux migration leftover. Is that necessary?.
-class JSONError(tornado.web.HTTPError):
-
-    def __init__(self, status_code, log_message=None, *args, **kwargs):
-        data = {}
-        self.data.update(log_message)
-        if not isinstance(log_message, string_types):
-            json_log_message = self.data
-            json_log_message['code'] = status_code
-            json_log_message = json_encode(json_log_message)
-        super(JSONError, self).__init__(
-            status_code, json_log_message, *args, **kwargs)

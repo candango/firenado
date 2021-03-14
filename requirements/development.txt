@@ -1,0 +1,5 @@
+-r all.txt
+-r basic.txt
+-r tests.txt
+-r tornado_new.txt
+pymysql==1.0.2

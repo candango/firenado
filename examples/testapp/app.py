@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright 2015-2018 Flavio Garcia
+# Copyright 2015-2021 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,14 +15,23 @@
 # limitations under the License.
 
 from . import handlers, services, uimodules
-import firenado.tornadoweb
-from firenado import service
+from firenado import tornadoweb
+from firenado import data, service
 import logging
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
 
-class TestappComponent(firenado.tornadoweb.TornadoComponent):
+class ComponentCustomErrorHandler(tornadoweb.TornadoErrorHandler):
+
+    def handle_error(self, request: tornadoweb.TornadoHandler,
+                     status_code: int, **kwargs: Any) -> None:
+        request.set_status(status_code)
+        request.render("error.html", http_error=kwargs.get('exc_info')[1])
+
+
+class TestappComponent(tornadoweb.TornadoComponent):
 
     user_service: services.LoginService
 
@@ -30,12 +39,17 @@ class TestappComponent(firenado.tornadoweb.TornadoComponent):
         super(TestappComponent, self).__init__(name, application)
         self.user_service = None
 
+    def get_error_handler(self) -> tornadoweb.TornadoErrorHandler:
+        return ComponentCustomErrorHandler(self)
+
     def get_handlers(self):
         import firenado.conf
         default_login = firenado.conf.app['login']['urls']['default']
         return [
             (r"/", handlers.IndexHandler),
             (r"/async/timeout", handlers.AsyncTimeoutHandler),
+            (r"/component/error", handlers.ComponentErrorHandler),
+            (r"/handler/error", handlers.HandlerErrorHandler),
             (r"/session/counter", handlers.SessionCounterHandler),
             (r"/session/config", handlers.SessionConfigHandler),
             (r"/pagination", handlers.PaginationHandler),
@@ -51,14 +65,20 @@ class TestappComponent(firenado.tornadoweb.TornadoComponent):
     def initialize(self):
         import firenado.conf
         firenado.conf.app['login']['urls']['buga'] = 'buga'
+        data_source_conf = {
+            'connector': "sqlalchemy",
+            'url': "mysql+pymysql://root@localhost:3306/test"}
+        data_source = data.config_to_data_source(data_source_conf,
+                                                 self.application)
+        self.application.set_data_source("test", data_source)
 
     @service.served_by(services.UserService)
     def install(self):
         """  Installing test database
         """
         from firenado.util.sqlalchemy_util import Base
-        print('Installing Diasporapy Pod...')
-        print('Creating Pod ...')
+        print('Installing Testapp App...')
+        print('Creating App ...')
         engine = self.application.get_data_source(
             'test').engine
         engine.echo = True
@@ -75,11 +95,12 @@ class TestappComponent(firenado.tornadoweb.TornadoComponent):
             'email': "test@test.ts"
         })
 
-    def get_data_sources(self):
-        return self.application.data_sources
+    @property
+    def data_connected(self):
+        return self.application
 
-    def after_handler(self, handler):
-        logging.info("Doing something after handler: %s" % handler)
+    def after_request(self, handler):
+        logging.info("Doing something after handler's request: %s" % handler)
 
-    def before_handler(self, handler):
-        logging.info("Doing something before handler: %s" % handler)
+    def before_request(self, handler):
+        logging.info("Doing something before handler's request: %s" % handler)

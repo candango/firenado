@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright 2015-2019 Flavio Garcia
+# Copyright 2015-2021 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,10 +14,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from cartola.pagination import Paginator
 import firenado.conf
-from firenado import security, service, tornadogen, tornadoweb
-from firenado.components.toolbox.pagination import Paginator
-from tornado import gen
+from firenado import security, service, tornadoweb
+from firenado.util.sqlalchemy_util import base_to_dict
+import hashlib
+from tornado import escape, gen
+from tornado.web import HTTPError
+from typing import Any
 import logging
 
 logger = logging.getLogger(__name__)
@@ -33,6 +37,14 @@ class AuthHandler:
         return None
 
 
+class HandlerCustomErrorHandler(tornadoweb.TornadoErrorHandler):
+
+    def handle_error(self, request: tornadoweb.TornadoHandler,
+                     status_code: int, **kwargs: Any) -> None:
+        request.set_status(status_code)
+        request.render("error.html", http_error=kwargs.get('exc_info')[1])
+
+
 class AsyncTimeoutHandler(tornadoweb.TornadoHandler):
 
     def timed_out(self):
@@ -42,7 +54,7 @@ class AsyncTimeoutHandler(tornadoweb.TornadoHandler):
     def get(self):
         from tornado.util import TimeoutError
         try:
-            yield tornadogen.with_timeout(2, gen.sleep(5))
+            yield gen.with_timeout(2, gen.sleep(5))
             self.write("This will never be reached!!")
         except TimeoutError as te:
             logger.warning(te.__repr__())
@@ -56,6 +68,28 @@ class IndexHandler(AuthHandler, tornadoweb.TornadoHandler):
         default_login = firenado.conf.app['login']['urls']['default']
         self.render("index.html", message="Hello world!!!",
                     login_url=default_login)
+
+
+class ComponentErrorHandler(tornadoweb.TornadoHandler):
+
+    def get(self):
+        raise HTTPError(400, "This is an error thrown by my handler and "
+                             "handled by the component's error handler.",
+                        reason="ComponentCustomErrorHandler is set at the "
+                               "handler's component and be used by default.")
+
+
+class HandlerErrorHandler(tornadoweb.TornadoHandler):
+
+    def get_error_handler(self) -> tornadoweb.TornadoErrorHandler:
+        return HandlerCustomErrorHandler(self)
+
+    def get(self):
+        raise HTTPError(400, "This is an error thrown by my handler and "
+                             "handled by the handler's error handler.",
+                        reason="HandlerCustomErrorHandler is set at the "
+                               "current handler overwriting the component's "
+                               "custom error handler.")
 
 
 class SessionConfigHandler(tornadoweb.TornadoHandler):
@@ -96,7 +130,6 @@ class LoginHandler(AuthHandler, tornadoweb.TornadoHandler):
     @service.served_by("testapp.services.LoginService")
     @service.served_by("testapp.services.UserService")
     def post(self):
-        from tornado.escape import json_encode
         self.session.delete('login_errors')
         default_login = firenado.conf.app['login']['urls']['default']
         username = self.get_argument('username')
@@ -112,12 +145,25 @@ class LoginHandler(AuthHandler, tornadoweb.TornadoHandler):
                 errors['fail'] = "Invalid login"
             else:
                 user = self.user_service.by_username(username)
-                self.session.set("user", json_encode(user))
+                user_data = base_to_dict(user, ['id', 'username', 'password',
+                                                'first_name', 'last_name',
+                                                'email'])
+                # Shhhhh!!!! this is a secret.
+                user_data['password'] = hashlib.sha256(
+                    "_".join(user_data['password']).encode('ascii')
+                ).hexdigest()
+                self.session.set("user", escape.json_encode(user_data))
                 self.redirect(self.get_rooted_path("private"))
 
         if errors:
             self.session.set('login_errors', errors)
             self.redirect(self.get_rooted_path(default_login))
+
+    def after_request(self):
+        logging.info("Doing something after the login handler's request.")
+
+    def before_request(self):
+        logging.info("Doing something before the login handler's request.")
 
 
 class LogoutHandler(AuthHandler, tornadoweb.TornadoHandler):
@@ -136,7 +182,8 @@ class PrivateHandler(AuthHandler, tornadoweb.TornadoHandler):
 
     @security.authenticated
     def get(self):
-        self.render("private.html")
+        user_data = escape.json_decode(self.session.get("user"))
+        self.render("private.html", user_data=user_data)
 
 
 class PaginationHandler(tornadoweb.TornadoHandler):

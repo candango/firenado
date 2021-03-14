@@ -1,3 +1,4 @@
 -r pexpect.txt
 -r redis.txt
+-r schedule.txt
 -r sqlalchemy.txt

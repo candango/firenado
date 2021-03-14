@@ -1,0 +1,19 @@
+What's new in Firenado 0.2.1
+==========================
+
+Sep 11, 2020
+------------
+
+We are pleased to announce the release of Firenado 0.2.1.
+
+This release will add couple minor features and updating cartola.
+
+We'll increment the release number instead of minor.
+
+Here are the highlights:
+
+New Features
+~~~~~~~~~~~~
+
+* Add function to create HTTPRequests`#131 <https://github.com/candango/firenado/issues/131>`_
+* Create a function to transform sqlalchemy objects to dict `#321 <https://github.com/candango/firenado/issues/321>`_

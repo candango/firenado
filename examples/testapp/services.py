@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright 2015-2017 Flavio Garcia
+# Copyright 2015-2020 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,9 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from firenado import service
 from .models import UserBase
 import datetime
+from firenado import service
 
 
 def password_digest(pass_phrase):
@@ -46,7 +46,7 @@ class LoginService(service.FirenadoService):
         """
         user = self.user_service.by_username(username)
         if user:
-            if user['pass'] == password:
+            if user.password == password_digest(password):
                 return True
         return False
 
@@ -60,8 +60,7 @@ class UserService(service.FirenadoService):
         user.first_name = user_data['first_name']
         user.last_name = user_data['last_name']
         user.password = password_digest(user_data['password'])
-        user.email = user_data['last_name']
-
+        user.email = user_data['email']
         db_session = self.get_data_source('test').session
         db_session.add(user)
         db_session.commit()
@@ -69,9 +68,8 @@ class UserService(service.FirenadoService):
         return user
 
     def by_username(self, username):
-        user = None
-        if username == "test":
-            user = {'usename': "test", 'pass': "testpass"}
+        session = self.get_data_source('test').session
+        user = session.query(UserBase).filter(
+            UserBase.username == username).one_or_none()
+        session.close()
         return user
-
-

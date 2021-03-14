@@ -1,0 +1,14 @@
+What's new in Firenado 0.2.5
+============================
+
+Mar 02, 2021
+------------
+
+We are pleased to announce the release of Firenado 0.2.5.
+
+Here are the highlights:
+
+Bug Fixes
+~~~~~~~~~
+
+* TornadoHandler write error will never hit the default RequestHandler write error. `#335 <https://github.com/candango/firenado/issues/335>`_

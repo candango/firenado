@@ -21,7 +21,6 @@ Contents:
 
    guide
    configuration
-   components
    releases
 
 Indices and tables

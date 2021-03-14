@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 #
-# Copyright 2015-2019 Flavio Garcia
+# Copyright 2015-2020 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import firenado.config as _config
 import logging
 import os
 import sys
+import tempfile
 
 # Setting root path
 ROOT = None
@@ -80,7 +81,7 @@ for extension in config_file_extensions:
 
 # Tmp path variable
 # TODO: Should I care about windows?
-TMP_SYS_PATH = "/tmp"
+TMP_SYS_PATH = tempfile.gettempdir()
 TMP_APP_PATH = TMP_SYS_PATH
 
 # Setting firenado's default variables
@@ -129,11 +130,11 @@ session['id_generators'] = {}
 # If set to 0 the session will not expire
 session['life_time'] = 1800
 session['name'] = "FIRENADOSESSID"
+session['prefix'] = "firenado:session"
 session['purge_limit'] = 500
 session['redis'] = {}
 session['redis']['data'] = {}
 session['redis']['data']['source'] = ""
-session['redis']['prefix'] = "firenado:session"
 session['type'] = ""
 
 if HAS_LIB_CONFIG_FILE:

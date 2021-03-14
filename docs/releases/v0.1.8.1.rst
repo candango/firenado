@@ -1,0 +1,41 @@
+What's new in Firenado 0.1.8.1
+==============================
+
+Mar 04, 2020
+------------
+
+We are pleased to announce the release of Firenado 0.1.8.1.
+
+We still support python 2.7 in the main development contrary to the announce
+from 0.1.7.8 but we started to relax tests against 2.7 and prepare the code
+base for a python 3.x only.
+
+Firenado gave birth to Cartola and we added this project to the basic
+dependency.
+
+This version fixes definitely the process launcher shutdown making easier to
+spam and teardown Firenado application in a test and that's the reason we still
+keep with python 2.7.
+
+A new json session encoder were added to the available list of session encoders
+making it easier to share session data between applications that don't have
+pikle encoding/serialization.
+
+Here are the highlights:
+
+New Features
+~~~~~~~~~~~~
+
+* Add json session encoder to the project. `#295 <https://github.com/candango/firenado/issues/295>`_
+* Clean sys.path and set PYTHONPATH before launch a process. . `#299 <https://github.com/candango/firenado/issues/299>`_
+
+Bug Fixes
+~~~~~~~~~
+* Process launcher shutdown doesn't work. `#290 <https://github.com/candango/firenado/issues/290>`_
+
+Refactory
+~~~~~~~~~
+* Use pymobiledetect instead of util.browser. `#292 <https://github.com/candango/firenado/issues/292>`_
+* Use cartola instead of util.sysexits. `#293 <https://github.com/candango/firenado/issues/293>`_
+* Use cartola instead of util.file. `#294 <https://github.com/candango/firenado/issues/294>`_
+* Use cartola instead of local security package. `#296 <https://github.com/candango/firenado/issues/296>`_

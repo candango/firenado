@@ -1,0 +1,14 @@
+What's new in Firenado 0.2.4
+============================
+
+Feb 28, 2021
+------------
+
+We are pleased to announce the release of Firenado 0.2.4.
+
+Here are the highlights:
+
+New Features
+~~~~~~~~~~~~
+
+* Add http error handling to the framework. `#242 <https://github.com/candango/firenado/issues/242>`_

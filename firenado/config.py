@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 #
-# Copyright 2015-2019 Flavio Garcia
+# Copyright 2015-2020 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,8 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from cartola import sysexits
 import yaml
 import logging
+import os
 
 
 def get_app_defaults():
@@ -73,6 +75,7 @@ def log_level_from_string(str_level):
         'WARNING': logging.WARNING,
         'INFO': logging.INFO,
         'DEBUG': logging.DEBUG,
+        'NOTSET': logging.NOTSET,
     }
     try:
         return levels[str_level.upper()]
@@ -202,7 +205,7 @@ def process_app_config(config, config_data):
         config.is_multi_app = True
         process_apps_config_session(config, config_data['apps'])
         if 'app' in config_data:
-            from .util import sysexits
+
             logger = logging.getLogger(__name__)
             logger.critical("Firenado is running in multi application mode. "
                             "The app section is only allowed in simple "
@@ -216,8 +219,6 @@ def process_app_config(config, config_data):
 
 # TODO: This is being used for the multi app configuration
 def process_apps_config_session(config, apps_config):
-    from .util import sysexits
-    import os
     logger = logging.getLogger(__name__)
 
     class AppConf:
@@ -358,9 +359,23 @@ def process_data_config_section(config, data_config):
                 connector['class'])
     if 'sources' in data_config:
         if data_config['sources']:
-            for source in data_config['sources']:
-                config.data['sources'][source['name']] = source
-                del config.data['sources'][source['name']]['name']
+            process_data_sources_config(config, data_config['sources'])
+
+
+def process_data_sources_config_file(config, file):
+    if not os.path.isabs(file):
+        file = os.path.join(config.APP_CONFIG_PATH, file)
+        sources_config = load_yaml_config_file(file)
+        process_data_sources_config(config, sources_config)
+
+
+def process_data_sources_config(config, sources_config):
+    for source_config in sources_config:
+        if "name" in source_config:
+            config.data['sources'][source_config['name']] = source_config
+            del config.data['sources'][source_config['name']]['name']
+        if "file" in source_config:
+            process_data_sources_config_file(config, source_config['file'])
 
 
 def process_log_config_section(config, log_config):
@@ -440,5 +455,15 @@ def process_session_config_section(config, session_config):
         config.session['callback_hiccup'] = session_config['callback_hiccup']
     if 'callback_time' in session_config:
         config.session['callback_time'] = session_config['callback_time']
+    if 'prefix' in session_config:
+        config.session['prefix'] = session_config['prefix']
     if 'purge_limit' in session_config:
         config.session['purge_limit'] = session_config['purge_limit']
+    if 'encoder' in session_config:
+        if session_config['encoder'] in config.session['encoders']:
+            config.session['encoder'] = session_config['encoder']
+        else:
+            logger = logging.getLogger(__name__)
+            logger.critical("The session encoder \"{}\" is not defined."
+                            "".format(session_config['encoder']))
+            sysexits.exit_fatal(sysexits.EX_CONFIG)
