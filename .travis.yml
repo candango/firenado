@@ -1,16 +1,14 @@
 # https://travis-ci.org/candango/firenado
 language: python
 python:
-  - "2.7"
-  - "3.5"
   - "3.6"
   - "3.7"
   - "3.8"
+  - "3.9"
 install:
   - "pip install -r requirements/basic.txt"
   - "pip install -r requirements/all.txt"
   - "pip install -r requirements/tests.txt"
-  - ./scripts/install_tornado.sh
 script:
   - "PYTHONPATH=$PYTHONPATH:. python tests/runtests.py"
   - ./scripts/run_behave.sh
