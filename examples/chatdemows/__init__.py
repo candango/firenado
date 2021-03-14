@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright 2015-2016 Flavio Garcia
+# Copyright 2015-2021 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import chatdemows.handlers
+from . import handlers
 import firenado.tornadoweb
 
 
@@ -22,6 +22,6 @@ class ChatdemoWsComponent(firenado.tornadoweb.TornadoComponent):
 
     def get_handlers(self):
         return [
-            (r'/', chatdemows.handlers.MainHandler),
-            (r"/chatsocket", chatdemows.handlers.ChatSocketHandler),
+            (r'/', handlers.MainHandler),
+            (r"/chatsocket", handlers.ChatSocketHandler),
         ]

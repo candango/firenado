@@ -323,24 +323,13 @@ class TornadoComponent(object):
         pass
 
 
-class TornadoHandler(tornado.web.RequestHandler):
-    """ Base request handler to be used on a Firenado application.
-    It provides session and handles component paths.
+class SessionHandler:
+    """ Set the stage for a handler with session. The session per-se will be
+    managed by the ComponentHandler that extends SessionHandler.
     """
-    def __init__(self, application, request, **kwargs):
-        self.component = None
+
+    def __init__(self):
         self.session = None
-        self.__template_variables = dict()
-        super(TornadoHandler, self).__init__(application, request, **kwargs)
-
-    def initialize(self, component):
-        self.component = component
-
-    def add_variable_to_template(self, name, variable):
-        """ Add a variable to a dict that will be added to the template during
-        the render or render_string execution.
-        """
-        self.__template_variables[name] = variable
 
     def authenticated(self):
         """ Returns if the current user is authenticated. If the current user
@@ -350,13 +339,24 @@ class TornadoHandler(tornado.web.RequestHandler):
         """
         return self.current_user is not None
 
-    def is_mobile(self):
-        from mobiledetect import MobileDetect
-        if 'User-Agent' in self.request.headers:
-            return MobileDetect(
-                useragent=self.request.headers['User-Agent']
-            ).is_mobile()
-        return False
+
+class ComponentHandler(SessionHandler):
+    """ This mixing will define a handler with components and session.
+    ComponentHandler is the base of what a Firenado handler should be and it
+    will be used to unify TornadoHandler and TornadoWebSocketHandler logic.
+    Other functionalities will be implemented in TemplateHandler that assumes
+    the handler being applied to is also a ComponentHandler.
+    """
+
+    def __init__(self, **kwargs):
+        self.component = None
+        SessionHandler.__init__(self)
+
+    def initialize(self, component):
+        self.component = component
+
+    def get_data_connected(self):
+        return self.application
 
     def write_error(self, status_code: int, **kwargs: Any) -> None:
         """
@@ -428,45 +428,42 @@ class TornadoHandler(tornado.web.RequestHandler):
         """
         pass
 
+
+class TemplateHandler:
+    """ Deals with all aspects related to templates. The mixin will assume
+    it was applied to a ComponentHandler so we can resolve and deal with
+    templates defined in the same component or other components from the
+    application.
+    """
+
+    def __init__(self):
+        self.__template_variables = dict()
+
+    @property
+    def template_variables(self):
+        return self.__template_variables
+
+    def add_variable_to_template(self, name, variable):
+        """ Add a variable to a dict that will be added to the template during
+        the render or render_string execution.
+        """
+        self.__template_variables[name] = variable
+
     def render_string(self, template_name, **kwargs):
-        ignore_component = False
-        application_component = None
-        for key in ('ignore_component', 'component',):
-            if key in kwargs:
-                if key == 'ignore_component':
-                    ignore_component = kwargs[key]
-                if key == 'component':
-                    pass
         kwargs['user_agent'] = self.user_agent if hasattr(
             self, 'user_agent') else None
         kwargs['credential'] = self.credential if hasattr(
             self, 'credential') else None
-        for name, variable in iteritems(self.__template_variables):
+        for name, variable in iteritems(self.template_variables):
             kwargs[name] = variable
         if self.ui:
-            return super(TornadoHandler, self).render_string(
+            return super(TemplateHandler, self).render_string(
                 template_name, **kwargs)
         else:
             # TODO: After a redirect I'm still hitting here.
             # Need to figure out what is going on.
             self._finished = False
             return None
-
-    def get_data_connected(self):
-        return self.application
-
-    def get_firenado_template_path(self):
-        """Override to customize the firenado template path for each handler.
-
-        By default, we use the ``firenado_template_path`` application setting.
-        Return None to load templates relative to the calling file.
-        """
-        return self.application.settings.get('firenado_template_path')
-
-    def get_rooted_path(self, path):
-        from .util.url_util import rooted_path
-        root = firenado.conf.app['url_root_path']
-        return rooted_path(root, path)
 
     def get_template_path(self):
         """Override to customize template path for each handler.
@@ -480,6 +477,14 @@ class TornadoHandler(tornado.web.RequestHandler):
             return super(TornadoHandler, self).get_template_path()
         else:
             return self.component.get_template_path()
+
+    def get_firenado_template_path(self):
+        """Override to customize the firenado template path for each handler.
+
+        By default, we use the ``firenado_template_path`` application setting.
+        Return None to load templates relative to the calling file.
+        """
+        return self.application.settings.get('firenado_template_path')
 
     def create_template_loader(self, template_path):
         """Returns a new template loader for the given path.
@@ -497,6 +502,47 @@ class TornadoHandler(tornado.web.RequestHandler):
             kwargs['autoescape'] = settings['autoescape']
         return FirenadoComponentLoader(
             template_path, component=self.component, **kwargs)
+
+
+class WebUtilHandler:
+    """ Holds everything else related to web utilities.
+    """
+
+    def is_mobile(self):
+        from mobiledetect import MobileDetect
+        if 'User-Agent' in self.request.headers:
+            return MobileDetect(
+                useragent=self.request.headers['User-Agent']
+            ).is_mobile()
+        return False
+
+    def get_rooted_path(self, path):
+        from .util.url_util import rooted_path
+        root = firenado.conf.app['url_root_path']
+        return rooted_path(root, path)
+
+
+class TornadoHandler(ComponentHandler, TemplateHandler, WebUtilHandler,
+                     tornado.web.RequestHandler):
+    """ Base request handler to be used on a Firenado application.
+    It provides session and handles component paths.
+    """
+    def __init__(self, application, request, **kwargs):
+        ComponentHandler.__init__(self, **kwargs)
+        TemplateHandler.__init__(self)
+        tornado.web.RequestHandler.__init__(self, application, request,
+                                            **kwargs)
+
+
+class TornadoWebSocketHandler(ComponentHandler, TemplateHandler,
+                              WebUtilHandler,
+                              tornado.websocket.WebSocketHandler):
+
+    def __init__(self, application, request, **kwargs):
+        ComponentHandler.__init__(self, **kwargs)
+        TemplateHandler.__init__(self)
+        tornado.websocket.WebSocketHandler.__init__(
+            self, application, request, **kwargs)
 
 
 class FirenadoComponentLoader(Loader):
@@ -530,92 +576,3 @@ class FirenadoComponentLoader(Loader):
 
         return super(FirenadoComponentLoader,
                      self).resolve_path(name_resolved, parent_path)
-
-
-# TODO: We need to create a class to avoid those methods repeated here.
-class TornadoWebSocketHandler(tornado.websocket.WebSocketHandler):
-
-    def __init__(self, application, request, **kwargs):
-        self.component = None
-        self.__template_variables = dict()
-        super(TornadoWebSocketHandler, self).__init__(application,
-                                                      request, **kwargs)
-
-    def initialize(self, component):
-        self.component = component
-
-    def add_variable_to_template(self, name, variable):
-        """ Add a variable to a dict that will be added to the template during
-        the render or render_string execution.
-        """
-        self.__template_variables[name] = variable
-
-    @session.read
-    def prepare(self):
-        self.component.before_handler(self)
-
-    @session.write
-    def on_finish(self):
-        self.component.after_handler(self)
-
-    def render_string(self, template_name, **kwargs):
-        ignore_component = False
-        application_component = None
-        for key in ('ignore_component', 'component',):
-            if key in kwargs:
-                if key == 'ignore_component':
-                    ignore_component = kwargs[key]
-                if key == 'component':
-                    pass
-        kwargs['user_agent'] = self.user_agent if hasattr(
-            self, 'user_agent') else None
-        kwargs['credential'] = self.credential if hasattr(
-            self, 'credential') else None
-        for name, variable in iteritems(self.__template_variables):
-            kwargs[name] = variable
-        if self.ui:
-            return super(TornadoWebSocketHandler, self).render_string(
-                template_name, **kwargs)
-        else:
-            # TODO: After a redirect I'm still hitting here.
-            # Need to figure out what is going on.
-            self._finished = False
-            return None
-
-    def get_firenado_template_path(self):
-        """Override to customize the firenado template path for each handler.
-
-        By default, we use the ``firenado_template_path`` application setting.
-        Return None to load templates relative to the calling file.
-        """
-        return self.application.settings.get('firenado_template_path')
-
-    def get_template_path(self):
-        """Override to customize template path for each handler.
-
-        By default, we use the ``template_path`` application setting.
-        Return None to load templates relative to the calling file.
-        """
-        if self.component is None:
-            # This is the default behaviour provided by Tornado.
-            # No components on the request no fancy template path.
-            return super(TornadoWebSocketHandler, self).get_template_path()
-        else:
-            return self.component.get_template_path()
-
-    def create_template_loader(self, template_path):
-        """Returns a new template loader for the given path.
-
-        May be overridden by subclasses.  By default returns a
-        directory-based loader on the given path, using the
-        ``autoescape`` application setting.  If a ``template_loader``
-        application setting is supplied, uses that instead.
-        """
-        settings = self.application.settings
-        kwargs = {}
-        if 'autoescape' in settings:
-            # autoescape=None means "no escaping", so we have to be sure
-            # to only pass this kwarg if the user asked for it.
-            kwargs['autoescape'] = settings['autoescape']
-        return FirenadoComponentLoader(
-            template_path, component=self.component, **kwargs)
