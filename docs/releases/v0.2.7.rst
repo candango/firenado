@@ -1,0 +1,31 @@
+What's new in Firenado 0.2.7
+============================
+
+Mar 14, 2021
+------------
+
+We are pleased to announce the release of Firenado 0.2.7.
+
+Upgraded to Tornado 6.1. Python 2.7 and 3.5 are no longer supported.
+
+Significant refactory to unify TornadoHandler and TornadoWebSocketHandler
+logic.
+
+
+Here are the highlights:
+
+Bug Fixes
+~~~~~~~~~
+
+* Launcher won't launch on Windows with python 3.9. `#339 <https://github.com/candango/firenado/issues/339>`_
+
+New Features
+~~~~~~~~~~~~
+
+ * Upgrade tornado to 6.1. `#344 <https://github.com/candango/firenado/issues/344>`_
+ * Remove Python 2.7 and 3.5 from the support list. `#343 <https://github.com/candango/firenado/issues/343>`_
+
+Refactory
+~~~~~~~~~
+
+ * Unify TornadoHandler and TornadoWebSocketHandler logic. `#342 <https://github.com/candango/firenado/issues/342>`_
