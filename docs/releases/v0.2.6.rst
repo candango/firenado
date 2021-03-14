@@ -1,0 +1,14 @@
+What's new in Firenado 0.2.6
+============================
+
+Mar 14, 2021
+------------
+
+We are pleased to announce the release of Firenado 0.2.6.
+
+Here are the highlights:
+
+Bug Fixes
+~~~~~~~~~
+
+* Pyyaml conflict with cartola when installing 0.2.5. `#338 <https://github.com/candango/firenado/issues/338>`_
