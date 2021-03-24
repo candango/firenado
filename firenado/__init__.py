@@ -17,8 +17,6 @@
 
 """The Firenado Framework"""
 
-from __future__ import (absolute_import, division, print_function,
-                        with_statement)
 __author__ = "Flavio Garcia <piraz@candango.org>"
 __version__ = (0, 2, 7)
 __licence__ = "Apache License V2.0"

@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 #
-# Copyright 2015-2020 Flavio Garcia
+# Copyright 2015-2021 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@ from firenado.management import ManagementTask
 from firenado.util import argparse_util
 import logging
 import os
-from six import iteritems
 import sys
 
 logger = logging.getLogger(__name__)
@@ -37,9 +36,9 @@ class CreateProjectTask(ManagementTask):
             component = module.replace(".", " ").title().replace(" ", "")
             project_name = module.replace(".", "_").lower()
             project_directory = fs.create_module(module, os.getcwd())
-            #TODO: Check if project exists
-            #TODO: If doesn't exists create project
-            #TODO: If exists throw an error
+            # TODO: Check if project exists
+            # TODO: If doesn't exists create project
+            # TODO: If exists throw an error
             loader = template.Loader(os.path.join(firenado.conf.ROOT,
                                                   "management", "templates",
                                                   "project"))
@@ -48,13 +47,13 @@ class CreateProjectTask(ManagementTask):
             # Generating application firenado component and handlers
             fs.write(os.path.join(project_directory, "__init__.py"), "")
             fs.write(os.path.join(project_directory, "app.py"),
-                        project_init_content.decode(sys.stdout.encoding))
+                     project_init_content.decode(sys.stdout.encoding))
             handlers_file_name = os.path.join(project_directory, "handlers.py")
             fs.touch(handlers_file_name)
             project_handlers_content = loader.load("handlers.py.txt").generate(
                 handlers=["Index"])
             fs.write(handlers_file_name,
-                        project_handlers_content.decode(sys.stdout.encoding))
+                     project_handlers_content.decode(sys.stdout.encoding))
             # Generating configuration
             project_conf_directory = os.path.join(project_directory, "conf")
             os.mkdir(project_conf_directory)
@@ -64,10 +63,10 @@ class CreateProjectTask(ManagementTask):
             project_init_content = loader.load("firenado.yml.txt").generate(
                 app_name=project_name, module=module, component=component)
             fs.write(project_conf_file,
-                        project_init_content.decode(sys.stdout.encoding))
+                     project_init_content.decode(sys.stdout.encoding))
         else:
-            #TODO: This thing has to go. The parameter validation should be
-            #TODO: executed by the argument parser.
+            # TODO: This thing has to go. The parameter validation should be
+            # TODO: executed by the argument parser.
             loader = template.Loader(os.path.join(
                 firenado.conf.ROOT, "management", "templates", "help"))
             help_message = loader.load("init_command_help.txt").generate()
@@ -103,7 +102,7 @@ class InstallProjectTask(ManagementTask):
         # Firenado.
         from firenado.tornadoweb import TornadoApplication
         application = TornadoApplication()
-        for key, component in iteritems(application.components):
+        for key, component in application.components.items():
             component.install()
 
 
@@ -121,7 +120,7 @@ class RunApplicationTask(ManagementTask):
     on the it's project configuration
     """
     def run(self, namespace):
-        #TODO throw a custom error when type is not found
+        # TODO throw a custom error when type is not found
         from firenado.config import get_class_from_config
         parameters = {}
         if namespace.app is not None:

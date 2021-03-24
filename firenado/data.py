@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 #
-# Copyright 2015-2020 Flavio Goncalves Garcia
+# Copyright 2015-2021 Flavio Goncalves Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,18 +14,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import (absolute_import, division, print_function,
-                        with_statement)
-
 import errno
-import functools
 import firenado.conf
+import functools
 import importlib
 import logging
 import sys
-
-from six import string_types, text_type
-
 
 logger = logging.getLogger(__name__)
 
@@ -311,7 +305,7 @@ def configure_data_sources(data_sources, data_connected):
     :param data_connected: Data connected object where the data sources will
     be configured.
     """
-    if isinstance(data_sources, (string_types, text_type)):
+    if isinstance(data_sources, str):
         if data_sources in firenado.conf.data['sources']:
             logger.debug("Found data source [%s] in the list. Preceding with "
                          "the configuration process." % data_sources)
