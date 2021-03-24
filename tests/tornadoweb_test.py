@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright 2015-2020 Flavio Garcia
+# Copyright 2015-2021 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,9 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-from __future__ import (absolute_import, division, print_function,
-                        with_statement)
 
 import firenado.conf
 from firenado.tornadoweb import get_request, TornadoApplication, TornadoHandler
@@ -75,7 +72,7 @@ class ApplicationComponentTestCase(unittest.TestCase):
         """ Application configuration file will be read and components will be
         loaded.
         """
-        chdir_app('tornadoweb')
+        chdir_app("tornadoweb")
         self.application = TornadoApplication()
 
     def test_component_loaded(self):
@@ -133,7 +130,7 @@ class TornadoHandlerTestCase(unittest.TestCase):
         """ Application configuration file will be read and components will be
         loaded.
         """
-        chdir_app('tornadoweb')
+        chdir_app("tornadoweb")
         self.application = TornadoApplication()
 
     def test_authenticated(self):
@@ -179,7 +176,7 @@ class TornadoLaucherTestCase(unittest.TestCase):
         self.assertEqual(socket, launcher.socket)
 
     def test_load(self):
-        chdir_app('tornadoweb')
+        chdir_app("tornadoweb")
         launcher = TornadoLauncher()
         launcher.load()
         self.assertTrue(isinstance(launcher.application, TornadoApplication))

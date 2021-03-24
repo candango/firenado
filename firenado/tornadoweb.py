@@ -14,20 +14,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import (absolute_import, division, print_function,
-                        with_statement)
-
-from cartola import fs
+# The first two imports sequence matters
 import tornado.web
 import firenado.conf
+# Those imports are ok to move around
 from . import data
 from . import session
 from . import uimodules
 from .config import get_class_from_config, load_yaml_config_file
+from cartola import fs
 import inspect
 import logging
 import os
-from six import iteritems
 from tornado.httpclient import HTTPRequest
 from tornado.template import Loader
 import tornado.websocket
@@ -104,7 +102,7 @@ class TornadoApplication(tornado.web.Application, data.DataConnectedMixin,
         ui_modules = []
         data.configure_data_sources(firenado.conf.app['data']['sources'], self)
         self.__load_components()
-        for key, component in iteritems(self.components):
+        for key, component in self.components.items():
             component_handlers = component.get_handlers()
             for i in range(0, len(component_handlers)):
                 if issubclass(
@@ -172,7 +170,7 @@ class TornadoApplication(tornado.web.Application, data.DataConnectedMixin,
         """ Loads all enabled components registered from the components
         config section.
         """
-        for key, value in iteritems(firenado.conf.components):
+        for key, value in firenado.conf.components.items():
             if value['enabled']:
                 component_class = get_class_from_config(value)
                 self.components[key] = component_class(key, self)
@@ -191,7 +189,7 @@ class TornadoApplication(tornado.web.Application, data.DataConnectedMixin,
                                         self.components[key].get_config_file())
                                      )
         # Initializing enabled components after the load.
-        for key, value in iteritems(firenado.conf.components):
+        for key, value in firenado.conf.components.items():
             if value['enabled']:
                 self.components[key].initialize()
 
@@ -454,7 +452,7 @@ class TemplateHandler:
             self, 'user_agent') else None
         kwargs['credential'] = self.credential if hasattr(
             self, 'credential') else None
-        for name, variable in iteritems(self.template_variables):
+        for name, variable in self.template_variables.items():
             kwargs[name] = variable
         if self.ui:
             return super(TemplateHandler, self).render_string(
@@ -566,11 +564,11 @@ class FirenadoComponentLoader(Loader):
         logger.debug("Resolving template %s." % name)
         name_resolved = name
         if ':' in name:
-            nameX = name.split(':')
-            component_name = nameX[0]
+            name_x = name.split(':')
+            component_name = name_x[0]
             name_resolved = os.path.join(
                 self.component.application.components[
-                    component_name].get_template_path(), nameX[-1])
+                    component_name].get_template_path(), name_x[-1])
         if name != name_resolved:
             logger.debug("Template %s resolved at %s." % (name, name_resolved))
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright 2015-2020 Flavio Garcia
+# Copyright 2015-2021 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,25 +14,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import (absolute_import, division, print_function,
-                        with_statement)
-
 from cartola import fs
 import unittest
 import firenado.conf
+from importlib import reload
 from tests import chdir_app
 import logging
 import os
-import six
-
-if six.PY3:
-    try:
-        import importlib
-        reload = importlib.reload
-    except AttributeError:
-        # PY33
-        import imp
-        reload = imp.reload
 
 
 class ApplicationComponentTestCase(unittest.TestCase):

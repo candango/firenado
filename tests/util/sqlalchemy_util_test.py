@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright 2015-2020 Flavio Garcia
+# Copyright 2015-2021 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,9 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-from __future__ import (absolute_import, division, print_function,
-                        with_statement)
 
 from firenado.util.sqlalchemy_util import Base, base_to_dict
 from sqlalchemy import Column, String
@@ -71,8 +68,8 @@ class BaseToDictTestCase(unittest.TestCase):
         self.assertEqual(dict_from_base['username'], self.test_object.username)
         self.assertEqual(dict_from_base['first_name'],
                          self.test_object.first_name)
-        self.assertTrue('password' not in dict_from_base)
-        self.assertTrue('last_name' not in dict_from_base)
-        self.assertTrue('email' not in dict_from_base)
-        self.assertTrue('created' not in dict_from_base)
-        self.assertTrue('modified' not in dict_from_base)
+        self.assertTrue("password" not in dict_from_base)
+        self.assertTrue("last_name" not in dict_from_base)
+        self.assertTrue("email" not in dict_from_base)
+        self.assertTrue("created" not in dict_from_base)
+        self.assertTrue("modified" not in dict_from_base)

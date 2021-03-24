@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright 2015-2019 Flavio Garcia
+# Copyright 2015-2021 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,9 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-from __future__ import (absolute_import, division, print_function,
-                        with_statement)
 
 from firenado import security
 import unittest
@@ -64,7 +61,7 @@ class SecurityTestCase(unittest.TestCase):
         self.assertEqual(self.handler.status, 200)
         self.assertEqual(self.handler.response, None)
 
-        self.handler.request.headers.pop('X-Requested-With')
+        self.handler.request.headers.pop("X-Requested-With")
         self.handler.get_only_xhr()
         self.assertEqual(self.handler.status, 403)
         self.assertEqual(self.handler.response, "This is a XMLHttpRequest "

@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 #
-# Copyright 2015-2020 Flavio Garcia
+# Copyright 2015-2021 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ from .tornadoweb import TornadoComponent
 from cartola import config, sysexits
 from datetime import datetime, timedelta
 import logging
-from six import iteritems
 import sys
 import tornado.ioloop
 
@@ -78,7 +77,7 @@ class Scheduler(object):
 
     @property
     def jobs(self):
-        return [job for _, job in iteritems(self._jobs)]
+        return [job for _, job in self._jobs.items()]
 
     @property
     def name(self):
@@ -124,7 +123,7 @@ class Scheduler(object):
 
     def _manage_jobs(self):
         logger.debug("Scheduler [id: %s, name: %s] managing jobs." %
-                    (self.id, self.name))
+                     (self.id, self.name))
         logger.debug("Scheduler [id: %s, name: %s] stopping periodic callback."
                      % (self.id, self.name))
         self._periodic_callback.stop()
@@ -142,10 +141,10 @@ class Scheduler(object):
             else:
                 logger.debug("Job %s from Scheduler [id: %s, name: %s] already"
                              "scheduled." % (job.hard_id, self.id,
-                                                self.name))
+                                             self.name))
 
         logger.debug("Scheduler [id: %s, name: %s] ending of managing jobs." %
-                    (self.id, self.name))
+                     (self.id, self.name))
         logger.debug("Scheduler [id: %s, name: %s] starting periodic callback."
                      % (self.id, self.name))
         self._periodic_callback.start()
@@ -329,7 +328,7 @@ class ScheduledTornadoComponent(TornadoComponent):
 
     @property
     def schedulers(self):
-        return [schedule for _, schedule in iteritems(self._schedulers)]
+        return [schedule for _, schedule in self._schedulers.items()]
 
     def get_config_filename(self):
         return "%s_%s" % (self.name, "schedule")

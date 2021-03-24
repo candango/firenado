@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 #
-# Copyright 2015-2020 Flavio Garcia
+# Copyright 2015-2021 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,21 +16,11 @@
 
 from cartola import sysexits
 import firenado.conf
+from importlib import reload
 import logging
 import os
-import six
-from six import iteritems
 import sys
 from tornado import gen
-
-if six.PY3:
-    try:
-        import importlib
-        reload = importlib.reload
-    except AttributeError:
-        # PY33
-        import imp
-        reload = imp.reload
 
 logger = logging.getLogger(__name__)
 
@@ -93,7 +83,6 @@ class ProcessLauncher(FirenadoLauncher):
         self.response = None
 
     def load(self):
-        sys.base_exec_prefix
         firenado_script = os.path.join(firenado.conf.ROOT, "bin",
                                        "firenado-cli.py")
         self.command = "%s %s app run" % (sys.executable, firenado_script)
@@ -287,7 +276,7 @@ class TornadoLauncher(FirenadoLauncher):
             logger.info("main process (pid %s): stopping http server" % pid)
         else:
             logger.info("child %s (pid %s): stopping http server" % (tid, pid))
-        for key, component in iteritems(self.application.components):
+        for key, component in self.application.components.items():
             component.shutdown()
         self.http_server.stop()
 
