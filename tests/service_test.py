@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright 2015-2019 Flavio Garcia
+# Copyright 2015-2021 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,13 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import (absolute_import, division, print_function,
-                        with_statement)
-
-import unittest
-
 from firenado.data import DataConnectedMixin
 from firenado.service import served_by, FirenadoService
+import unittest
 
 
 class MockServiceDataConnected(FirenadoService):
