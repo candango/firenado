@@ -163,12 +163,17 @@ class SqlalchemyConnector(Connector):
         engine_params = {
             'isolation_level': "READ UNCOMMITTED"
         }
+
         if "backend" in config:
             if config['backend'] == 'mysql':
                 # Setting connection default connection timeout for mysql
                 # backends as suggested on http://bit.ly/2bvOLxs
                 # TODO: ignore this if pool_recycle is defined on config
                 engine_params['pool_recycle'] = 3600
+
+        if "future" in config:
+            if config['future']:
+                engine_params['future'] = True
 
         if "session" in config:
             if "autoflush" in config['session']:
@@ -249,7 +254,6 @@ class SqlalchemyConnector(Connector):
 
     def get_a_session(self, autoflush=True, autocommit=False,
                       expire_on_commit=True, info=None):
-
         from firenado.util.sqlalchemy_util import Session
         Session.configure(bind=self.__engine, autoflush=autoflush,
                           autocommit=autocommit,
@@ -274,7 +278,7 @@ class SqlalchemyConnector(Connector):
         }
         for key in config:
             # TODO Handle other properties and create the url if needed.
-            if key in ['url', 'session']:
+            if key in ["url", "session", "future"]:
                 db_config[key] = config[key]
         # TODO: Handler errors here
         db_config['backend'] = db_config['url'].split(':')[0].split('+')[0]
