@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from cartola.config import load_yaml_file
 import firenado.config as _config
 import logging
 import os
@@ -135,15 +136,15 @@ session['redis']['data']['source'] = ""
 session['type'] = ""
 
 if HAS_LIB_CONFIG_FILE:
-    lib_config = _config.load_yaml_config_file(LIB_CONFIG_FILE)
+    lib_config = load_yaml_file(LIB_CONFIG_FILE)
     _config.process_config(sys.modules[__name__], lib_config)
 
 if HAS_SYS_CONFIG_FILE:
-    sys_config = _config.load_yaml_config_file(SYS_CONFIG_FILE)
+    sys_config = load_yaml_file(SYS_CONFIG_FILE)
     _config.process_config(sys.modules[__name__], sys_config)
 
 if HAS_APP_CONFIG_FILE:
-    app_config = _config.load_yaml_config_file(APP_CONFIG_FILE)
+    app_config = load_yaml_file(APP_CONFIG_FILE)
     _config.process_app_config(sys.modules[__name__], app_config)
 
 # Set logging basic configurations

@@ -58,7 +58,6 @@ class SqlalchemyConnectorTestCase(unittest.TestCase):
                                                  self.data_connected_instance)
         self.assertTrue(isinstance(data_source.engine, base_engine.Engine))
 
-
     def test_engine_future(self):
         """ Test if the engine created will be the future one if future is set
         as True in the data source configuration. """
