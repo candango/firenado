@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 #
-# Copyright 2015-2019 Flavio Garcia
+# Copyright 2015-2021 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,12 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import (absolute_import, division, print_function,
-                        with_statement)
-
 import functools
 import importlib
-from six import string_types
 
 
 class FirenadoService(object):
@@ -81,7 +77,7 @@ def served_by(service, attribute_name=None):
     def f_wrapper(method):
         @functools.wraps(method)
         def wrapper(self, *args, **kwargs):
-            if isinstance(service, string_types):
+            if isinstance(service, str):
                 service_x = service.split('.')
                 service_module = importlib.import_module(
                     '.'.join(service_x[:-1]))

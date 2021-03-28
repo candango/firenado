@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 #
-# Copyright 2015-2020 Flavio Goncalves Garcia
+# Copyright 2015-2021 Flavio Goncalves Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,18 +14,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import (absolute_import, division, print_function,
-                        with_statement)
-
+from cartola import config
 import errno
-import functools
 import firenado.conf
-import importlib
+import functools
 import logging
 import sys
-
-from six import string_types, text_type
-
 
 logger = logging.getLogger(__name__)
 
@@ -87,7 +81,7 @@ class Connector(object):
         """
         return None
 
-    def process_config(self, config):
+    def process_config(self, conf):
         """ Parse the configuration data provided by the firenado.conf engine.
         """
         return {}
@@ -107,14 +101,14 @@ class RedisConnector(Connector):
         self.__connection = None
         super(RedisConnector, self).__init__(data_connected)
 
-    def configure(self, config):
-        logger.info("Connecting to redis using the configuration: %s.", config)
+    def configure(self, conf):
+        logger.info("Connecting to redis using the configuration: %s.", conf)
         import redis
-        redis_config = dict()
-        redis_config.update(config)
-        redis_config.pop("connector")
+        redis_conf = dict()
+        redis_conf.update(conf)
+        redis_conf.pop("connector")
         # TODO Handle connection error
-        self.__connection = redis.Redis(**redis_config)
+        self.__connection = redis.Redis(**redis_conf)
         try:
             self.__connection.ping()
         except redis.ConnectionError as error:
@@ -124,19 +118,19 @@ class RedisConnector(Connector):
     def get_connection(self):
         return self.__connection
 
-    def process_config(self, config):
-        db_config = {
+    def process_config(self, conf):
+        db_conf = {
             'connector': 'redis',
             'host': 'localhost',
             'port': 6379,
             'db': 0,
         }
-        for key in config:
+        for key in conf:
             if key in ['db', 'host', 'port']:
                 if key in ['db', 'port']:
-                    db_config[key] = int(config[key])
-                db_config[key] = config[key]
-        return db_config
+                    db_conf[key] = int(conf[key])
+                db_conf[key] = conf[key]
+        return db_conf
 
 
 class SqlalchemyConnector(Connector):
@@ -159,38 +153,53 @@ class SqlalchemyConnector(Connector):
         }
         self.__engine = None
 
-    def configure(self, config):
+    def configure(self, conf):
         from sqlalchemy import create_engine
         from sqlalchemy import exc, event, select
         # We will set the isolation level to READ UNCOMMITTED by default
         # to avoid the "cache" effect sqlalchemy has without this option.
         # Solution from: http://bit.ly/2bDq0Nv
-        # TODO: Get the isolation level from data source config
+        # TODO: Get the isolation level from data source conf
         engine_params = {
             'isolation_level': "READ UNCOMMITTED"
         }
-        if "backend" in config:
-            if config['backend'] == 'mysql':
+
+        if "backend" in conf:
+            if conf['backend'] == 'mysql':
                 # Setting connection default connection timeout for mysql
                 # backends as suggested on http://bit.ly/2bvOLxs
-                # TODO: ignore this if pool_recycle is defined on config
+                # TODO: ignore this if pool_recycle is defined on conf
                 engine_params['pool_recycle'] = 3600
 
-        if "session" in config:
-            if "autoflush" in config['session']:
-                self.__connection['session']['autoflush'] = config[
-                    'session']['autoflush']
-            if "autocommit" in config['session']:
-                self.__connection['session']['autocommit'] = config[
-                    'session']['autocommit']
-            if "expire_on_commit" in config['session']:
-                self.__connection['session']['expire_on_commit'] = config[
-                    'session']['expire_on_commit']
-            if "info" in config['session']:
-                self.__connection['session']['info'] = config['session'][
-                    'info']
+        if "future" in conf:
+            if conf['future']:
+                engine_params['future'] = True
 
-        self.__engine = create_engine(config['url'], **engine_params)
+        if "pool" in conf:
+            if "size" in conf['pool']:
+                engine_params['pool_size'] = conf['pool']['size']
+            if "max_overflow" in conf['pool']:
+                engine_params['max_overflow'] = conf['pool']['max_overflow']
+            if "class" in conf['pool']:
+                engine_params['pool_class'] = conf['pool']['class']
+                if isinstance(engine_params['pool_class'], str):
+                    engine_params['pool_class'] = config.get_from_string(
+                        engine_params['pool_class'])
+
+        if "session" in conf:
+            if "autoflush" in conf['session']:
+                self.__connection['session']['autoflush'] = conf['session'][
+                    'autoflush']
+            if "autocommit" in conf['session']:
+                self.__connection['session']['autocommit'] = conf['session'][
+                    'autocommit']
+            if "expire_on_commit" in conf['session']:
+                self.__connection['session']['expire_on_commit'] = conf[
+                    'session']['expire_on_commit']
+            if "info" in conf['session']:
+                self.__connection['session']['info'] = conf['session']['info']
+
+        self.__engine = create_engine(conf['url'], **engine_params)
 
         @event.listens_for(self.__engine, "engine_connect")
         def ping_connection(connection, branch):
@@ -239,7 +248,7 @@ class SqlalchemyConnector(Connector):
 
         logger.info("Connecting to the database using the engine: %s.",
                     self.__engine)
-        self.__connection['backend'] = config['backend']
+        self.__connection['backend'] = conf['backend']
         # will just happen during the handler execution
 
     def get_connection(self):
@@ -255,7 +264,6 @@ class SqlalchemyConnector(Connector):
 
     def get_a_session(self, autoflush=True, autocommit=False,
                       expire_on_commit=True, info=None):
-
         from firenado.util.sqlalchemy_util import Session
         Session.configure(bind=self.__engine, autoflush=autoflush,
                           autocommit=autocommit,
@@ -274,33 +282,33 @@ class SqlalchemyConnector(Connector):
     def session(self):
         return self.get_a_session()
 
-    def process_config(self, config):
-        db_config = {
+    def process_config(self, conf):
+        db_conf = {
             'type': 'sqlalchemy',
         }
-        for key in config:
+        for key in conf:
             # TODO Handle other properties and create the url if needed.
-            if key in ['url', 'session']:
-                db_config[key] = config[key]
+            if key in ["future", "pool" "session", "url"]:
+                db_conf[key] = conf[key]
         # TODO: Handler errors here
-        db_config['backend'] = db_config['url'].split(':')[0].split('+')[0]
-        return db_config
+        db_conf['backend'] = db_conf['url'].split(':')[0].split('+')[0]
+        return db_conf
 
 
-def config_to_data_source(config, data_connected):
-    """ Convert a data source config to it's respective data source. We need
+def config_to_data_source(conf, data_connected):
+    """ Convert a data source conf to it's respective data source. We need
     a data connected to use while instantiating the data source.
-    :param config: A data source configuration item
+    :param conf: A data source confuration item
     :param data_connected: A data connected object
     :return: Connector
     """
-    connector_config = firenado.conf.data['connectors'][
-        config['connector']]
-    module = importlib.import_module(connector_config['module'])
-    handler_class = getattr(module, connector_config['class'])
+    connector_conf = firenado.conf.data['connectors'][conf['connector']]
+    # TODO: Test if handler was returned None. An error occurred.
+    handler_class = config.get_from_module(connector_conf['module'],
+                                           connector_conf['class'])
     data_source_instance = handler_class(data_connected)
-    config = data_source_instance.process_config(config)
-    data_source_instance.configure(config)
+    conf = data_source_instance.process_config(conf)
+    data_source_instance.configure(conf)
     return data_source_instance
 
 
@@ -311,12 +319,12 @@ def configure_data_sources(data_sources, data_connected):
     :param data_connected: Data connected object where the data sources will
     be configured.
     """
-    if isinstance(data_sources, (string_types, text_type)):
+    if isinstance(data_sources, str):
         if data_sources in firenado.conf.data['sources']:
             logger.debug("Found data source [%s] in the list. Preceding with "
                          "the configuration process." % data_sources)
-            config = firenado.conf.data['sources'][data_sources]
-            data_source_instance = config_to_data_source(config,
+            conf = firenado.conf.data['sources'][data_sources]
+            data_source_instance = config_to_data_source(conf,
                                                          data_connected)
             data_connected.set_data_source(data_sources, data_source_instance)
         else:

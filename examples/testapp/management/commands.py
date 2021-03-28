@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright 2015-2018 Flavio Garcia
+# Copyright 2015-2021 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,17 +14,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import (absolute_import, division,
-                        print_function, with_statement)
-
 from . import tasks
 from firenado.management import ManagementCommand
 from tornado import template
 import os
 
 TESTAPP_ROOT = os.path.realpath(os.path.join(os.path.dirname(__file__), ".."))
-
-
 loader = template.Loader(os.path.join(TESTAPP_ROOT, "templates", "management"))
 
 

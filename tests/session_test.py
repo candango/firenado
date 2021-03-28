@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright 2015-2020 Flavio Garcia
+# Copyright 2015-2021 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,15 +14,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import (absolute_import, division, print_function,
-                        with_statement)
-
-import unittest
-
 import firenado.conf
 from firenado.config import get_class_from_config
-from tests import chdir_app
 from firenado.tornadoweb import TornadoApplication
+from tests import chdir_app
+import unittest
 
 
 class FileSessionTestCase(unittest.TestCase):
@@ -34,7 +30,7 @@ class FileSessionTestCase(unittest.TestCase):
         """ Application configuration file will be read and components will be
         loaded.
         """
-        chdir_app('file', 'session')
+        chdir_app("file", "session")
         self.application = TornadoApplication()
         self.session_handler_config = firenado.conf.session[
             'handlers'][firenado.conf.session['type']]
@@ -80,14 +76,14 @@ class RedisSessionTestCase(unittest.TestCase):
         """ Application configuration file will be read and components will be
         loaded.
         """
-        chdir_app('redis', 'session')
+        chdir_app("redis", "session")
 
     def test_session_type_redis(self):
         """ Checks if test component was loaded correctly by the application
         __init__ method.
         """
         self.assertEqual(firenado.conf.session['enabled'], True)
-        self.assertEqual(firenado.conf.session['type'], 'redis')
+        self.assertEqual(firenado.conf.session['type'], "redis")
 
     def test_custom_session_parameters(self):
         """ Checks default session parameters on the configuration

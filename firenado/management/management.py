@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 #
-# Copyright 2015-2019 Flavio Garcia
+# Copyright 2015-2021 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,9 +15,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import (absolute_import, division,
-                        print_function, with_statement)
-
 import argparse
 import firenado.conf
 from firenado.util.argparse_util import FirenadoArgumentError
@@ -25,7 +22,6 @@ from firenado.util.argparse_util import FirenadoArgumentParser
 import logging
 import os
 import sys
-from six import iteritems
 from tornado import template
 
 logger = logging.getLogger(__name__)
@@ -98,7 +94,7 @@ def command_exists(command):
     """ Check if the given command was registered. In another words if it
     exists.
     """
-    for category, commands in iteritems(command_categories):
+    for category, commands in command_categories.items():
         for existing_command in commands:
             if existing_command.match(command):
                 return True
@@ -108,7 +104,7 @@ def command_exists(command):
 def run_command(command, args):
     """ Run all tasks registered in a command.
     """
-    for category, commands in iteritems(command_categories):
+    for category, commands in command_categories.items():
         for existing_command in commands:
             if existing_command.match(command):
                 existing_command.run(args)

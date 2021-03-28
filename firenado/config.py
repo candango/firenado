@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 #
-# Copyright 2015-2020 Flavio Garcia
+# Copyright 2015-2021 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
 # limitations under the License.
 
 from cartola import sysexits
-import yaml
+from cartola.config import load_yaml_file
 import logging
 import os
 
@@ -155,18 +155,6 @@ def get_class_from_config(config, index="class"):
     return get_class_from_module(config['module'], config[index])
 
 
-def load_yaml_config_file(path):
-    """ Returns the parsed structure from a yaml config file.
-
-    :param path: Path where the yaml file is located.
-    :return: The yaml configuration represented by the yaml file.
-    """
-    result = None
-    with open(path, 'r') as steam:
-        result = yaml.safe_load(steam)
-    return result
-
-
 def process_config(config, config_data):
     """ Populates config with data from the configuration data dict. It handles
     components, data, log, management and session sections from the
@@ -242,7 +230,7 @@ def process_apps_config_session(config, apps_config):
                                     "your apps definition and inform a valid "
                                     "file." % file)
                     sysexits.exit_fatal(sysexits.EX_CONFIG)
-                file_app_config = load_yaml_config_file(file)
+                file_app_config = load_yaml_file(file)
                 if "app" in file_app_config:
                     process_app_config_section(config.apps[name],
                                                file_app_config['app'])
@@ -365,7 +353,7 @@ def process_data_config_section(config, data_config):
 def process_data_sources_config_file(config, file):
     if not os.path.isabs(file):
         file = os.path.join(config.APP_CONFIG_PATH, file)
-        sources_config = load_yaml_config_file(file)
+        sources_config = load_yaml_file(file)
         process_data_sources_config(config, sources_config)
 
 

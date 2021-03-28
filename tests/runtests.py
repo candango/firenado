@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright 2015-2020 Flavio Garcia
+# Copyright 2015-2021 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,12 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import (absolute_import, division, print_function,
-                        with_statement)
-
 import unittest
-from tests import (components_test, conf_test, config_test, security_test,
-                   service_test, session_test, tornadoweb_test)
+from tests import (components_test, conf_test, config_test, data_test,
+                   security_test, service_test, session_test, tornadoweb_test)
 from tests.util import sqlalchemy_util_test, url_util_test
 
 
@@ -29,6 +26,7 @@ def suite():
     alltests.addTests(testLoader.loadTestsFromModule(components_test))
     alltests.addTests(testLoader.loadTestsFromModule(conf_test))
     alltests.addTests(testLoader.loadTestsFromModule(config_test))
+    alltests.addTests(testLoader.loadTestsFromModule(data_test))
     alltests.addTests(testLoader.loadTestsFromModule(security_test))
     alltests.addTests(testLoader.loadTestsFromModule(service_test))
     alltests.addTests(testLoader.loadTestsFromModule(session_test))

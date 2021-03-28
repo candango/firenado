@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 #
-# Copyright 2015-2020 Flavio Garcia
+# Copyright 2015-2021 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ from .tornadoweb import TornadoComponent
 from cartola import config, sysexits
 from datetime import datetime, timedelta
 import logging
-from six import iteritems
 import sys
 import tornado.ioloop
 
@@ -78,7 +77,7 @@ class Scheduler(object):
 
     @property
     def jobs(self):
-        return [job for _, job in iteritems(self._jobs)]
+        return [job for _, job in self._jobs.items()]
 
     @property
     def name(self):
@@ -89,8 +88,8 @@ class Scheduler(object):
         return self._can_run
 
     def add_job(self, job):
-        logger.info("Adding job %s into the scheduler [id: %s, name: %s]." %
-                    (job.id, self.id, self.name))
+        logger.debug("Adding job %s into the scheduler [id: %s, name: %s]." %
+                     (job.id, self.id, self.name))
         self._jobs[job.id] = job
 
     def get_job(self, job_id):
@@ -99,15 +98,15 @@ class Scheduler(object):
     def initialize(self, **kwargs):
         self._id = kwargs.get("id")
         self._name = kwargs.get("name")
-        logger.info("Initializing scheduler [id: %s, name: %s]." % (
+        logger.debug("Initializing scheduler [id: %s, name: %s]." % (
             self.id, self.name))
 
     def load_jobs(self):
         raise NotImplementedError
 
     def remove_job(self, job_id):
-        logger.info("Removing job %s from the scheduler [id: %s, name: %s]."
-                    % (job_id, self.id, self.name))
+        logger.debug("Removing job %s from the scheduler [id: %s, name: %s]."
+                     % (job_id, self.id, self.name))
         job = self.get_job(job_id)
         if job is None:
             return None
@@ -116,25 +115,25 @@ class Scheduler(object):
 
     def run(self):
         self.load_jobs()
-        logger.info("Scheduler [id: %s, name: %s] interval set to %sms." %
-                    (self.id, self.name, self._interval))
+        logger.debug("Scheduler [id: %s, name: %s] interval set to %sms." %
+                     (self.id, self.name, self._interval))
         self._periodic_callback = tornado.ioloop.PeriodicCallback(
             self._manage_jobs, self._interval)
         self._periodic_callback.start()
 
     def _manage_jobs(self):
         logger.debug("Scheduler [id: %s, name: %s] managing jobs." %
-                    (self.id, self.name))
+                     (self.id, self.name))
         logger.debug("Scheduler [id: %s, name: %s] stopping periodic callback."
                      % (self.id, self.name))
         self._periodic_callback.stop()
         for job in self.jobs:
             if not job.already_scheduled:
-                logger.info("Job %s from Scheduler [id: %s, name: %s] isn't "
-                            "scheduled yet." % (job.hard_id, self.id,
-                                                self.name))
+                logger.debug("Job %s from Scheduler [id: %s, name: %s] isn't "
+                             "scheduled yet." % (job.hard_id, self.id,
+                                                 self.name))
                 if job.must_schedule:
-                    logger.info(
+                    logger.debug(
                         "Job %s from Scheduler [id: %s, name: %s] must be "
                         "scheduled to run at %s." % (
                             job.hard_id, self.id, self.name, job.next_run))
@@ -142,10 +141,10 @@ class Scheduler(object):
             else:
                 logger.debug("Job %s from Scheduler [id: %s, name: %s] already"
                              "scheduled." % (job.hard_id, self.id,
-                                                self.name))
+                                             self.name))
 
         logger.debug("Scheduler [id: %s, name: %s] ending of managing jobs." %
-                    (self.id, self.name))
+                     (self.id, self.name))
         logger.debug("Scheduler [id: %s, name: %s] starting periodic callback."
                      % (self.id, self.name))
         self._periodic_callback.start()
@@ -281,11 +280,11 @@ class ScheduledJob(object):
 
     def schedule(self):
         next_interval = self.next_interval
-        logger.info("Job %s from Scheduler [id: %s, name: %s] scheduled to run"
-                    " at next interval of %sms." % (self.hard_id,
-                                                    self._scheduler.id,
-                                                    self._scheduler.name,
-                                                    self.next_interval))
+        logger.debug("Job %s from Scheduler [id: %s, name: %s] scheduled to "
+                     "run at next interval of %sms." % (self.hard_id,
+                                                        self._scheduler.id,
+                                                        self._scheduler.name,
+                                                        self.next_interval))
         self._periodic_callback = tornado.ioloop.PeriodicCallback(
             self._run_job, next_interval)
         self._periodic_callback.start()
@@ -295,7 +294,7 @@ class ScheduledJob(object):
         :return None:
         """
         self._periodic_callback.stop()
-        logger.info(
+        logger.debug(
             "Running job %s from Scheduler [id: %s, name: %s]." % (
                 self.hard_id, self._scheduler.id, self._scheduler.name))
         future = self.run()
@@ -305,7 +304,7 @@ class ScheduledJob(object):
                 "asynchronously. " % (self.hard_id, self._scheduler.id,
                                       self._scheduler.name))
             await future
-        logger.info(
+        logger.debug(
             "Job %s removed from Scheduler [id: %s, name: %s]" % (
                 self.hard_id, self._scheduler.id, self._scheduler.name))
         self._periodic_callback = None
@@ -329,7 +328,7 @@ class ScheduledTornadoComponent(TornadoComponent):
 
     @property
     def schedulers(self):
-        return [schedule for _, schedule in iteritems(self._schedulers)]
+        return [schedule for _, schedule in self._schedulers.items()]
 
     def get_config_filename(self):
         return "%s_%s" % (self.name, "schedule")
@@ -342,10 +341,10 @@ class ScheduledTornadoComponent(TornadoComponent):
     def _config_schedule_component(self):
         if "interval" in self.schedule_conf():
             self._interval = self.conf['interval']
-        logger.info("Scheduled component %s interval set to %sms." %
-                    (self.name, self._interval))
+        logger.debug("Scheduled component %s interval set to %sms." %
+                     (self.name, self._interval))
         if "schedulers" in self.schedule_conf():
-            logger.info("Initializing %s schedulers." % self.name)
+            logger.debug("Initializing %s schedulers." % self.name)
             self._initialize_schedulers()
         else:
             logger.warning("No scheduler was defined in the scheduled "
@@ -370,8 +369,8 @@ class ScheduledTornadoComponent(TornadoComponent):
 
     def initialize(self):
         if self.has_conf:
-            logger.info("Configuration file found. Starting scheduled "
-                        "component %s initialization." % self.name)
+            logger.debug("Configuration file found. Starting scheduled "
+                         "component %s initialization." % self.name)
             self._config_schedule_component()
         else:
             logger.warning("No configuration file was found. Scheduled"

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright 2015-2020 Flavio Garcia
+# Copyright 2015-2021 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,20 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import (absolute_import, division, print_function,
-                        with_statement)
-
+from importlib import reload
 import os
-import six
 
-if six.PY3:
-    try:
-        import importlib
-        reload = importlib.reload
-    except AttributeError:
-        # PY33
-        import imp
-        reload = imp.reload
 
 TEST_ROOT = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = os.path.abspath(os.path.join(TEST_ROOT, ".."))
@@ -51,20 +40,21 @@ def chdir_fixture_app(app_name, **kwargs):
     return test_app_dirname
 
 
-def chdir_app(app_name, dir_name=None):
+def chdir_app(app_name, dir=None):
     """ Change to the application directory located at the resource directory
     for conf tests.
 
     The conf resources directory is firenado/tests/resources/conf.
 
     :param app_name: The application name
+    :param dir: The directory to be changed
     """
     import firenado.conf
 
     test_dirname, filename = os.path.split(os.path.abspath(__file__))
-    if dir_name:
+    if dir:
         test_app_dirname = os.path.join(test_dirname, 'resources',
-                                        dir_name, app_name)
+                                        dir, app_name)
     else:
         test_app_dirname = os.path.join(test_dirname, 'resources', app_name)
     os.chdir(test_app_dirname)
