@@ -14,20 +14,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# The first two imports sequence matters
-import tornado.web
-import firenado.conf
-# Those imports are ok to move around
 from . import data
 from . import session
 from . import uimodules
-from .config import get_class_from_config, load_yaml_config_file
+from .config import get_class_from_config
 from cartola import fs
+from cartola.config import load_yaml_file
+import firenado.conf
 import inspect
 import logging
 import os
 from tornado.httpclient import HTTPRequest
 from tornado.template import Loader
+import tornado.web
 import tornado.websocket
 from typing import Any
 
@@ -159,7 +158,9 @@ class TornadoApplication(tornado.web.Application, data.DataConnectedMixin,
         logger.debug("Checking if session is enabled.")
         if firenado.conf.session['enabled']:
             logger.debug("Session is enabled. Starting session engine.")
-            self.session_engine
+            # This is forcing the session engine to be created from the get-go
+            # an assert will be use to call it and check if is not none.
+            assert self.session_engine is not None
         else:
             logger.debug("Session is disabled.")
 
@@ -177,8 +178,7 @@ class TornadoApplication(tornado.web.Application, data.DataConnectedMixin,
                 if self.components[key].get_config_file():
                     filename = self.components[key].get_complete_config_file()
                     if filename is not None:
-                        self.components[key].conf = load_yaml_config_file(
-                            filename)
+                        self.components[key].conf = load_yaml_file(filename)
                         self.components[key].process_config()
                         self.components[key].has_conf = True
                     else:
