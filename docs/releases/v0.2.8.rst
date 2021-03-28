@@ -1,0 +1,31 @@
+What's new in Firenado 0.2.8
+============================
+
+Mar 27, 2021
+------------
+
+We are pleased to announce the release of Firenado 0.2.8.
+
+Removed six from the project directly. Some other packages(like croniter) may
+depend on six but our logic is tied to python 3 at this point. It was also
+removed `import from __future__` as python 2.7 support was removed.
+
+The dynamic configuration is being handled by cartola.config and logging from
+scheduler level was changed to debug instead of info.
+
+As sqlalchemy was changed to 1.4.3 we added the future parameter to the data
+source configuration to make it possible port application to the 2.0 style.
+
+Here are the highlights:
+
+New Features
+~~~~~~~~~~~~
+
+ * Add future parameter to the sqlalchemy data source data feature. `#354 <https://github.com/candango/firenado/issues/354>`_
+
+Refactory
+~~~~~~~~~
+
+ * Remove six from the project refactory. `#352 <https://github.com/candango/firenado/issues/352>`_
+ * Handle dinamic configuration from yaml files using cartola.config. `#355 <https://github.com/candango/firenado/issues/355>`_
+ * Change logging from in the schedule to debug instead of info. `#356 <https://github.com/candango/firenado/issues/356>`_
