@@ -15,7 +15,7 @@
 # limitations under the License.
 
 from cartola import sysexits
-from cartola.config import load_yaml_file
+from cartola.config import load_yaml_file, log_level_from_string
 import logging
 import os
 
@@ -61,31 +61,6 @@ def get_app_defaults():
     # Wait before shutdown is on seconds
     app['wait_before_shutdown'] = 0
     return app
-
-
-def log_level_from_string(str_level):
-    """ Returns the proper log level core based on a given string
-
-    :param str_level: Log level string
-    :return: The log level code
-    """
-    levels = {
-        'CRITICAL': logging.CRITICAL,
-        'ERROR': logging.ERROR,
-        'WARNING': logging.WARNING,
-        'INFO': logging.INFO,
-        'DEBUG': logging.DEBUG,
-        'NOTSET': logging.NOTSET,
-    }
-    try:
-        return levels[str_level.upper()]
-    except KeyError:
-        pass
-    except AttributeError:
-        if str_level in [logging.DEBUG, logging.INFO, logging.WARNING,
-                         logging.ERROR, logging.CRITICAL]:
-            return str_level
-    return logging.NOTSET
 
 
 def get_config_from_package(package):
