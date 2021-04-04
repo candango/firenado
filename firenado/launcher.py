@@ -57,6 +57,17 @@ class FirenadoLauncher(object):
                         real_pythonpaths.append(path.strip())
         sys.path = real_pythonpaths
         os.environ['PYTHONPATH'] = ":".join(real_pythonpaths)
+        if self.dir is not None:
+            os.chdir(self.dir)
+        if self.app is not None or self.dir is not None:
+            reload(firenado.conf)
+
+        # Set logging basic configurations
+        for handler in logging.root.handlers[:]:
+            # clearing loggers, solution from: https://bit.ly/2yTchyx
+            logging.root.removeHandler(handler)
+        logging.basicConfig(level=firenado.conf.log['level'],
+                            format=firenado.conf.log['format'])
 
     def load(self):
         return None
@@ -152,10 +163,6 @@ class TornadoLauncher(FirenadoLauncher):
         super(TornadoLauncher, self).__init__(**settings)
         self.http_server = None
         self.application = None
-        if self.dir is not None:
-            os.chdir(self.dir)
-        if self.app is not None or self.dir is not None:
-            reload(firenado.conf)
         self.MAX_WAIT_SECONDS_BEFORE_SHUTDOWN = firenado.conf.app[
             'wait_before_shutdown']
         if self.addresses is None or self.addresses == ['']:

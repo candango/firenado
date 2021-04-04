@@ -1,0 +1,20 @@
+What's new in Firenado 0.2.9
+============================
+
+Apr 03, 2021
+------------
+
+We are pleased to announce the release of Firenado 0.2.9.
+
+Logging basic configuration will be executed in the launcher instead of the
+import of `firenado.conf`. This will make it easier to evolve logging
+functionalities and fix some undesired behaviours caused by all logging logic
+being handled in `firenado.conf`.
+
+Here are the highlights:
+
+Refactory
+~~~~~~~~~
+
+ * Move log handling to the launcher. `#361 <https://github.com/candango/firenado/issues/361>`_
+ * Use log_level_from_string from carcara. `#362 <https://github.com/candango/firenado/issues/362>`_
