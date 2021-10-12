@@ -225,7 +225,7 @@ class TornadoComponent(object):
         implemented at the component, all handlers will use it as default. If a
         handler implements the `get_error_handler` method, it will be used
         instead of the one implemented at the component."""
-        pass
+        return None
 
     def is_current_app(self):
         if not firenado.conf.is_multi_app:
@@ -402,7 +402,7 @@ class ComponentHandler(SessionHandler):
         handling than the tornado's default. If the error handler is
         implemented at the handler, it will be used instead of the one
         implemented at the component."""
-        pass
+        return None
 
     def before_request(self):
         """Called at the beginning of a request before  `get`/`post`/etc.
