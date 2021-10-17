@@ -8,7 +8,7 @@ We are pleased to announce the release of Firenado 0.2.9.
 
 Logging basic configuration will be executed in the launcher instead of the
 import of `firenado.conf`. This will make it easier to evolve logging
-functionalities and fix some undesired behaviours caused by all logging logic
+functionalities and fix some undesired behaviors caused by all logging logic
 being handled in `firenado.conf`.
 
 Here are the highlights:
