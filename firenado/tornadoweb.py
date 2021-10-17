@@ -367,7 +367,7 @@ class ComponentHandler(SessionHandler):
         if error_handler is None:
             error_handler = self.component.get_error_handler()
         if error_handler is None:
-            super(TornadoHandler, self).write_error(status_code, **kwargs)
+            super().write_error(status_code, **kwargs)
         else:
             error_handler.handle_error(self, status_code, **kwargs)
 
