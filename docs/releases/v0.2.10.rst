@@ -14,4 +14,4 @@ Here are the highlights:
 Bug Fixes
 ~~~~~~~~~
 
- * When writing an error the component handler will enter in infinite loop. #366. `#366 <https://github.com/candango/firenado/issues/366>`_
+ * When writing an error the component handler will enter in infinite loop. `#366 <https://github.com/candango/firenado/issues/366>`_
