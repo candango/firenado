@@ -58,6 +58,7 @@ def get_app_defaults():
     app['types']['tornado']['launcher']['class'] = "TornadoLauncher"
     app['types']['tornado']['launcher']['module'] = "firenado.launcher"
     app['url_root_path'] = None
+    app['xheaders'] = None
     # Wait before shutdown is on seconds
     app['wait_before_shutdown'] = 0
     return app
@@ -277,6 +278,8 @@ def process_app_config_section(config, app_config):
             app_type['launcher'] = get_config_from_package(
                 app_type['launcher'])
             config.app['types'][app_type['name']] = app_type
+    if 'xheaders' in app_config:
+        config.app['xheaders'] = app_config['xheaders']
     if 'wait_before_shutdown' in app_config:
         config.app['wait_before_shutdown'] = app_config['wait_before_shutdown']
 

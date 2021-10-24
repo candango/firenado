@@ -1,0 +1,17 @@
+What's new in Firenado 0.2.11
+=============================
+
+Oct 17, 2021
+------------
+
+We are pleased to announce the release of Firenado 0.2.11.
+
+The fix presented at 0.2.10 won't cover methods not allowed, bug `#366 <https://github.com/candango/firenado/issues/366>`_ was
+reopened. This version fixed the issue.
+
+Here are the highlights:
+
+Bug Fixes
+~~~~~~~~~
+
+ * When writing an error the component handler will enter in infinite loop. `#366 <https://github.com/candango/firenado/issues/366>`_
