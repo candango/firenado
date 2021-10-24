@@ -1,0 +1,15 @@
+What's new in Firenado 0.2.12
+=============================
+
+Oct 23, 2021
+------------
+
+We are pleased to announce the release of Firenado 0.2.12.
+
+Here are the highlights:
+
+Features
+~~~~~~~~
+
+ * Add xheaders configuration item to the application section. `#370 <https://github.com/candango/firenado/issues/370>`_
+ * Create a sqlalchemy fast count method. `#371 <https://github.com/candango/firenado/issues/371>`_
