@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright 2015-2020 Flavio Garcia
+# Copyright 2015-2021 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,9 +15,8 @@
 # limitations under the License.
 
 import logging
-from sqlalchemy import inspect, text
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy import inspect, func, text
+from sqlalchemy.orm import declarative_base, sessionmaker
 
 # Named as sqlalchemy_util to avoid conflict with the original sqlalchemy
 # module.
@@ -39,6 +38,17 @@ def base_to_dict(base, columns=None):
                 for c in inspect(base).mapper.column_attrs}
     return {c.key: getattr(base, c.key)
             for c in inspect(base).mapper.column_attrs if c.key in columns}
+
+
+def fast_count(query):
+    """
+    based on https://gist.github.com/hest/8798884
+    :return:
+    """
+    count_statement = query.statement.with_only_columns(
+        [func.count()]).order_by(None)
+    count = query.session.execute(count_statement).scalar()
+    return count
 
 
 def run_script(script_path, session, handle_command=None, handle_line=None):
