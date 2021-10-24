@@ -188,6 +188,16 @@ class TornadoLauncher(FirenadoLauncher):
         if os.name == "posix":
             signal.signal(signal.SIGTSTP, self.sig_handler)
         self.http_server = tornado.httpserver.HTTPServer(self.application)
+        if firenado.conf.app['xheaders'] is not None and type(
+                firenado.conf.app['xheaders']) == bool:
+            logger.debug("Setting http server xheaders as %s." %
+                         firenado.conf.app['xheaders'])
+            self.http_server.xheaders = firenado.conf.app['xheaders']
+        if type(firenado.conf.app['xheaders']) != bool:
+            logger.warning("The xheaders defined in the application section"
+                           "must be bool instead of %s. Ignoring the "
+                           "configuration item." %
+                           type(firenado.conf.app['xheaders']).__name__)
         listening_count = 0
         listening_what = "socket"
         if firenado.conf.app['socket'] or self.socket:
