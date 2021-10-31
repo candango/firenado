@@ -1,0 +1,23 @@
+What's new in Firenado 0.2.13
+=============================
+
+Oct 31, 2021
+------------
+
+We are pleased to announce the release of Firenado 0.2.13.
+
+This release is adding a new way to create sqlalchemy data sources and fixing
+the xheaders warning when no xheaders parameter is defined in the application
+configuration.
+
+Here are the highlights:
+
+Bug Fixes
+~~~~~~~~~
+
+ * If xheaders isn't defined in an application firenado will always warn about it. `#374 <https://github.com/candango/firenado/issues/374>`_
+
+New Features
+~~~~~~~~~~~~
+
+* Define a sqlalchemy using parameters instead url. `#70 <https://github.com/candango/firenado/issues/70>`_
