@@ -69,9 +69,11 @@ class TestappComponent(tornadoweb.TornadoComponent):
             'connector': "sqlalchemy",
             'url': "mysql+pymysql://root@localhost:3306/test"
         }
-        data_source = data.config_to_data_source(data_source_conf,
+        data_source_name = "test"
+        data_source = data.config_to_data_source(data_source_name,
+                                                 data_source_conf,
                                                  self.application)
-        self.application.set_data_source("test", data_source)
+        self.application.set_data_source(data_source_name, data_source)
 
     @service.served_by(services.UserService)
     def install(self):
