@@ -100,8 +100,10 @@ class RedisConnector(Connector):
     def __init__(self, data_connected):
         self.__connection = None
         super(RedisConnector, self).__init__(data_connected)
+        self.__name = None
 
-    def configure(self, conf):
+    def configure(self, name, conf):
+        self.__name = name
         logger.info("Connecting to redis using the configuration: %s.", conf)
         import redis
         redis_conf = dict()
@@ -142,6 +144,7 @@ class SqlalchemyConnector(Connector):
 
     def __init__(self, data_connected):
         super(SqlalchemyConnector, self).__init__(data_connected)
+        self.__name = None
         self.__connection = {
             'backend': None,
             'session': {
@@ -153,7 +156,8 @@ class SqlalchemyConnector(Connector):
         }
         self.__engine = None
 
-    def configure(self, conf):
+    def configure(self, name, conf):
+        self.__name = name
         from sqlalchemy import create_engine
         from sqlalchemy import exc, event, select
         # We will set the isolation level to READ UNCOMMITTED by default
@@ -199,6 +203,12 @@ class SqlalchemyConnector(Connector):
             if "info" in conf['session']:
                 self.__connection['session']['info'] = conf['session']['info']
 
+        if "url" not in conf:
+            print(self.__connection)
+            logger.error("It is not possible to create sqlalchemy engine for "
+                         "%s datasource. Configuration: %s." %
+                         (self.__name, conf))
+
         self.__engine = create_engine(conf['url'], **engine_params)
 
         @event.listens_for(self.__engine, "engine_connect")
@@ -243,9 +253,8 @@ class SqlalchemyConnector(Connector):
                     raise
             finally:
                 # restore "close with result"
-                connection.should_close_with_result = \
-                    save_should_close_with_result
-
+                connection.should_close_with_result = (
+                    save_should_close_with_result)
         logger.info("Connecting to the database using the engine: %s.",
                     self.__engine)
         self.__connection['backend'] = conf['backend']
@@ -288,16 +297,46 @@ class SqlalchemyConnector(Connector):
         }
         for key in conf:
             # TODO Handle other properties and create the url if needed.
-            if key in ["future", "pool" "session", "url"]:
-                db_conf[key] = conf[key]
+            if key in ["db", "database", "dialect", "driver", "future", "host",
+                       "pass", "password", "pool", "port", "session", "url",
+                       "user", "username"]:
+                index = key
+                if index == "db":
+                    index = "database"
+                if index == "user":
+                    index = "username"
+                if index == "pass":
+                    index = "password"
+                db_conf[index] = conf[key]
         # TODO: Handler errors here
-        db_conf['backend'] = db_conf['url'].split(':')[0].split('+')[0]
+        if "url" in db_conf:
+            db_conf['backend'] = db_conf['url'].split(':')[0].split('+')[0]
+        else:
+            url = ""
+            if "dialect" in db_conf:
+                db_conf['backend'] = db_conf['dialect']
+                url = "%s" % db_conf.pop("dialect")
+                if "driver" in db_conf:
+                    url = "%s+%s" % (url, db_conf.pop("driver"))
+            if "username" in db_conf:
+                url = "%s://%s" % (url, db_conf.pop("username"))
+                if "password" in db_conf:
+                    from urllib.parse import quote
+                    url = "%s:%s" % (url, quote(db_conf.pop("password")))
+            if "host" in db_conf:
+                url = "%s@%s" % (url, db_conf.pop("host"))
+                if "port" in db_conf:
+                    url = "%s:%s" % (url, db_conf.pop("port"))
+            if "database" in db_conf:
+                url = "%s/%s" % (url, db_conf.pop("database"))
+            db_conf['url'] = url
         return db_conf
 
 
-def config_to_data_source(conf, data_connected):
+def config_to_data_source(name, conf, data_connected):
     """ Convert a data source conf to it's respective data source. We need
     a data connected to use while instantiating the data source.
+    :param name: Datasource name
     :param conf: A data source confuration item
     :param data_connected: A data connected object
     :return: Connector
@@ -308,7 +347,7 @@ def config_to_data_source(conf, data_connected):
                                            connector_conf['class'])
     data_source_instance = handler_class(data_connected)
     conf = data_source_instance.process_config(conf)
-    data_source_instance.configure(conf)
+    data_source_instance.configure(name, conf)
     return data_source_instance
 
 
@@ -324,8 +363,8 @@ def configure_data_sources(data_sources, data_connected):
             logger.debug("Found data source [%s] in the list. Preceding with "
                          "the configuration process." % data_sources)
             conf = firenado.conf.data['sources'][data_sources]
-            data_source_instance = config_to_data_source(conf,
-                                                         data_connected)
+            data_source_instance = config_to_data_source(
+                data_sources, conf, data_connected)
             data_connected.set_data_source(data_sources, data_source_instance)
         else:
             logger.fatal("It was not possible to find [%s] in the list of "
