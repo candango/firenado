@@ -193,7 +193,8 @@ class TornadoLauncher(FirenadoLauncher):
             logger.debug("Setting http server xheaders as %s." %
                          firenado.conf.app['xheaders'])
             self.http_server.xheaders = firenado.conf.app['xheaders']
-        if type(firenado.conf.app['xheaders']) != bool:
+        if firenado.conf.app['xheaders'] is not None and type(
+                firenado.conf.app['xheaders']) != bool:
             logger.warning("The xheaders defined in the application section"
                            "must be bool instead of %s. Ignoring the "
                            "configuration item." %
