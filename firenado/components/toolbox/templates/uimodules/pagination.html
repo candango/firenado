@@ -7,19 +7,19 @@
 	        </a>
 	    </li>
 	    <li>
-	        <a href="{{request.path}}?{{ argument }}={{ paginator.current_page-1 }}" title="Previous">
+	        <a href="{{request.path}}?{{ argument }}={{ paginator.page-1 }}" title="Previous">
 	            <span><i class="glyphicon glyphicon-fast-backward"></i></span>
 	        </a>
 	    </li>
         {% end %}
-        {% for i in paginator.block_pages %}
+        {% for i in paginator.pages_in_block %}
 
-	    <li {% if i==paginator.current_page %}class="active"{% end %}><a href="{% if i==paginator.current_page %}javascript:void(0){% else %}{{request.path}}?{{ argument }}={{ i }}{% end %}">{{ i }}</a></li>
+	    <li {% if i==paginator.page %}class="active"{% end %}><a href="{% if i==paginator.page %}javascript:void(0){% else %}{{request.path}}?{{ argument }}={{ i }}{% end %}">{{ i }}</a></li>
 		{% end %}
 
         {% if not paginator.is_last_page %}
         <li>
-	        <a href="{{request.path}}?{{ argument }}={{ paginator.current_page+1 }}" title="Next">
+	        <a href="{{request.path}}?{{ argument }}={{ paginator.page + 1 }}" title="Next">
 	            <span class="glyphicon glyphicon-forward" aria-hidden="true"></span>
 	        </a>
 	    </li>
