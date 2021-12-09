@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 #
-# Copyright 2015-2021 Flavio Garcia
+# Copyright 2015-2022 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@
 """The Firenado Framework"""
 
 __author__ = "Flavio Garcia <piraz@candango.org>"
-__version__ = (0, 2, 13)
+__version__ = (0, 2, 14)
 __licence__ = "Apache License V2.0"
 
 

@@ -1,0 +1,18 @@
+What's new in Firenado 0.2.14
+=============================
+
+Dec 09, 2021
+------------
+
+We are pleased to announce the release of Firenado 0.2.14.
+
+Fixed pagination api as implemented in the new Cartola 0.14 and replaced travis
+by github actions for testing.
+
+Here are the highlights:
+
+Refactory
+~~~~~~~~~
+
+ * Update cartola paginator. `#380 <https://github.com/candango/firenado/issues/380>`_
+ * Replace travis by github actions. `#381 <https://github.com/candango/firenado/issues/381>`_

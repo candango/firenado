@@ -192,6 +192,5 @@ class PaginationHandler(tornadoweb.TornadoHandler):
         pag_argument = "pag"
         page = self.get_argument(pag_argument, default=1)
         row_count = 316
-        paginator = Paginator(row_count, page)
-        self.render("pagination.html", row_count=row_count, page=page,
-                    paginator=paginator, pag_argument=pag_argument)
+        self.render("pagination.html", page=page, row_count=row_count,
+                    pag_argument=pag_argument)

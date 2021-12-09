@@ -20,21 +20,31 @@ import tornado.web
 
 class Paginate(tornado.web.UIModule):
 
-    def render(self, row_count, current_page, rows_per_page=None,
-               pages_per_block=None, argument="p",
-               template="toolbox:uimodules/pagination.html"):
+    def render(self, count, **kwargs):
+        name = kwargs.get("name", "paginator")
+        template = kwargs.get("template", "toolbox:uimodules/pagination.html")
+        parameters = {}
         component_conf = self.handler.component.conf
-        if 'pagination' in self.handler.component.conf:
-            if 'rows_per_page' in component_conf['pagination']:
-                rows_per_page = component_conf['pagination']['rows_per_page']
-            if 'pages_per_block' in component_conf['pagination']:
-                pages_per_block = component_conf['pagination'][
-                    'pages_per_block']
-        if rows_per_page is None:
-            rows_per_page = 10
-        if pages_per_block is None:
-            pages_per_block = 10
-        paginator = Paginator(row_count, current_page, rows_per_page,
-                              pages_per_block)
+        per_page = 10
+        per_block = 10
+        if 'pagination' in component_conf:
+            if 'per_page' in component_conf['pagination']:
+                per_page = component_conf['pagination']['per_page']
+            if 'per_block' in component_conf['pagination']:
+                per_block = component_conf['pagination']['per_block']
+
+        argument = kwargs.get("argument", "p")
+        page = self.request.arguments.get(argument, kwargs.get("page"))
+        if isinstance(page, list):
+            page = self.request.arguments.get(argument)[0]
+        if page:
+            page = int(page)
+        if page:
+            parameters['page'] = page
+
+        parameters['per_page'] = kwargs.get("per_page", per_page)
+        parameters['per_block'] = kwargs.get("per_block", per_block)
+        paginator = Paginator(count, **parameters)
+        setattr(self.handler, name, paginator)
         return self.render_string(template, argument=argument,
                                   paginator=paginator)
