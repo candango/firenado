@@ -1,13 +1,9 @@
 # Firenado Framework 
 
-**master:** [![Build Status](https://travis-ci.org/candango/firenado.svg?branch=master)](https://travis-ci.org/candango/firenado)
-[![Code Health](https://landscape.io/github/candango/firenado/master/landscape.svg?style=flat)](https://landscape.io/github/candango/firenado/master)
-[![Documentation Status](https://readthedocs.org/projects/firenado/badge/?version=latest)](https://readthedocs.org/projects/firenado/?badge=latest)
-
-**develop:** [![Build Status develop](https://travis-ci.org/candango/firenado.svg?branch=develop)](https://travis-ci.org/candango/firenado)
-[![Code Health](https://landscape.io/github/candango/firenado/develop/landscape.svg?style=flat)](https://landscape.io/github/candango/firenado/develop)
-[![Documentation Status](https://readthedocs.org/projects/firenado/badge/?version=develop)](http://firenado.readthedocs.org/en/develop/?badge=develop)
-
+[![Latest PyPI version](https://img.shields.io/pypi/v/firenado.svg)](https://pypi.org/project/firenado/)
+[![Number of PyPI downloads](https://img.shields.io/pypi/dm/firenado.svg)](https://pypi.org/project/firenado/)
+[![Build Status](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Factions-badge.atrox.dev%2Fcandango%2Ffirenado%2Fbadge&style=flat)](https://actions-badge.atrox.dev/candango/firenado/goto)
+[![GitHub license](https://img.shields.io/github/license/candango/firenado)](https://github.com/candango/firenado/blob/develop/LICENSE)
 
 ## Introduction
 
@@ -93,8 +89,10 @@ app:
 
 ## Support
 
-Firenado is one of [Candango Open Source Group](http://www.candango.org/projects/) initiatives. It is available under
-the [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.html).
+Firenado is one of [Candango Open Source Group
+](http://www.candango.org/projects/) initiatives. It is available under
+the [Apache License, Version 2.0
+](http://www.apache.org/licenses/LICENSE-2.0.html).
 
 This web site and all documentation is licensed under [Creative
 Commons 3.0](http://creativecommons.org/licenses/by/3.0/).

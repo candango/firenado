@@ -1,1 +1,1 @@
-croniter==1.0.10
+croniter==1.2.0
