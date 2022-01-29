@@ -120,13 +120,16 @@ def served_by(service, attribute_name=None):
     return f_wrapper
 
 
-def sessionned(service=None, **kwargs):
-    """ Decorator that will use an existing session or create a new one if not
-    defined """
+def sessionned(*args, **kwargs):
+    """ This decorator will add an existing session to the method being
+    decorated or create a new session to be used by the method."""
+    service = None
+    if len(args) > 0:
+        service = args[0]
 
     def method_wrapper(method):
         @functools.wraps(method)
-        def wrapper(self, *args, **method_kwargs):
+        def wrapper(self, *method_args, **method_kwargs):
             session = method_kwargs.get("session")
             close = kwargs.get("close", False)
             close = method_kwargs.get("close", close)
@@ -134,12 +137,26 @@ def sessionned(service=None, **kwargs):
                 data_source = kwargs.get("data_source")
                 data_source = method_kwargs.get("data_source", data_source)
                 if not data_source:
-                    if hasattr(service, "default_data_source"):
-                        if inspect.ismethod(self.default_data_source,
-                                            callable):
-                            data_source = service.default_data_source()
-                #TODO: resolve session from the default data source
-            result = method(self, *args, **method_kwargs)
+                    hasattr(self, "default_data_source")
+                    if hasattr(self, "default_data_source"):
+                        if inspect.ismethod(self.default_data_source):
+                            data_source = self.default_data_source()
+                        else:
+                            data_source = self.default_data_source
+                try:
+                    if isinstance(data_source, str):
+                        ds = self.get_data_source(data_source)
+                        method_kwargs['data_source'] = data_source
+                        session = ds.session
+                    else:
+                        print(data_source)
+                        session = data_source.session
+                    method_kwargs['session'] = session
+                except KeyError:
+                    logger.exception("There is no datasource defined with"
+                                     "index \"%s\" related to the service." %
+                                     data_source)
+            result = method(self, *method_args, **method_kwargs)
             if close:
                 if not session:
                     logger.warning("No session was resolved.")
