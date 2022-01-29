@@ -47,8 +47,8 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'Firenado Framework'
-copyright = u'2015-2020, Flavio Garcia'
-author = u'Flavio Garcia'
+copyright = u'2015-2020, Flávio Gonçalves Garcia'
+author = u'Flávio Gonçalves Garcia'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
