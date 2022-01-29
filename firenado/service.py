@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 #
-# Copyright 2015-2021 Flavio Garcia
+# Copyright 2015-2022 Flávio Gonçalves Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,6 +16,10 @@
 
 import functools
 import importlib
+import inspect
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class FirenadoService(object):
@@ -114,3 +118,41 @@ def served_by(service, attribute_name=None):
 
         return wrapper
     return f_wrapper
+
+
+def sessionned(service=None, **kwargs):
+    """ Decorator that will use an existing session or create a new one if not
+    defined """
+
+    def method_wrapper(method):
+        @functools.wraps(method)
+        def wrapper(self, *args, **method_kwargs):
+            session = method_kwargs.get("session")
+            close = kwargs.get("close", False)
+            close = method_kwargs.get("close", close)
+            if not session:
+                data_source = kwargs.get("data_source")
+                data_source = method_kwargs.get("data_source", data_source)
+                if not data_source:
+                    if hasattr(service, "default_data_source"):
+                        if inspect.ismethod(self.default_data_source,
+                                            callable):
+                            data_source = service.default_data_source()
+                #TODO: resolve session from the default data source
+            result = method(self, *args, **method_kwargs)
+            if close:
+                if not session:
+                    logger.warning("No session was resolved.")
+                logger.debug("Closing session %s." % session)
+                session.close()
+            return result
+        return wrapper
+    # If the decorator has no parameter, I mean no parentesis, we need to wrap
+    # the service variable again , instead of the service instance, we need to
+    # deal with the method being decorated but as a <function> instace.
+    if inspect.isfunction(service):
+        @functools.wraps(None)
+        def func_wrapper(_function):
+            return method_wrapper(_function)
+        return func_wrapper(service)
+    return method_wrapper
