@@ -12,7 +12,7 @@ classes are ``firenado.tornadoweb.TornadoHandler`` and any descendent of
 
 Creating a service and decorating a handler:
 
-.. code-block::python
+.. code-block:: python
 
    from firenado import service, tornadoweb
    # Importing a package with some services
