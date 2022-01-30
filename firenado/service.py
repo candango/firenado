@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 #
-# Copyright 2015-2021 Flavio Garcia
+# Copyright 2015-2022 Flávio Gonçalves Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,6 +16,10 @@
 
 import functools
 import importlib
+import inspect
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class FirenadoService(object):
@@ -114,3 +118,58 @@ def served_by(service, attribute_name=None):
 
         return wrapper
     return f_wrapper
+
+
+def sessionned(*args, **kwargs):
+    """ This decorator will add an existing session to the method being
+    decorated or create a new session to be used by the method."""
+    service = None
+    if len(args) > 0:
+        service = args[0]
+
+    def method_wrapper(method):
+        @functools.wraps(method)
+        def wrapper(self, *method_args, **method_kwargs):
+            session = method_kwargs.get("session")
+            close = kwargs.get("close", False)
+            close = method_kwargs.get("close", close)
+            if not session:
+                data_source = kwargs.get("data_source")
+                data_source = method_kwargs.get("data_source", data_source)
+                if not data_source:
+                    hasattr(self, "default_data_source")
+                    if hasattr(self, "default_data_source"):
+                        if inspect.ismethod(self.default_data_source):
+                            data_source = self.default_data_source()
+                        else:
+                            data_source = self.default_data_source
+                try:
+                    if isinstance(data_source, str):
+                        ds = self.get_data_source(data_source)
+                        method_kwargs['data_source'] = data_source
+                        session = ds.session
+                    else:
+                        print(data_source)
+                        session = data_source.session
+                    method_kwargs['session'] = session
+                except KeyError:
+                    logger.exception("There is no datasource defined with"
+                                     "index \"%s\" related to the service." %
+                                     data_source)
+            result = method(self, *method_args, **method_kwargs)
+            if close:
+                if not session:
+                    logger.warning("No session was resolved.")
+                logger.debug("Closing session %s." % session)
+                session.close()
+            return result
+        return wrapper
+    # If the decorator has no parameter, I mean no parentesis, we need to wrap
+    # the service variable again , instead of the service instance, we need to
+    # deal with the method being decorated but as a <function> instace.
+    if inspect.isfunction(service):
+        @functools.wraps(None)
+        def func_wrapper(_function):
+            return method_wrapper(_function)
+        return func_wrapper(service)
+    return method_wrapper

@@ -164,7 +164,12 @@ class TornadoApplication(tornado.web.Application, data.DataConnectedMixin,
         else:
             logger.debug("Session is disabled.")
 
-    def get_app_component(self):
+    def get_app_component(self) -> "TornadoComponent":
+        """ Return the component set as the application component at the
+        app config.
+
+        :return: TornadoComponent
+        """
         return self.components[firenado.conf.app['component']]
 
     def __load_components(self):
