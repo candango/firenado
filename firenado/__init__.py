@@ -17,7 +17,7 @@
 
 """The Firenado Framework"""
 
-__author__ = "Flávio Gonçalves Garcia <piraz at candango.org>"
+__author__ = "Flávio Gonçalves Garcia <piraz@candango.org>"
 __version__ = (0, 2, 15)
 __licence__ = "Apache License V2.0"
 
