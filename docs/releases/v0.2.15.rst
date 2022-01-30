@@ -1,0 +1,23 @@
+What's new in Firenado 0.2.15
+=============================
+
+Jan 30, 2022
+------------
+
+We are pleased to announce the release of Firenado 0.2.15.
+
+At this release we added a service decorator to help handle sqlalchemy
+sessions.
+
+Here are the highlights:
+
+Bug Fixes
+~~~~~~~~~
+
+ * Change dashed parameters to underscored ones in setup.cfg. `#385 <https://github.com/candango/firenado/issues/385>`_
+
+Features
+~~~~~~~~
+
+ * Create a decorator to handle shared sqlalchemy sessions between mehtods. `#377 <https://github.com/candango/firenado/issues/377>`_
+ * Add shortcut properties to help get components from the scheduler and scheduled job. `#387 <https://github.com/candango/firenado/issues/387>`_

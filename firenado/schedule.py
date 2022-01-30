@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 #
-# Copyright 2015-2021 Flavio Garcia
+# Copyright 2015-2022 Flávio Gonçalves Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -72,6 +72,14 @@ class Scheduler(object):
         self._periodic_callback = None
 
     @property
+    def app_component(self) -> TornadoComponent:
+        """ Shortcut to self.component.app_component
+
+        :return: TornadoComponent
+        """
+        return self.component.app_component
+
+    @property
     def id(self):
         return self._id
 
@@ -84,7 +92,9 @@ class Scheduler(object):
         return self._name
 
     @property
-    def can_run(self):
+    def can_run(self) -> bool:
+        """ Indicates if the scheduler can run
+        """
         return self._can_run
 
     def add_job(self, job):
@@ -238,6 +248,18 @@ class ScheduledJob(object):
         self._cron = kwargs.get('cron')
         self._interval = kwargs.get('interval')
         self._periodic_callback = None
+
+    @property
+    def component(self) -> "ScheduledTornadoComponent":
+        """ Return scheduler's component
+        """
+        return self._scheduler.component
+
+    @property
+    def app_component(self) -> TornadoComponent:
+        """ Shortcut to  self.component.app_component
+        """
+        return self.component.app_component
 
     @property
     def id(self):
