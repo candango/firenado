@@ -1,7 +1,7 @@
 # Firenado Framework 
 
 [![Latest PyPI version](https://img.shields.io/pypi/v/firenado.svg)](https://pypi.org/project/firenado/)
-[![Number of PyPI downloads](https://img.shields.io/pypi/dm/firenado.svg)](https://pypi.org/project/firenado/)
+[![Number of PyPI downloads](https://img.shields.io/pypi/dm/firenado.svg)](https://pypi.org/project/firenado/#files)
 [![Build Status](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Factions-badge.atrox.dev%2Fcandango%2Ffirenado%2Fbadge&style=flat)](https://actions-badge.atrox.dev/candango/firenado/goto)
 [![GitHub license](https://img.shields.io/github/license/candango/firenado)](https://github.com/candango/firenado/blob/develop/LICENSE)
 

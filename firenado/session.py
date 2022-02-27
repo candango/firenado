@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 #
-# Copyright 2015-2021 Flavio Garcia
+# Copyright 2015-2022 Flávio Gonçalves Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -38,8 +38,7 @@ class SessionEngine(object):
         self.callback_time = None
         self.callback_hiccup = firenado.conf.session['callback_hiccup'] * 1000
 
-        # TODO: By the way session could be disabled. How do we 
-        # handle that?
+        # TODO: By the way session could be disabled. How to handle that?
         # TODO: check if session type exists. Maybe disable it if type is not
         # defined. We need to inform the error here
         if firenado.conf.session['enabled']:

@@ -22,3 +22,11 @@ schedulers:
         class: schedapp.jobs.PrintAsyncTestJob
         cron: "*/2 * * * *"
         custom_property: Custom property from job3.
+      - id: job4
+        class: schedapp.jobs.ErroredJob
+        interval: 5000
+        custom_property: Custom property from job4.
+      - id: job5
+        class: schedapp.jobs.ErroredAsyncJob
+        interval: 5000
+        custom_property: Custom property from job5.

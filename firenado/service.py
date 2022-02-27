@@ -134,6 +134,9 @@ def sessionned(*args, **kwargs):
             close = kwargs.get("close", False)
             close = method_kwargs.get("close", close)
             if not session:
+                # If a new session is created we must close it after running
+                # the method
+                close = True
                 data_source = kwargs.get("data_source")
                 data_source = method_kwargs.get("data_source", data_source)
                 if not data_source:
@@ -149,7 +152,6 @@ def sessionned(*args, **kwargs):
                         method_kwargs['data_source'] = data_source
                         session = ds.session
                     else:
-                        print(data_source)
                         session = data_source.session
                     method_kwargs['session'] = session
                 except KeyError:
