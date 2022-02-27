@@ -1,0 +1,23 @@
+What's new in Firenado 0.2.16
+=============================
+
+Feb 27, 2022
+------------
+
+We are pleased to announce the release of Firenado 0.2.16.
+
+This release is consolidating the service decorator for sqlalchemy sessions and
+introducing an exception catch all to not handled exceptions raised by
+scheduled jobs.
+
+Here are the highlights:
+
+Bug Fixes
+~~~~~~~~~
+
+ * Handle uncaught exception/error while loading/running a scheduled job bug. `#349 <https://github.com/candango/firenado/issues/349>`_
+
+Features
+~~~~~~~~
+
+ * Close session created inside the sessioned decorator. `#394 <https://github.com/candango/firenado/issues/394>`_

@@ -15,7 +15,7 @@
 # limitations under the License.
 
 from .tornadoweb import TornadoComponent
-from cartola import config, sysexits
+from cartola import config, exception, sysexits
 from datetime import datetime, timedelta
 import logging
 import sys
@@ -41,11 +41,12 @@ except ImportError:
     sys.exit(sysexits.EX_FATAL_ERROR)
 
 
-def next_from_cron(cron):
-    """ Return next schedule run offset from now to the time of execution
+def next_from_cron(cron: str) -> datetime:
+    """ Return a datatetime object with the next execution based on the informed
+    cron string and the current time.
 
-    :param cron: The cron string
-    :return:
+    :param str cron: The cron string
+    :return datetime: A datetime object with the next execution
     """
     iterator = croniter(cron, datetime.now())
     return iterator.get_next(datetime)
@@ -319,13 +320,20 @@ class ScheduledJob(object):
         logger.debug(
             "Running job %s from Scheduler [id: %s, name: %s]." % (
                 self.hard_id, self._scheduler.id, self._scheduler.name))
-        future = self.run()
-        if future is not None:
-            logger.debug(
-                "Running job %s from Scheduler [id: %s, name: %s] "
-                "asynchronously. " % (self.hard_id, self._scheduler.id,
-                                      self._scheduler.name))
-            await future
+        try:
+            future = self.run()
+            if future:
+                logger.debug(
+                    "Running job %s from Scheduler [id: %s, name: %s] "
+                    "asynchronously. " % (self.hard_id, self._scheduler.id,
+                                          self._scheduler.name))
+                await future
+        except:
+            logger.error("A non handled exception was cough while running the "
+                         "job %s:" % self.hard_id,
+                         exc_info=exception.full_exc_info())
+            logger.error("Please handle the exception to fix the job "
+                         "execution and avoid breaking the scheduler.")
         logger.debug(
             "Job %s removed from Scheduler [id: %s, name: %s]" % (
                 self.hard_id, self._scheduler.id, self._scheduler.name))

@@ -197,18 +197,19 @@ class SessionedTestCase(unittest.TestCase):
         and no parameter. The data source to be used is the one defined either
         in the property or method named default_data_source. In this case we're
         using a property.
+
+        As no session was provided the session will be closed
         """
         resolved_kwargs = (
             self.mock_sessioned_service.resolve_from_default_data_source()
         )
-        print(resolved_kwargs)
         self.assertEqual("datasource2", resolved_kwargs['data_source'])
         data_source = self.data_connected.get_data_source(
             resolved_kwargs['data_source']
         )
         self.assertEqual(data_source.resolve_session(),
                          resolved_kwargs['session'].name)
-        self.assertTrue(resolved_kwargs['session'].is_oppened)
+        self.assertFalse(resolved_kwargs['session'].is_oppened)
 
     @served_by(MockSessionedService)
     def test_sessioned_default_data_source_my_session(self):
@@ -244,7 +245,26 @@ class SessionedTestCase(unittest.TestCase):
         )
         self.assertEqual(data_source.resolve_session(),
                          resolved_kwargs['session'].name)
-        self.assertTrue(resolved_kwargs['session'].is_oppened)
+        self.assertFalse(resolved_kwargs['session'].is_oppened)
+
+    @served_by(MockSessionedService)
+    def test_sessioned_from_data_source_provide_session(self):
+        """ Method resolve_from_default_data_source is anoteded with sessioned
+        and no parameter. This time we provide the session and provided to
+        close the datasource after executing resolve_from_data_source.
+        """
+        data_source = self.data_connected.get_data_source("datasource2")
+        resolved_kwargs = (
+            self.mock_sessioned_service.resolve_from_data_source(
+                session=data_source.session, close=True
+            )
+        )
+        # No datasource will be added to the kwards
+        self.assertIsNone(resolved_kwargs.get("data_source"))
+        # Using session provided
+        self.assertEqual(data_source.resolve_session(),
+                         resolved_kwargs['session'].name)
+        self.assertFalse(resolved_kwargs['session'].is_oppened)
 
     @served_by(MockSessionedService)
     def test_sessioned_with_my_data_source_closing_connection(self):
@@ -255,7 +275,7 @@ class SessionedTestCase(unittest.TestCase):
         """
         resolved_kwargs = (
             self.mock_sessioned_service.resolve_from_data_source(
-                data_source="datasource2", close=True)
+                data_source="datasource2")
         )
         self.assertEqual("datasource2", resolved_kwargs['data_source'])
         data_source = self.data_connected.get_data_source(

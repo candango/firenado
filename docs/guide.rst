@@ -8,6 +8,6 @@ User's guide
    guide/command_line
    guide/components
    guide/datasources
-   guide/schedules
+   guide/schedulers
    guide/services
    guide/session
