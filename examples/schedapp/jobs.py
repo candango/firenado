@@ -49,3 +49,15 @@ class ErroredJob(ScheduledJob):
     def run(self):
         error_result = 1/0
         print("This is the custom property value: %s" % self._custom_property)
+
+
+class ErroredAsyncJob(ScheduledJob):
+
+    def __init__(self, scheduler, **kwargs):
+        super(ErroredAsyncJob, self).__init__(scheduler, **kwargs)
+        self._custom_property = kwargs.get('custom_property', None)
+
+    async def run(self):
+        error_result = 1/0
+        print("This is the custom property value: %s" % self._custom_property)
+        await sleep(1)
