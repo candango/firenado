@@ -15,7 +15,7 @@
 # limitations under the License.
 
 from .tornadoweb import TornadoComponent
-from cartola import config, sysexits
+from cartola import config, exception, sysexits
 from datetime import datetime, timedelta
 import logging
 import sys
@@ -319,8 +319,16 @@ class ScheduledJob(object):
         logger.debug(
             "Running job %s from Scheduler [id: %s, name: %s]." % (
                 self.hard_id, self._scheduler.id, self._scheduler.name))
-        future = self.run()
-        if future is not None:
+        future = None
+        try:
+            future = self.run()
+        except:
+            logger.error("A non handled exception was cough while running the "
+                         "job %s:" % self.hard_id,
+                         exc_info=exception.full_exc_info())
+            logger.error("Please handle the exception to fix the job "
+                         "execution and avoid breaking the scheduler.")
+        if future:
             logger.debug(
                 "Running job %s from Scheduler [id: %s, name: %s] "
                 "asynchronously. " % (self.hard_id, self._scheduler.id,
