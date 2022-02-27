@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 #
-# Copyright 2015-2020 Flavio Garcia
+# Copyright 2015-2022 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -38,3 +38,14 @@ class PrintAsyncTestJob(ScheduledJob):
         print("This is the custom property value from async job: %s" %
               self._custom_property)
         await sleep(1)
+
+
+class ErroredJob(ScheduledJob):
+
+    def __init__(self, scheduler, **kwargs):
+        super(ErroredJob, self).__init__(scheduler, **kwargs)
+        self._custom_property = kwargs.get('custom_property', None)
+
+    def run(self):
+        error_result = 1/0
+        print("This is the custom property value: %s" % self._custom_property)
