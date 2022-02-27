@@ -41,11 +41,12 @@ except ImportError:
     sys.exit(sysexits.EX_FATAL_ERROR)
 
 
-def next_from_cron(cron):
-    """ Return next schedule run offset from now to the time of execution
+def next_from_cron(cron: str) -> datetime:
+    """ Return a datatetime object with the next execution based on the informed
+    cron string and the current time.
 
-    :param cron: The cron string
-    :return:
+    :param str cron: The cron string
+    :return datetime: A datetime object with the next execution
     """
     iterator = croniter(cron, datetime.now())
     return iterator.get_next(datetime)
