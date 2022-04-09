@@ -1,0 +1,13 @@
+What's new in Firenado 0.2.17
+=============================
+
+Apr 09, 2022
+------------
+
+We are pleased to announce the release of Firenado 0.2.17.
+
+This release is just upgrading cartola, redis and sqlalchemy versions.
+
+The new feature from cartola will open an space so we can start do create a
+more dynamic framework.
+
