@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 #
-# Copyright 2015-2021 Flavio Garcia
+# Copyright 2015-2022 Flávio Gonçalves Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ from importlib import reload
 import logging
 import os
 import sys
-from tornado import gen
+import warnings
 
 logger = logging.getLogger(__name__)
 
@@ -70,10 +70,13 @@ class FirenadoLauncher(object):
                             format=firenado.conf.log['format'])
 
     def load(self):
-        return None
+        raise NotImplementedError()
 
     def launch(self):
-        return None
+        raise NotImplementedError()
+
+    def shutdown(self):
+        raise NotImplementedError()
 
 
 class ProcessLauncher(FirenadoLauncher):
@@ -86,9 +89,10 @@ class ProcessLauncher(FirenadoLauncher):
                      "ProcessLauncher.")
 
     def __init__(self, **settings):
-        super(ProcessLauncher, self).__init__(**settings)
+        super().__init__(**settings)
         self.process = None
         self.process_callback = None
+        self.process_callback_time = 100
         self.logfile = settings.get("logfile", None)
         self.command = None
         self.response = None
@@ -112,38 +116,39 @@ class ProcessLauncher(FirenadoLauncher):
             socket_parameter = "--port=%s" % self.socket
             self.command = "%s %s" % (self.command, socket_parameter)
 
-    @gen.coroutine
-    def read_process(self):
+    async def read_process(self):
         import pexpect
         self.process_callback.stop()
         try:
             # Simple way to catch everything is wait for a new line:
             #
-            yield self.process.expect("\n", async_=True)
+            await self.process.expect("\n", async_=True)
         except pexpect.TIMEOUT:
-            logger.warning("Reached timeout")
-            pass
+            logger.debug("Reached timeout, getting back in the loop.")
         self.process_callback.start()
 
-    @gen.coroutine
-    def launch(self):
-        import pexpect
-        import tornado.ioloop
-        logger.info("Launching %s" % self.command)
-        parameters = {
-            'command': self.command,
-            'encoding': "utf-8"
-        }
-        if self.logfile is not None:
-            parameters['logfile'] = self.logfile
-        self.process = pexpect.spawn(**parameters)
-        yield self.process.expect(
-            [r"[Firenado server started successfully].*"], async_=True)
-        self.process_callback = tornado.ioloop.PeriodicCallback(
-            self.read_process,
-            400
-        )
-        self.process_callback.start()
+    async def launch(self):
+        with warnings.catch_warnings():
+            import pexpect
+            import tornado.ioloop
+            logger.info("Launching %s" % self.command)
+            parameters = {
+                'command': self.command,
+                'encoding': "utf-8"
+            }
+            if self.dir:
+                parameters['cwd'] = self.dir
+            if self.logfile is not None:
+                parameters['logfile'] = self.logfile
+            self.process = pexpect.spawn(**parameters)
+            warnings.simplefilter("ignore")
+            await self.process.expect(
+                [r"[Firenado server started successfully].*"], async_=True)
+            self.process_callback = tornado.ioloop.PeriodicCallback(
+                self.read_process,
+                self.process_callback_time
+            )
+            self.process_callback.start()
 
     def send(self, line):
         logger.info("Sending line {}".format(line))

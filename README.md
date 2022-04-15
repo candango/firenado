@@ -28,17 +28,54 @@ pip install firenado
 
 It is possible to install extra packages as redis-py, sqlalchemy and pexpect.
 
-To install only redis-py:
+Installing only redis-py:
 
 ```
 pip install firenado[redis]
 ```
 
-Complete installation:
+Installing only redis-py:
 
 ```
-pip install firenado[pexpect, redis, sqlalchemy]
+pip install firenado[sqlalchemy pexpect]
 ```
+
+Installing only redis (redis-py, hiredis):
+
+```
+pip install firenado[sqlalchemy pexpect]
+```
+
+Installing redis and schedule(croniter):
+
+```
+pip install firenado[redis schedule]
+```
+
+Complete installation(what it is being the case, everytime):
+
+```
+pip install firenado[all]
+```
+
+> In the future, the installation logic will be inverted. Redis and pexpect
+> will be added by default, and disabling them using optional parameters.
+>
+> The sqlalchemy and schedule(croniter) optionals will remain as is.
+>
+> With that change if you want just add schedule to the redis and pexpect:
+>
+> ``` pip install firenado[schedule] ```
+>
+> Maybe you want an agent with scheduled features and no redis:
+>
+> ``` pip install firenado[schedule noredis] ```
+>
+> Or don't need ProcessLaucher but sqlalchemy support:
+>
+> ``` pip install firenado[sqlalchemy nopexpect] ```
+>
+> See: #401
 
 ## Usage
 
