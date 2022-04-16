@@ -206,8 +206,8 @@ class SqlalchemyConnector(Connector):
         if "url" not in conf:
             print(self.__connection)
             logger.error("It is not possible to create sqlalchemy engine for "
-                         "%s datasource. Configuration: %s." %
-                         (self.__name, conf))
+                         "%s datasource. Configuration: %s.", self.__name,
+                         conf)
 
         self.__engine = create_engine(conf['url'], **engine_params)
 
@@ -361,7 +361,7 @@ def configure_data_sources(data_sources, data_connected):
     if isinstance(data_sources, str):
         if data_sources in firenado.conf.data['sources']:
             logger.debug("Found data source [%s] in the list. Preceding with "
-                         "the configuration process." % data_sources)
+                         "the configuration process.", data_sources)
             conf = firenado.conf.data['sources'][data_sources]
             data_source_instance = config_to_data_source(
                 data_sources, conf, data_connected)
@@ -371,7 +371,7 @@ def configure_data_sources(data_sources, data_connected):
                          "available data sources. Please fix the firenado "
                          "configuration file. Sometimes that could be only a "
                          "typo in one of app data sources to be created. Look "
-                         "at app.data.sources list." % data_sources)
+                         "at app.data.sources list.", data_sources)
             sys.exit(errno.ENOKEY)
         # TODO: Testing the connection
         # Without that the error will just happen during the handler execution
