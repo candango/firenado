@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+# -*- coding: UTF-8 -*-
 #
 # Copyright 2015-2022 Flávio Gonçalves Garcia
 #
@@ -67,9 +67,11 @@ class FileSessionTestCase(unittest.TestCase):
             application = TornadoApplication()
             session_handler_config = firenado.conf.session[
                 'handlers'][firenado.conf.session['type']]
-            session_handler_class = get_class_from_config(session_handler_config)
-            self.assertEqual(application.session_engine.session_handler.__class__,
-                             session_handler_class)
+            session_handler_class = get_class_from_config(
+                session_handler_config)
+            self.assertEqual(
+                application.session_engine.session_handler.__class__,
+                session_handler_class)
 
 
 class RedisSessionTestCase(unittest.TestCase):
