@@ -237,11 +237,11 @@ class Session(object):
 
 class SessionDestroyedError(tornado.web.HTTPError):
 
-    def __init__(self, status_code, log_message=None, *args, **kwargs):
-        message = "The session was destroyed. It is necessary a renew the " \
-                  "session before use it again."
+    def __init__(self, status_code=500, log_message=None, *args, **kwargs):
+        message = ("The session is already destroyed. It is necessary to renew"
+                   " the session before using it again.")
         super(SessionDestroyedError, self).__init__(
-            505, message, *args, **kwargs)
+            status_code, message, *args, **kwargs)
 
 
 class SessionHandler(object):
