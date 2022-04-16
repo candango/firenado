@@ -195,7 +195,7 @@ class ApplicationComponentTestCase(unittest.TestCase):
         chdir_app("root_url_slash_none", "conf")
         self.assertEqual(None,  firenado.conf.app['url_root_path'])
 
-    def test_static_path(self):
+    def test_static_url_prefix(self):
         """ If static url prefix is defined on the app configuration.
         """
         chdir_app("yml", "conf")

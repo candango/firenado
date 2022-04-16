@@ -61,7 +61,7 @@ class BaseToDictTestCase(unittest.TestCase):
         self.assertEqual(dict_from_base['created'], self.test_object.created)
         self.assertEqual(dict_from_base['modified'], self.test_object.modified)
 
-    def test_base_to_dict(self):
+    def test_base_to_dict_parametrized(self):
         dict_from_base = base_to_dict(self.test_object,
                                       ["id", "username", "first_name"])
         self.assertEqual(dict_from_base['id'], self.test_object.id)

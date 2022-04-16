@@ -1,6 +1,6 @@
-#!/usr/bin/env python
+# -*- coding: UTF-8 -*-
 #
-# Copyright 2015-2021 Flavio Garcia
+# Copyright 2015-2022 Flávio Gonçalves Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import firenado.conf
 from firenado.config import get_class_from_config
 from tests import chdir_app
 from firenado.tornadoweb import TornadoApplication
+import warnings
 
 chdir_app('file', 'session')
 
@@ -33,14 +34,16 @@ class StaticMapsTestCase(unittest.TestCase):
         """ Application configuration file will be read and components will be
         loaded.
         """
-        chdir_app('file', 'session')
-        self.application = TornadoApplication()
-        self.session_handler_config = firenado.conf.session[
-            'handlers'][firenado.conf.session['type']]
-        self.session_handler_config = firenado.conf.session[
-            'handlers'][firenado.conf.session['type']]
-        self.session_handler_class = get_class_from_config(
-            self.session_handler_config)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            chdir_app('file', 'session')
+            self.application = TornadoApplication()
+            self.session_handler_config = firenado.conf.session[
+                'handlers'][firenado.conf.session['type']]
+            self.session_handler_config = firenado.conf.session[
+                'handlers'][firenado.conf.session['type']]
+            self.session_handler_class = get_class_from_config(
+                self.session_handler_config)
 
     def test_application_session_handler(self):
         """ Checks if the session handler loaded is the same the session
