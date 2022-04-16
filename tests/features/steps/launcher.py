@@ -39,7 +39,7 @@ async def step_we_launch_application_using_process_launcher(context,
 
 @when("The application is running correctly at {port} port")
 @async_run_until_complete
-async def step_we_launch_application_using_process_launcher(context, port):
+async def step_application_running_correctly_at_port(context, port):
     http_client = AsyncHTTPClient()
     try:
         response = await http_client.fetch("http://localhost:%s" %

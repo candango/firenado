@@ -31,14 +31,6 @@ class ApplicationComponentTestCase(unittest.TestCase):
     def test_conf_root(self):
         """ Test if Firenado root matches the upper directory relative to the
         current one. """
-        import os
-        current_path = os.path.dirname(os.path.realpath(__file__))
-        firenado_root = ("%s" % os.sep).join(current_path.split(os.sep)[:-1])
-        self.assertEqual(firenado_root, firenado.conf.ROOT)
-
-    def test_conf_root(self):
-        """ Test if Firenado root matches the upper directory relative to the
-        current one. """
         current_path = os.path.dirname(os.path.realpath(__file__))
         firenado_root = ("%s" % os.sep).join(current_path.split(os.sep)[:-1])
         firenado_root = os.path.join(firenado_root, "firenado")
