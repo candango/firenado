@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 #
-# Copyright 2015-2021 Flavio Garcia
+# Copyright 2015-2022 Flávio Gonçalves Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -93,7 +93,7 @@ class TornadoApplication(tornado.web.Application, data.DataConnectedMixin,
     """
 
     def __init__(self, default_host="", transforms=None, **settings):
-        logger.debug('Wiring application located at %s.' %
+        logger.debug("Wiring application located at %s.",
                      firenado.conf.APP_ROOT_PATH)
         self.components = {}
         settings.update(firenado.conf.app['settings'])
@@ -152,9 +152,8 @@ class TornadoApplication(tornado.web.Application, data.DataConnectedMixin,
                 handler_list[0] = rooted_path(
                     firenado.conf.app['url_root_path'], handler_list[0])
                 handlers[idx] = tuple(handler_list)
-        tornado.web.Application.__init__(self, handlers=handlers,
-                                         default_host=default_host,
-                                         transforms=transforms, **settings)
+        super().__init__(handlers=handlers, default_host=default_host,
+                         transforms=transforms, **settings)
         logger.debug("Checking if session is enabled.")
         if firenado.conf.session['enabled']:
             logger.debug("Session is enabled. Starting session engine.")
@@ -189,10 +188,9 @@ class TornadoApplication(tornado.web.Application, data.DataConnectedMixin,
                     else:
                         logger.debug("Failed to find the file for the "
                                      "component %s at %s. Component's "
-                                     "filename returned is %s." % (
-                                        key, firenado.conf.APP_CONFIG_PATH,
-                                        self.components[key].get_config_file())
-                                     )
+                                     "filename returned is %s.", key,
+                                     firenado.conf.APP_CONFIG_PATH,
+                                     self.components[key].get_config_file())
         # Initializing enabled components after the load.
         for key, value in firenado.conf.components.items():
             if value['enabled']:
@@ -333,6 +331,7 @@ class SessionHandler:
 
     def __init__(self):
         self.session = None
+        self.skip_auth = False
 
     def authenticated(self):
         """ Returns if the current user is authenticated. If the current user
@@ -352,8 +351,8 @@ class ComponentHandler(SessionHandler):
     """
 
     def __init__(self, **kwargs):
+        super().__init__()
         self.component = None
-        SessionHandler.__init__(self)
 
     def initialize(self, component):
         self.component = component
@@ -378,6 +377,9 @@ class ComponentHandler(SessionHandler):
 
     @session.read
     def prepare(self):
+        if hasattr(self, "authenticate"):
+            if self.authenticate and hasattr(self.authenticate, '__call__'):
+                self.authenticate()
         self.component.before_request(self)
         self.before_request()
 
@@ -433,9 +435,9 @@ class ComponentHandler(SessionHandler):
 
 
 class TemplateHandler:
-    """ Deals with all aspects related to templates. The mixin will assume
-    it was applied to a ComponentHandler so we can resolve and deal with
-    templates defined in the same component or other components from the
+    """ Deals with all aspects related to templates. This mixin will assume
+    it was applied to a ComponentHandler. It will resolve and deal with
+    templates defined in the same component or other components of an
     application.
     """
 
@@ -477,7 +479,7 @@ class TemplateHandler:
         if self.component is None:
             # This is the default behaviour provided by Tornado.
             # No components on the request no fancy template path.
-            return super(TornadoHandler, self).get_template_path()
+            return super().get_template_path()
         else:
             return self.component.get_template_path()
 
@@ -566,7 +568,7 @@ class FirenadoComponentLoader(Loader):
         :param parent_path: The template parent path
         :return: Tornado resolve_path result.
         """
-        logger.debug("Resolving template %s." % name)
+        logger.debug("Resolving template %s.", name)
         name_resolved = name
         if ':' in name:
             name_x = name.split(':')
@@ -575,7 +577,6 @@ class FirenadoComponentLoader(Loader):
                 self.component.application.components[
                     component_name].get_template_path(), name_x[-1])
         if name != name_resolved:
-            logger.debug("Template %s resolved at %s." % (name, name_resolved))
+            logger.debug("Template %s resolved at %s.", name, name_resolved)
 
-        return super(FirenadoComponentLoader,
-                     self).resolve_path(name_resolved, parent_path)
+        return super().resolve_path(name_resolved, parent_path)

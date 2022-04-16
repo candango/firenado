@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 #
-# Copyright 2015-2021 Flavio Garcia
+# Copyright 2015-2022 Flávio Gonçalves Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -34,11 +34,10 @@ def run_from_command_line():
     """ Run Firenado's management commands from a command line
     """
     for commands_conf in firenado.conf.management['commands']:
-        logger.debug("Loading %s commands from %s." % (
-            commands_conf['name'],
-            commands_conf['module']
-        ))
-        exec('import %s' % commands_conf['module'])
+        logger.debug("Loading %s commands from %s.", commands_conf['name'],
+                     commands_conf['module'])
+        # from https://stackoverflow.com/a/19221024/2887989
+        __import__(commands_conf['module'])
     command_index = 1
     for arg in sys.argv[1:]:
         command_index += 1
@@ -54,6 +53,7 @@ def run_from_command_line():
         if not command_exists(namespace.command):
             show_command_line_usage(parser)
         else:
+
             run_command(namespace.command, sys.argv[command_index-1:])
     except FirenadoArgumentError:
         show_command_line_usage(parser, True)

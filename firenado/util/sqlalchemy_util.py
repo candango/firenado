@@ -1,6 +1,6 @@
-#!/usr/bin/env python
+# -*- coding: UTF-8 -*-
 #
-# Copyright 2015-2021 Flavio Garcia
+# Copyright 2015-2022 Flávio Gonçalves Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -64,7 +64,7 @@ def run_script(script_path, session, handle_command=None, handle_line=None):
     :param handle_line: Function to handle a valid line
     :return:
     """
-    logger.debug("Opening script %s." % script_path)
+    logger.debug("Opening script %s.", script_path)
     with open(script_path, "r") as stream:
         sql_command = ""
         for line in stream:
@@ -72,8 +72,8 @@ def run_script(script_path, session, handle_command=None, handle_line=None):
             if not line.startswith("--") and line.strip("\n"):
                 # Append line to the command string
                 if handle_line is not None:
-                    logger.debug("Calling the handle line function for: "
-                                 "%s." % line)
+                    logger.debug("Calling the handle line function for: %s.",
+                                 line)
                     line = handle_line(line)
                 sql_command = "%s%s" % (sql_command, line.strip("\n"))
                 # If the command string ends with ";", it is a full statement
@@ -82,7 +82,7 @@ def run_script(script_path, session, handle_command=None, handle_line=None):
                     try:
                         if handle_command is not None:
                             logger.debug("Calling the handle command function "
-                                         "for: %s." % sql_command)
+                                         "for: %s.", sql_command)
                             sql_command = handle_command(sql_command)
                         session.execute(text(sql_command))
                     # Assert in case of error

@@ -99,8 +99,8 @@ class Scheduler(object):
         return self._can_run
 
     def add_job(self, job):
-        logger.debug("Adding job %s into the scheduler [id: %s, name: %s]." %
-                     (job.id, self.id, self.name))
+        logger.debug("Adding job %s into the scheduler [id: %s, name: %s].",
+                     job.id, self.id, self.name)
         self._jobs[job.id] = job
 
     def get_job(self, job_id):
@@ -109,15 +109,15 @@ class Scheduler(object):
     def initialize(self, **kwargs):
         self._id = kwargs.get("id")
         self._name = kwargs.get("name")
-        logger.debug("Initializing scheduler [id: %s, name: %s]." % (
-            self.id, self.name))
+        logger.debug("Initializing scheduler [id: %s, name: %s].", self.id,
+                     self.name)
 
     def load_jobs(self):
         raise NotImplementedError
 
     def remove_job(self, job_id):
-        logger.debug("Removing job %s from the scheduler [id: %s, name: %s]."
-                     % (job_id, self.id, self.name))
+        logger.debug("Removing job %s from the scheduler [id: %s, name: %s].",
+                     job_id, self.id, self.name)
         job = self.get_job(job_id)
         if job is None:
             return None
@@ -126,38 +126,36 @@ class Scheduler(object):
 
     def run(self):
         self.load_jobs()
-        logger.debug("Scheduler [id: %s, name: %s] interval set to %sms." %
-                     (self.id, self.name, self._interval))
+        logger.debug("Scheduler [id: %s, name: %s] interval set to %sms.",
+                     self.id, self.name, self._interval)
         self._periodic_callback = tornado.ioloop.PeriodicCallback(
             self._manage_jobs, self._interval)
         self._periodic_callback.start()
 
     def _manage_jobs(self):
-        logger.debug("Scheduler [id: %s, name: %s] managing jobs." %
-                     (self.id, self.name))
+        logger.debug("Scheduler [id: %s, name: %s] managing jobs.", self.id,
+                     self.name)
         logger.debug("Scheduler [id: %s, name: %s] stopping periodic callback."
-                     % (self.id, self.name))
+                     , self.id, self.name)
         self._periodic_callback.stop()
         for job in self.jobs:
             if not job.already_scheduled:
                 logger.debug("Job %s from Scheduler [id: %s, name: %s] isn't "
-                             "scheduled yet." % (job.hard_id, self.id,
-                                                 self.name))
+                             "scheduled yet.", job.hard_id, self.id, self.name)
                 if job.must_schedule:
-                    logger.debug(
-                        "Job %s from Scheduler [id: %s, name: %s] must be "
-                        "scheduled to run at %s." % (
-                            job.hard_id, self.id, self.name, job.next_run))
+                    logger.debug("Job %s from Scheduler [id: %s, name: %s] "
+                                 "must be scheduled to run at %s.",
+                                 job.hard_id, self.id, self.name, job.next_run)
                     job.schedule()
             else:
-                logger.debug("Job %s from Scheduler [id: %s, name: %s] already"
-                             "scheduled." % (job.hard_id, self.id,
-                                             self.name))
+                logger.debug("Job %s from Scheduler [id: %s, name: %s] "
+                             "already scheduled.", job.hard_id, self.id,
+                             self.name)
 
-        logger.debug("Scheduler [id: %s, name: %s] ending of managing jobs." %
-                     (self.id, self.name))
+        logger.debug("Scheduler [id: %s, name: %s] ending of managing jobs.",
+                     self.id, self.name)
         logger.debug("Scheduler [id: %s, name: %s] starting periodic callback."
-                     % (self.id, self.name))
+                     , self.id, self.name)
         self._periodic_callback.start()
 
 
@@ -184,10 +182,10 @@ class ConfScheduler(Scheduler):
                                    "in the file:\n        %s\n    Job id: %s"
                                    "\n    Scheduler: [id: %s, name: %s]"
                                    "\n        Config: %s\n"
-                                   "\n    Please fix this issue.\n" %
-                                   (job_conf['class'],
-                                    self.component.get_complete_config_file(),
-                                    job_id, self.id, self.name, job_conf))
+                                   "\n    Please fix this issue.\n",
+                                   job_conf['class'],
+                                   self.component.get_complete_config_file(),
+                                   job_id, self.id, self.name, job_conf)
                 else:
                     if job_id is None:
                         logger.warning(
@@ -209,9 +207,9 @@ class ConfScheduler(Scheduler):
                                 "  Job id: %s\n    Scheduler: [id: %s, "
                                 "name: %s]\n        Config: %s\n"
                                 "\n    Please define either a cron string or "
-                                "date.\n" %
-                                (self.component.get_complete_config_file(),
-                                 job_id, self.id, self.name, job_conf))
+                                "date.\n",
+                                self.component.get_complete_config_file(),
+                                job_id, self.id, self.name, job_conf)
                         else:
                             self.add_job(job_resolved_class(self, **job_conf))
 
@@ -224,12 +222,12 @@ class ConfScheduler(Scheduler):
         if "id" not in self._conf:
             logger.warning("It is not possible to initialize the scheduler "
                            "because id is missing in the configuration "
-                           "provided.\n Config: %s" % self._conf)
+                           "provided.\n Config: %s", self._conf)
             has_error = True
         if "name" not in self._conf:
             logger.warning("It is not possible to initialize the scheduler "
                            "because name is missing in the configuration "
-                           "provided.\n Config: %s" % self._conf)
+                           "provided.\n Config: %s", self._conf)
             has_error = True
 
         if not has_error:
@@ -304,10 +302,9 @@ class ScheduledJob(object):
     def schedule(self):
         next_interval = self.next_interval
         logger.debug("Job %s from Scheduler [id: %s, name: %s] scheduled to "
-                     "run at next interval of %sms." % (self.hard_id,
-                                                        self._scheduler.id,
-                                                        self._scheduler.name,
-                                                        self.next_interval))
+                     "run at next interval of %sms.", self.hard_id,
+                     self._scheduler.id, self._scheduler.name,
+                     self.next_interval)
         self._periodic_callback = tornado.ioloop.PeriodicCallback(
             self._run_job, next_interval)
         self._periodic_callback.start()
@@ -317,26 +314,23 @@ class ScheduledJob(object):
         :return None:
         """
         self._periodic_callback.stop()
-        logger.debug(
-            "Running job %s from Scheduler [id: %s, name: %s]." % (
-                self.hard_id, self._scheduler.id, self._scheduler.name))
+        logger.debug("Running job %s from Scheduler [id: %s, name: %s].",
+                     self.hard_id, self._scheduler.id, self._scheduler.name)
         try:
             future = self.run()
             if future:
-                logger.debug(
-                    "Running job %s from Scheduler [id: %s, name: %s] "
-                    "asynchronously. " % (self.hard_id, self._scheduler.id,
-                                          self._scheduler.name))
+                logger.debug("Running job %s from Scheduler [id: %s, name: "
+                             "%s] asynchronously.", self.hard_id,
+                             self._scheduler.id, self._scheduler.name)
                 await future
         except:
             logger.error("A non handled exception was cough while running the "
-                         "job %s:" % self.hard_id,
+                         "job %s:", self.hard_id,
                          exc_info=exception.full_exc_info())
             logger.error("Please handle the exception to fix the job "
                          "execution and avoid breaking the scheduler.")
-        logger.debug(
-            "Job %s removed from Scheduler [id: %s, name: %s]" % (
-                self.hard_id, self._scheduler.id, self._scheduler.name))
+        logger.debug("Job %s removed from Scheduler [id: %s, name: %s]",
+                     self.hard_id, self._scheduler.id, self._scheduler.name)
         self._periodic_callback = None
         return
 
@@ -371,19 +365,18 @@ class ScheduledTornadoComponent(TornadoComponent):
     def _config_schedule_component(self):
         if "interval" in self.schedule_conf():
             self._interval = self.conf['interval']
-        logger.debug("Scheduled component %s interval set to %sms." %
-                     (self.name, self._interval))
+        logger.debug("Scheduled component %s interval set to %sms.", self.name,
+                     self._interval)
         if "schedulers" in self.schedule_conf():
-            logger.debug("Initializing %s schedulers." % self.name)
+            logger.debug("Initializing %s schedulers.", self.name)
             self._initialize_schedulers()
         else:
             logger.warning("No scheduler was defined in the scheduled "
                            "component %s.\n\n%s\n* It is necessary either "
                            "define schedulers or scheduler loaders in the \n*"
                            " %s config file. \n* %s-- Firenado scheduled "
-                           "component\n%s\n" %
-                           (self.name, "*" * 70,
-                            self.get_config_file(), " " * 37, "*" * 70))
+                           "component\n%s\n", self.name, "*" * 70,
+                           self.get_config_file(), " " * 37, "*" * 70)
 
     def _initialize_schedulers(self):
         for scheduler_conf in self.conf['schedulers']:
@@ -400,7 +393,7 @@ class ScheduledTornadoComponent(TornadoComponent):
     def initialize(self):
         if self.has_conf:
             logger.debug("Configuration file found. Starting scheduled "
-                         "component %s initialization." % self.name)
+                         "component %s initialization.", self.name)
             self._config_schedule_component()
         else:
             logger.warning("No configuration file was found. Scheduled"
