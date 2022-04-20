@@ -109,10 +109,12 @@ class SessionEngine(object):
                 if not request_handler.session.is_destroyed():
                     encoded_session_data = self.encode_session_data(
                         request_handler.session.get_data())
+                    params = request_handler.session.get_params
                     if request_handler.session.is_changed():
                         self.session_handler.write_stored_session(
                             session_id,
-                            encoded_session_data
+                            encoded_session_data,
+                            **params
                         )
                 else:
                     # Generating a new session
@@ -177,6 +179,7 @@ class Session(object):
         self.__engine = engine
         self.id = sess_id
         self.__data = {} if data is None else data
+        self.__params = {}
         self.__destroyed = False
         self.__changed = False
 
@@ -205,6 +208,10 @@ class Session(object):
         self.__lock_if_destroyed()
         return self.__data.copy()
 
+    def get_params(self):
+        self.__lock_if_destroyed()
+        return self.__params.copy()
+
     def has(self, key):
         self.__lock_if_destroyed()
         """ Returns if session data has some data stored by a given key. """
@@ -228,10 +235,11 @@ class Session(object):
         if self.is_destroyed():
             raise SessionDestroyedError()
 
-    def set(self, key, value):
+    def set(self, key, value, **kwargs):
         """ Set a value into the session data labeled by a given key """
         self.__lock_if_destroyed()
         self.__data[key] = value
+        self.__params[key] = kwargs
         self.__changed = True
 
 
@@ -244,26 +252,26 @@ class SessionDestroyedError(tornado.web.HTTPError):
             status_code, message, *args, **kwargs)
 
 
-class SessionHandler(object):
+class SessionHandler:
 
     def __init__(self, engine):
         self.engine = engine
         self.settings = {}
 
     def create_session(self, session_id, data):
-        pass
+        raise NotImplementedError
 
     def read_stored_session(self, session_id):
-        pass
+        raise NotImplementedError
 
-    def write_stored_session(self, session_id, data):
-        pass
+    def write_stored_session(self, session_id, data, **kwargs):
+        raise NotImplementedError
 
     def destroy_stored_session(self, session_id):
-        pass
+        raise NotImplementedError
 
     def purge_expired_sessions(self):
-        pass
+        raise NotImplementedError
 
     @staticmethod
     def create_session_id_cookie(request_handler):
@@ -403,7 +411,7 @@ class FileSessionHandler(SessionHandler):
         timed_data = fs.read(session_file)
         return binascii.unhexlify(timed_data.split("--")[0])
 
-    def write_stored_session(self, session_id, data):
+    def write_stored_session(self, session_id, data, **kwargs):
         import binascii
         import time
         timed_data = "%s--%s" % (binascii.hexlify(data).decode("ascii"),
@@ -494,7 +502,7 @@ class RedisSessionHandler(SessionHandler):
         self.data_source.get_connection().expire(key, self.life_time)
         return self.data_source.get_connection().get(key)
 
-    def write_stored_session(self, session_id, data):
+    def write_stored_session(self, session_id, data, **kwargs):
         key = self.__get_key(session_id)
         self.data_source.get_connection().set(key, data)
         self.data_source.get_connection().expire(key, self.life_time)

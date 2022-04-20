@@ -172,7 +172,6 @@ class SqlalchemyConnector(Connector):
             if conf['backend'] == 'mysql':
                 # Setting connection default connection timeout for mysql
                 # backends as suggested on http://bit.ly/2bvOLxs
-                # TODO: ignore this if pool_recycle is defined on conf
                 engine_params['pool_recycle'] = 3600
 
         if "future" in conf:
@@ -180,15 +179,20 @@ class SqlalchemyConnector(Connector):
                 engine_params['future'] = True
 
         if "pool" in conf:
-            if "size" in conf['pool']:
-                engine_params['pool_size'] = conf['pool']['size']
-            if "max_overflow" in conf['pool']:
-                engine_params['max_overflow'] = conf['pool']['max_overflow']
             if "class" in conf['pool']:
                 engine_params['pool_class'] = conf['pool']['class']
                 if isinstance(engine_params['pool_class'], str):
                     engine_params['pool_class'] = config.get_from_string(
                         engine_params['pool_class'])
+            if "isolation_level" in conf['pool']:
+                engine_params['isolation_level'] = conf['pool'][
+                    'isolation_level']
+            if "max_overflow" in conf['pool']:
+                engine_params['max_overflow'] = conf['pool']['max_overflow']
+            if "pool_recycle" in conf['pool']:
+                engine_params['pool_recycle'] = conf['pool']['pool_recycle']
+            if "size" in conf['pool']:
+                engine_params['pool_size'] = conf['pool']['size']
 
         if "session" in conf:
             if "autoflush" in conf['session']:
@@ -204,11 +208,9 @@ class SqlalchemyConnector(Connector):
                 self.__connection['session']['info'] = conf['session']['info']
 
         if "url" not in conf:
-            print(self.__connection)
             logger.error("It is not possible to create sqlalchemy engine for "
                          "%s datasource. Configuration: %s.", self.__name,
                          conf)
-
         self.__engine = create_engine(conf['url'], **engine_params)
 
         @event.listens_for(self.__engine, "engine_connect")
@@ -271,8 +273,22 @@ class SqlalchemyConnector(Connector):
             logger.fatal("Error trying to connect to database: %s", op_error)
             sys.exit(errno.ECONNREFUSED)
 
-    def get_a_session(self, autoflush=True, autocommit=False,
-                      expire_on_commit=True, info=None):
+    def get_a_session(self, **kwargs) -> "sqlalchemy.orm.Session":
+        """ Return a session bind to the datasource engine.
+
+        Default parameters based on: https://bit.ly/3MjWDzF
+        :param dict kwargs:
+        :key bool autoflush: Default to True
+        :key bool autocommit: Default to False
+        :key bool expire_on_commit: Default to False
+        :key dict info: Default to None
+        :return "sqlalchemy.orm.session.Session":
+        """
+        autoflush = kwargs.get("autoflush", True)
+        autocommit = kwargs.get("autocommit", False)
+        expire_on_commit = kwargs.get("expire_on_commit", True)
+        info = kwargs.get("info")
+
         from firenado.util.sqlalchemy_util import Session
         Session.configure(bind=self.__engine, autoflush=autoflush,
                           autocommit=autocommit,

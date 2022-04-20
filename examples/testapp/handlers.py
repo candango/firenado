@@ -1,6 +1,6 @@
-#!/usr/bin/env python
+# -*- coding: UTF-8 -*-
 #
-# Copyright 2015-2021 Flavio Garcia
+# Copyright 2015-2022 Flávio Gonçalves Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -171,7 +171,7 @@ class LogoutHandler(AuthHandler, tornadoweb.TornadoHandler):
     def get(self):
         default_login = firenado.conf.app['login']['urls']['default']
         if self.authenticated():
-            self.session.delete("user")
+            self.session.destroy(self)
             self.redirect(self.get_rooted_path("private"))
         else:
             self.redirect(self.get_rooted_path(default_login))
