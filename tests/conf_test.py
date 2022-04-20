@@ -222,6 +222,20 @@ class ApplicationComponentTestCase(unittest.TestCase):
         self.assertEqual(firenado.conf.session['enabled'], True)
         self.assertEqual(firenado.conf.session['name'], "REDISSESSID")
 
+    def test_data_source_pool(self):
+        """ Checks if the data source pool is set correctly
+        """
+        chdir_app("data", "conf")
+        self.assertEqual(
+            firenado.conf.data['sources']['mysql']['pool']['size'],
+            10)
+        self.assertEqual(
+            firenado.conf.data['sources']['mysql']['pool']['max_overflow'],
+            10)
+        self.assertEqual(
+            firenado.conf.data['sources']['mysql']['pool']['isolation_level'],
+            "REPEATABLE READ")
+
 
 class MultiAppTestCase(unittest.TestCase):
     """ Case that tests multi app configuration.
