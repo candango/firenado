@@ -46,9 +46,6 @@ def resolve_requires(requirements_file):
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
-# We still running: python setup.py sdist upload --repository=testpypi
-# Twine isn't handling long_descriptions as per:
-# https://github.com/pypa/twine/issues/262
 setup(
     name="Firenado",
     version=firenado.get_version(),
@@ -85,6 +82,7 @@ setup(
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
         "Programming Language :: Python :: 3 :: Only",
         "Topic :: Internet :: WWW/HTTP",
         "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
