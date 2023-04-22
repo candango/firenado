@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 #
-# Copyright 2015-2021 Flavio Garcia
+# Copyright 2015-2022 Flávio Gonçalves Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -204,7 +204,7 @@ def process_apps_config_session(config, apps_config):
                 if not os.path.exists(file):
                     logger.critical("The file %s doesn't exists. Please check"
                                     "your apps definition and inform a valid "
-                                    "file." % file)
+                                    "file.", file)
                     sysexits.exit_fatal(sysexits.EX_CONFIG)
                 file_app_config = load_yaml_file(file)
                 if "app" in file_app_config:
@@ -223,7 +223,7 @@ def process_apps_config_session(config, apps_config):
     if config.current_app_name in config.apps:
         config.app = config.apps[config.current_app_name].app
     else:
-        logger.critical("The application %s is not defined." %
+        logger.critical("The application %s is not defined.",
                         config.current_app_name)
         sysexits.exit_fatal(sysexits.EX_CONFIG)
 
@@ -246,8 +246,9 @@ def process_app_config_section(config, app_config):
         config.app['id'] = app_config['id']
     if 'login' in app_config:
         if 'urls' in app_config['login']:
-            for url in app_config['login']['urls']:
-                config.app['login']['urls'][url['name']] = url['value']
+            if app_config['login']['urls']:
+                for url in app_config['login']['urls']:
+                    config.app['login']['urls'][url['name']] = url['value']
     if 'pythonpath' in app_config:
         config.app['pythonpath'] = app_config['pythonpath']
     if 'port' in app_config:
@@ -430,6 +431,6 @@ def process_session_config_section(config, session_config):
             config.session['encoder'] = session_config['encoder']
         else:
             logger = logging.getLogger(__name__)
-            logger.critical("The session encoder \"{}\" is not defined."
-                            "".format(session_config['encoder']))
+            logger.critical("The session encoder \"%s\" is not defined.",
+                            session_config['encoder'])
             sysexits.exit_fatal(sysexits.EX_CONFIG)

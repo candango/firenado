@@ -1,2 +1,2 @@
-redis==4.1.4
-hiredis==2.0.0
+redis>=4.3.0
+hiredis>=2.0.0

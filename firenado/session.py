@@ -37,7 +37,6 @@ class SessionEngine(object):
         self.session_callback = None
         self.callback_time = None
         self.callback_hiccup = firenado.conf.session['callback_hiccup'] * 1000
-
         # TODO: By the way session could be disabled. How to handle that?
         # TODO: check if session type exists. Maybe disable it if type is not
         # defined. We need to inform the error here
@@ -73,7 +72,7 @@ class SessionEngine(object):
             )
             self.session_encoder = encoder_class()
 
-    def get_session(self, request_handler):
+    async def get_session(self, request_handler):
         """Returns a valid session object. This session is handler by the
         session handler defined on the application configuration. """
         if firenado.conf.session['enabled']:
@@ -98,7 +97,7 @@ class SessionEngine(object):
                 session = Session(self, session_data, session_id)
             return session
 
-    def store_session(self, request_handler):
+    async def store_session(self, request_handler):
         """Sends the session data to be stored by the session handler defined
         on the application configuration. """
         if firenado.conf.session['enabled']:
@@ -110,15 +109,17 @@ class SessionEngine(object):
                 if not request_handler.session.is_destroyed():
                     encoded_session_data = self.encode_session_data(
                         request_handler.session.get_data())
+                    params = request_handler.session.get_params
                     if request_handler.session.is_changed():
                         self.session_handler.write_stored_session(
                             session_id,
-                            encoded_session_data
+                            encoded_session_data,
+                            **params
                         )
                 else:
                     # Generating a new session
                     logger.debug("Dispatching session %s destruction to the "
-                                 "session handler." % session_id)
+                                 "session handler.", session_id)
                     self.session_handler.destroy_stored_session(session_id)
 
     def encode_session_data(self, data):
@@ -132,11 +133,11 @@ class SessionEngine(object):
 
     def set_purge_normal(self):
         self.session_callback.callback_time = self.callback_time
-        logger.debug("No hiccups. Callback in %sms." % self.callback_time)
+        logger.debug("No hiccups. Callback in %sms.", self.callback_time)
 
     def set_purge_hiccup(self):
         self.session_callback.callback_time = self.callback_hiccup
-        logger.warning("Purge hiccup in %sms." % self.callback_hiccup)
+        logger.warning("Purge hiccup in %sms.", self.callback_hiccup)
 
     def __renew_session(self, request_handler):
         if firenado.conf.session['enabled']:
@@ -178,6 +179,7 @@ class Session(object):
         self.__engine = engine
         self.id = sess_id
         self.__data = {} if data is None else data
+        self.__params = {}
         self.__destroyed = False
         self.__changed = False
 
@@ -206,6 +208,10 @@ class Session(object):
         self.__lock_if_destroyed()
         return self.__data.copy()
 
+    def get_params(self):
+        self.__lock_if_destroyed()
+        return self.__params.copy()
+
     def has(self, key):
         self.__lock_if_destroyed()
         """ Returns if session data has some data stored by a given key. """
@@ -229,42 +235,43 @@ class Session(object):
         if self.is_destroyed():
             raise SessionDestroyedError()
 
-    def set(self, key, value):
+    def set(self, key, value, **kwargs):
         """ Set a value into the session data labeled by a given key """
         self.__lock_if_destroyed()
         self.__data[key] = value
+        self.__params[key] = kwargs
         self.__changed = True
 
 
 class SessionDestroyedError(tornado.web.HTTPError):
 
-    def __init__(self, status_code, log_message=None, *args, **kwargs):
-        message = "The session was destroyed. It is necessary a renew the " \
-                  "session before use it again."
+    def __init__(self, status_code=500, log_message=None, *args, **kwargs):
+        message = ("The session is already destroyed. It is necessary to renew"
+                   " the session before using it again.")
         super(SessionDestroyedError, self).__init__(
-            505, message, *args, **kwargs)
+            status_code, message, *args, **kwargs)
 
 
-class SessionHandler(object):
+class SessionHandler:
 
     def __init__(self, engine):
         self.engine = engine
         self.settings = {}
 
     def create_session(self, session_id, data):
-        pass
+        raise NotImplementedError
 
     def read_stored_session(self, session_id):
-        pass
+        raise NotImplementedError
 
-    def write_stored_session(self, session_id, data):
-        pass
+    def write_stored_session(self, session_id, data, **kwargs):
+        raise NotImplementedError
 
     def destroy_stored_session(self, session_id):
-        pass
+        raise NotImplementedError
 
     def purge_expired_sessions(self):
-        pass
+        raise NotImplementedError
 
     @staticmethod
     def create_session_id_cookie(request_handler):
@@ -338,9 +345,9 @@ def create_session_engine(obj, session_engine_attribute, session_engine_class):
 
 def read(method):
     @functools.wraps(method)
-    def wrapper(self, *args, **kwargs):
+    async def wrapper(self, *args, **kwargs):
         if firenado.conf.session['enabled']:
-            session = self.application.session_engine.get_session(self)
+            session = await self.application.session_engine.get_session(self)
             self.session = session
             logging.debug("Reading session %s." % self.session.id)
         return method(self, *args, **kwargs)
@@ -350,6 +357,10 @@ def read(method):
 def write(method):
     @functools.wraps(method)
     def wrapper(self, *args, **kwargs):
+        async def write_session_callback():
+            logging.debug("Writing session %s." % self.session.id)
+            await self.application.session_engine.store_session(self)
+
         retval = method(self, *args, **kwargs)
         if firenado.conf.session['enabled']:
             if self.session is None:
@@ -358,8 +369,9 @@ def write(method):
                               " current handler status is: %s." %
                               self.get_status())
             else:
-                logging.debug("Writing session %s." % self.session.id)
-                self.application.session_engine.store_session(self)
+                tornado.ioloop.IOLoop.current().add_callback(
+                    callback=write_session_callback
+                )
         return retval
     return wrapper
 
@@ -399,7 +411,7 @@ class FileSessionHandler(SessionHandler):
         timed_data = fs.read(session_file)
         return binascii.unhexlify(timed_data.split("--")[0])
 
-    def write_stored_session(self, session_id, data):
+    def write_stored_session(self, session_id, data, **kwargs):
         import binascii
         import time
         timed_data = "%s--%s" % (binascii.hexlify(data).decode("ascii"),
@@ -408,14 +420,14 @@ class FileSessionHandler(SessionHandler):
         fs.write(session_file, timed_data)
 
     def destroy_stored_session(self, session_id):
-        logger.debug("Destroying session %s." % session_id)
+        logger.debug("Destroying session %s.", session_id)
         try:
             session_file = os.path.join(
                 self.path,
                 self.__get_filename(session_id)
             )
             os.remove(session_file)
-            logger.debug("Session %s destroyed." % session_id)
+            logger.debug("Session %s destroyed.", session_id)
         except OSError:
             # TODO Why we are deleting the session file twice?
             pass
@@ -430,8 +442,7 @@ class FileSessionHandler(SessionHandler):
         """
         logger.debug("File handler looking for expired sessions.")
         self.engine.session_callback.stop()
-        logging.debug("Session periodic callback stopped by the file "
-                      "handler.")
+        logger.debug("Session periodic callback stopped by the file handler.")
         purge_count = 0
         purge_hiccup = False
         for dirname, dirnames, filenames in os.walk(self.path):
@@ -448,10 +459,8 @@ class FileSessionHandler(SessionHandler):
                     purge_count += 1
             if purge_count == firenado.conf.session['purge_limit']:
                 purge_hiccup = True
-                logger.warning(
-                    "Expired 500 sessions. Exiting the call and waiting for "
-                    "purge hiccup."
-                )
+                logger.warning("Expired 500 sessions. Exiting the call and "
+                               "waiting for purge hiccup.")
                 break
         if purge_hiccup:
             self.engine.set_purge_hiccup()
@@ -493,16 +502,16 @@ class RedisSessionHandler(SessionHandler):
         self.data_source.get_connection().expire(key, self.life_time)
         return self.data_source.get_connection().get(key)
 
-    def write_stored_session(self, session_id, data):
+    def write_stored_session(self, session_id, data, **kwargs):
         key = self.__get_key(session_id)
         self.data_source.get_connection().set(key, data)
         self.data_source.get_connection().expire(key, self.life_time)
 
     def destroy_stored_session(self, session_id):
-        logger.debug("Destroying session %s." % session_id)
+        logger.debug("Destroying session %s.", session_id)
         key = self.__get_key(session_id)
         self.data_source.get_connection().delete(key)
-        logger.debug("Session %s destroyed." % session_id)
+        logger.debug("Session %s destroyed.", session_id)
 
     def purge_expired_sessions(self):
         """ On Redis we don't destroy expired sessions per-se.
@@ -518,17 +527,14 @@ class RedisSessionHandler(SessionHandler):
         for key in keys:
             ttl = self.data_source.get_connection().ttl(key)
             if ttl == -1:
-                logger.warning(
-                    "Session %s without ttl. Setting expiration now." % key
-                )
+                logger.warning("Session %s without ttl. Setting expiration "
+                               "now.", key)
                 self.data_source.get_connection().expire(key, self.life_time)
                 purge_count += 1
                 if purge_count == firenado.conf.session['purge_limit']:
                     purge_hiccup = True
-                    logger.warning(
-                        "Set ttl to 500 sessions. Exiting the call and waiting"
-                        " for purge hiccup."
-                    )
+                    logger.warning("Set ttl to 500 sessions. Exiting the call"
+                                   " and waiting for purge hiccup.")
                     break
         if purge_hiccup:
             self.engine.set_purge_hiccup()

@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 #
-# Copyright 2015-2021 Flavio Garcia
+# Copyright 2015-2022 Flávio Gonçalves Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ from importlib import reload
 import logging
 import os
 import sys
-from tornado import gen
+import warnings
 
 logger = logging.getLogger(__name__)
 
@@ -70,10 +70,13 @@ class FirenadoLauncher(object):
                             format=firenado.conf.log['format'])
 
     def load(self):
-        return None
+        raise NotImplementedError()
 
     def launch(self):
-        return None
+        raise NotImplementedError()
+
+    def shutdown(self):
+        raise NotImplementedError()
 
 
 class ProcessLauncher(FirenadoLauncher):
@@ -86,9 +89,10 @@ class ProcessLauncher(FirenadoLauncher):
                      "ProcessLauncher.")
 
     def __init__(self, **settings):
-        super(ProcessLauncher, self).__init__(**settings)
+        super().__init__(**settings)
         self.process = None
         self.process_callback = None
+        self.process_callback_time = 100
         self.logfile = settings.get("logfile", None)
         self.command = None
         self.response = None
@@ -112,41 +116,42 @@ class ProcessLauncher(FirenadoLauncher):
             socket_parameter = "--port=%s" % self.socket
             self.command = "%s %s" % (self.command, socket_parameter)
 
-    @gen.coroutine
-    def read_process(self):
+    async def read_process(self):
         import pexpect
         self.process_callback.stop()
         try:
             # Simple way to catch everything is wait for a new line:
             #
-            yield self.process.expect("\n", async_=True)
+            await self.process.expect("\n", async_=True)
         except pexpect.TIMEOUT:
-            logger.warning("Reached timeout")
-            pass
+            logger.debug("Reached timeout, getting back in the loop.")
         self.process_callback.start()
 
-    @gen.coroutine
-    def launch(self):
-        import pexpect
-        import tornado.ioloop
-        logger.info("Launching %s" % self.command)
-        parameters = {
-            'command': self.command,
-            'encoding': "utf-8"
-        }
-        if self.logfile is not None:
-            parameters['logfile'] = self.logfile
-        self.process = pexpect.spawn(**parameters)
-        yield self.process.expect(
-            [r"[Firenado server started successfully].*"], async_=True)
-        self.process_callback = tornado.ioloop.PeriodicCallback(
-            self.read_process,
-            400
-        )
-        self.process_callback.start()
+    async def launch(self):
+        with warnings.catch_warnings():
+            import pexpect
+            import tornado.ioloop
+            logger.info("Launching %s", self.command)
+            parameters = {
+                'command': self.command,
+                'encoding': "utf-8"
+            }
+            if self.dir:
+                parameters['cwd'] = self.dir
+            if self.logfile is not None:
+                parameters['logfile'] = self.logfile
+            self.process = pexpect.spawn(**parameters)
+            warnings.simplefilter("ignore")
+            await self.process.expect(
+                [r"[Firenado server started successfully].*"], async_=True)
+            self.process_callback = tornado.ioloop.PeriodicCallback(
+                self.read_process,
+                self.process_callback_time
+            )
+            self.process_callback.start()
 
     def send(self, line):
-        logger.info("Sending line {}".format(line))
+        logger.info("Sending line %s", line)
         self.process.sendline(line)
 
     def shutdown(self):
@@ -190,14 +195,14 @@ class TornadoLauncher(FirenadoLauncher):
         self.http_server = tornado.httpserver.HTTPServer(self.application)
         if firenado.conf.app['xheaders'] is not None and type(
                 firenado.conf.app['xheaders']) == bool:
-            logger.debug("Setting http server xheaders as %s." %
+            logger.debug("Setting http server xheaders as %s.",
                          firenado.conf.app['xheaders'])
             self.http_server.xheaders = firenado.conf.app['xheaders']
         if firenado.conf.app['xheaders'] is not None and type(
                 firenado.conf.app['xheaders']) != bool:
             logger.warning("The xheaders defined in the application section"
                            "must be bool instead of %s. Ignoring the "
-                           "configuration item." %
+                           "configuration item.",
                            type(firenado.conf.app['xheaders']).__name__)
         listening_count = 0
         listening_what = "socket"
@@ -208,7 +213,7 @@ class TornadoLauncher(FirenadoLauncher):
                 socket_path = self.socket
             socket = bind_unix_socket(socket_path)
             self.http_server.add_socket(socket)
-            logger.info("Firenado listening at socket ""%s" %
+            logger.info("Firenado listening at socket %s",
                         socket.getsockname())
             listening_count += 1
         else:
@@ -224,7 +229,7 @@ class TornadoLauncher(FirenadoLauncher):
             if listening_count > 1:
                 listening_what = "%ss" % listening_what
             logger.info("Firenado server started successfully. Listening at %s"
-                        " %s." % (listening_count, listening_what))
+                        " %s.", listening_count, listening_what)
             if firenado.conf.app['process']['num_processes'] is not None:
                 import tornado.process
                 num_processes = firenado.conf.app['process']['num_processes']
@@ -234,7 +239,7 @@ class TornadoLauncher(FirenadoLauncher):
                     num_processes_alert = ("0 (assuming %s as cpu count)" %
                                            tornado.process.cpu_count())
                 logger.info("Tornado set to start %s processes with %s max "
-                            "restarts." % (num_processes_alert, max_restarts))
+                            "restarts.", num_processes_alert, max_restarts)
                 tornado.process.fork_processes(num_processes, max_restarts)
             tornado.ioloop.IOLoop.current().start()
         else:
@@ -251,11 +256,10 @@ class TornadoLauncher(FirenadoLauncher):
         tid = task_id()
         pid = os.getpid()
         if tid is None:
-            logger.warning("main process (pid %s) caught signal: %s" %
-                           (pid, sig))
+            logger.warning("main process (pid %s) caught signal: %s", pid, sig)
         else:
-            logger.warning("child %s (pid %s) caught signal: %s" %
-                           (tid, pid, sig))
+            logger.warning("child %s (pid %s) caught signal: %s", tid, pid,
+                           sig)
         tornado.ioloop.IOLoop.current().add_callback_from_signal(self.shutdown)
 
     def add_sockets(self, port, address=None):
@@ -268,20 +272,18 @@ class TornadoLauncher(FirenadoLauncher):
                 sockets = bind_sockets(port)
                 address = "127.0.0.1"
             self.http_server.add_sockets(sockets)
-            logger.info("Firenado listening at http://%s:%s." %
-                        (address.strip(), port))
+            logger.info("Firenado listening at http://%s:%s.", address.strip(),
+                        port)
             return True
         except gaierror as error:
-            logger.error("Firenado failed to listen at http://%s:%s."
-                         % (address.strip(), port))
+            logger.error("Firenado failed to listen at http://%s:%s.",
+                         address.strip(), port)
         except OSError as error:
-            logger.error("Firenado failed to listen at http://%s:%s. "
-                         "Check if another process is listening at "
-                         "this port or if you provided a dns name and"
-                         "the correspondent ip in the addresses"
-                         "configuration or if the machine owns the ip "
-                         "Fireando will start to listen." %
-                         (address, port))
+            logger.error("Firenado failed to listen at http://%s:%s. Check if "
+                         "another process is listening at this port or if you "
+                         "provided a dns name and the correspondent ip in the "
+                         "addresses configuration or if the machine owns the "
+                         "ip Fireando will start to listen.", address, port)
         return False
 
     def shutdown(self):
@@ -291,9 +293,9 @@ class TornadoLauncher(FirenadoLauncher):
         tid = task_id()
         pid = os.getpid()
         if tid is None:
-            logger.info("main process (pid %s): stopping http server" % pid)
+            logger.info("main process (pid %s): stopping http server.", pid)
         else:
-            logger.info("child %s (pid %s): stopping http server" % (tid, pid))
+            logger.info("child %s (pid %s): stopping http server.", tid, pid)
         for key, component in self.application.components.items():
             component.shutdown()
         self.http_server.stop()
@@ -303,18 +305,16 @@ class TornadoLauncher(FirenadoLauncher):
         if self.MAX_WAIT_SECONDS_BEFORE_SHUTDOWN == 0:
             io_loop.stop()
             if tid is None:
-                logger.info("main process (pid %s): application is down" % pid)
+                logger.info("main process (pid %s): application is down", pid)
             else:
-                logger.info("child %s (pid %s): application is down" %
-                            (tid, pid))
+                logger.info("child %s (pid %s): application is down", tid, pid)
         else:
             if tid is None:
                 logger.info("main process (pid %s): shutdown in %s seconds "
-                            "..." %
-                            (pid, self.MAX_WAIT_SECONDS_BEFORE_SHUTDOWN))
+                            "...", pid, self.MAX_WAIT_SECONDS_BEFORE_SHUTDOWN)
             else:
-                logger.info("child %s (pid %s): shutdown in %s seconds ..." %
-                            (tid, pid, self.MAX_WAIT_SECONDS_BEFORE_SHUTDOWN))
+                logger.info("child %s (pid %s): shutdown in %s seconds ...",
+                            tid, pid, self.MAX_WAIT_SECONDS_BEFORE_SHUTDOWN)
             deadline = time.time() + self.MAX_WAIT_SECONDS_BEFORE_SHUTDOWN
 
             def stop_loop():
@@ -325,8 +325,8 @@ class TornadoLauncher(FirenadoLauncher):
                     io_loop.stop()
                     if tid is None:
                         logger.info("main process (pid %s): application is "
-                                    "down" % pid)
+                                    "down", pid)
                     else:
-                        logger.info("child %s (pid %s): application is down" %
-                                    (tid, pid))
+                        logger.info("child %s (pid %s): application is down",
+                                    tid, pid)
             stop_loop()

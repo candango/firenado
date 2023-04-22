@@ -40,21 +40,21 @@ def chdir_fixture_app(app_name, **kwargs):
     return test_app_dirname
 
 
-def chdir_app(app_name, dir=None):
+def chdir_app(app_name, directory=None):
     """ Change to the application directory located at the resource directory
     for conf tests.
 
     The conf resources directory is firenado/tests/resources/conf.
 
     :param app_name: The application name
-    :param dir: The directory to be changed
+    :param directory: The directory to be changed
     """
     import firenado.conf
 
     test_dirname, filename = os.path.split(os.path.abspath(__file__))
-    if dir:
+    if directory:
         test_app_dirname = os.path.join(test_dirname, 'resources',
-                                        dir, app_name)
+                                        directory, app_name)
     else:
         test_app_dirname = os.path.join(test_dirname, 'resources', app_name)
     os.chdir(test_app_dirname)

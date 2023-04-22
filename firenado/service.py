@@ -22,7 +22,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class FirenadoService(object):
+class FirenadoService:
     """ Base class to handle services. A Firenado service is usually connected
     to a handler or a service.
     The developer can add extra configuration using the configuration_service
@@ -155,14 +155,14 @@ def sessionned(*args, **kwargs):
                         session = data_source.session
                     method_kwargs['session'] = session
                 except KeyError:
-                    logger.exception("There is no datasource defined with"
-                                     "index \"%s\" related to the service." %
+                    logger.exception("There is no datasource defined with "
+                                     "index \"%s\" related to the service.",
                                      data_source)
             result = method(self, *method_args, **method_kwargs)
             if close:
                 if not session:
                     logger.warning("No session was resolved.")
-                logger.debug("Closing session %s." % session)
+                logger.debug("Closing session %s.", session)
                 session.close()
             return result
         return wrapper

@@ -1,6 +1,6 @@
-#!/usr/bin/env python
+# -*- coding: UTF-8 -*-
 #
-# Copyright 2015-2021 Flavio Garcia
+# Copyright 2015-2022 Flávio Gonçalves Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ from firenado.config import get_class_from_config
 from firenado.tornadoweb import TornadoApplication
 from tests import chdir_app
 import unittest
+import warnings
 
 
 class FileSessionTestCase(unittest.TestCase):
@@ -31,13 +32,15 @@ class FileSessionTestCase(unittest.TestCase):
         loaded.
         """
         chdir_app("file", "session")
-        self.application = TornadoApplication()
-        self.session_handler_config = firenado.conf.session[
-            'handlers'][firenado.conf.session['type']]
-        self.session_handler_config = firenado.conf.session[
-            'handlers'][firenado.conf.session['type']]
-        self.session_handler_class = get_class_from_config(
-            self.session_handler_config)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            self.application = TornadoApplication()
+            self.session_handler_config = firenado.conf.session[
+                'handlers'][firenado.conf.session['type']]
+            self.session_handler_config = firenado.conf.session[
+                'handlers'][firenado.conf.session['type']]
+            self.session_handler_class = get_class_from_config(
+                self.session_handler_config)
 
     def test_defaults_session_parameters(self):
         """ Checks default session parameters on the configuration
@@ -59,12 +62,16 @@ class FileSessionTestCase(unittest.TestCase):
         """ Checks if test component was loaded correctly by the application
         __init__ method.
         """
-        application = TornadoApplication()
-        session_handler_config = firenado.conf.session[
-            'handlers'][firenado.conf.session['type']]
-        session_handler_class = get_class_from_config(session_handler_config)
-        self.assertEqual(application.session_engine.session_handler.__class__,
-                         session_handler_class)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            application = TornadoApplication()
+            session_handler_config = firenado.conf.session[
+                'handlers'][firenado.conf.session['type']]
+            session_handler_class = get_class_from_config(
+                session_handler_config)
+            self.assertEqual(
+                application.session_engine.session_handler.__class__,
+                session_handler_class)
 
 
 class RedisSessionTestCase(unittest.TestCase):
