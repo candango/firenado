@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 #
-# Copyright 2015-2022 Flávio Gonçalves Garcia
+# Copyright 2015-2023 Flávio Gonçalves Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,21 +14,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from cartola import fs, security
-import firenado.conf
-from firenado.config import get_class_from_config
 import functools
 import logging
 import os
+
 import tornado
 import tornado.ioloop
 import tornado.web
+from cartola.fs import read as fs_read
+from cartola.fs import touch as fs_touch
+from cartola.fs import write as fs_write
+from cartola.security import random_string
+
+import firenado.conf
+from firenado.config import get_class_from_config
 
 logger = logging.getLogger(__name__)
 
 
 class SessionEngine(object):
-    """SessionEngine provides session support to an application.
+    """Provides session support to an application.
     """
 
     def __init__(self, session_aware_instance):
@@ -102,14 +107,15 @@ class SessionEngine(object):
         on the application configuration. """
         if firenado.conf.session['enabled']:
             session_id = request_handler.session.id
-            # If session was destroyed than we gonna handle it differently
+            # If session was destroyed than we're going to handle it
+            # differently
             # If session id is None than ignored (it is probably a redirect
             # leftover from security)
             if session_id is not None:
                 if not request_handler.session.is_destroyed():
                     encoded_session_data = self.encode_session_data(
                         request_handler.session.get_data())
-                    params = request_handler.session.get_params
+                    params = request_handler.session.get_params()
                     if request_handler.session.is_changed():
                         self.session_handler.write_stored_session(
                             session_id,
@@ -247,12 +253,15 @@ class SessionDestroyedError(tornado.web.HTTPError):
 
     def __init__(self, status_code=500, log_message=None, *args, **kwargs):
         message = ("The session is already destroyed. It is necessary to renew"
-                   " the session before using it again.")
+                   " the session before using it again."
+                   if log_message is None else log_message)
         super(SessionDestroyedError, self).__init__(
             status_code, message, *args, **kwargs)
 
 
 class SessionHandler:
+
+    life_time: int
 
     def __init__(self, engine):
         self.engine = engine
@@ -323,7 +332,7 @@ class SessionHandler:
         Retrieves the session id generator function from the configuration.
 
         It is possible for a developer create a new session id generator
-        function and and use it here.
+        function and use it here.
 
         Returns:
             A probably unique session id.
@@ -402,13 +411,13 @@ class FileSessionHandler(SessionHandler):
         if os.path.exists(firenado.conf.session['file']['path']):
             session_file = os.path.join(self.path,
                                         self.__get_filename(session_id))
-            fs.touch(session_file)
+            fs_touch(session_file)
             self.write_stored_session(session_id, data)
 
     def read_stored_session(self, session_id):
         import binascii
         session_file = os.path.join(self.path, self.__get_filename(session_id))
-        timed_data = fs.read(session_file)
+        timed_data = fs_read(session_file)
         return binascii.unhexlify(timed_data.split("--")[0])
 
     def write_stored_session(self, session_id, data, **kwargs):
@@ -417,7 +426,7 @@ class FileSessionHandler(SessionHandler):
         timed_data = "%s--%s" % (binascii.hexlify(data).decode("ascii"),
                                  int(time.time()))
         session_file = os.path.join(self.path, self.__get_filename(session_id))
-        fs.write(session_file, timed_data)
+        fs_write(session_file, timed_data)
 
     def destroy_stored_session(self, session_id):
         logger.debug("Destroying session %s.", session_id)
@@ -449,7 +458,7 @@ class FileSessionHandler(SessionHandler):
             for filename in filenames:
                 file_path = os.path.join(self.path, filename)
                 sess_id = filename.split(".")[0].split("_")[-1]
-                timed_data = fs.read(file_path)
+                timed_data = fs_read(file_path)
                 last_write = timed_data.split("--")[1]
                 age = int(time.time()) - int(last_write)
                 if age > self.life_time:
@@ -480,8 +489,9 @@ class FileSessionHandler(SessionHandler):
 
 class RedisSessionHandler(SessionHandler):
     """
-    Session handler that deals with file data stored  in a redis database.
+    A session handler that deals with data stored in a redis database.
     """
+
     def __init__(self, engine):
         SessionHandler.__init__(self, engine)
         self.data_source = None
@@ -570,7 +580,7 @@ class SessionEncoder(object):
         return data
 
 
-class PickeSessionEncoder(SessionEncoder):
+class PickleSessionEncoder(SessionEncoder):
 
     def encode(self, data):
         import pickle
@@ -599,4 +609,4 @@ def generate_session_id():
     Returns:
         A random string containing digits, upper and lower characters
     """
-    return security.random_string(64)
+    return random_string(64)

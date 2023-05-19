@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 #
-# Copyright 2015-2022 Flávio Gonçalves Garcia
+# Copyright 2015-2023 Flávio Gonçalves Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ def configure(data_sources):
 
 class DataConnectedMixin(object):
     """ Data connected objects has data sources. This mixin prepares an
-    object to to have data sources set to it and retrieved from it.
+    object to have data sources set to it and retrieved from it.
 
     Example:
     >>> class MyClass(..., DataConnectedMixin):
@@ -52,7 +52,7 @@ class DataConnectedMixin(object):
         return get_data_sources(self, '__data_sources')
 
     def get_data_source(self, name):
-        """ Returns a data source by it's name.
+        """ Returns a data source by its name.
         """
         return self.data_sources[name]
 
@@ -136,10 +136,10 @@ class RedisConnector(Connector):
 
 
 class SqlalchemyConnector(Connector):
-    """ Connects a sqlalchemy engine to a data connected instance. Sqlalchemy
-    support a big variety of relational database backends. The connection
-    returned by this handler contains a engine and session created by
-    sqlalchemy and the database backend name.
+    """ Connects a sqlalchemy engine to a data connected instance.
+    Sqlalchemy support a big variety of relational database backends. The
+    connection returned by this handler contains an engine and session created
+    by sqlalchemy and the database backend name.
     """
 
     def __init__(self, data_connected):
@@ -208,8 +208,8 @@ class SqlalchemyConnector(Connector):
                 self.__connection['session']['info'] = conf['session']['info']
 
         if "url" not in conf:
-            logger.error("It is not possible to create sqlalchemy engine for "
-                         "%s datasource. Configuration: %s.", self.__name,
+            logger.error("It is not possible to create sqlalchemy engine"
+                         "for %s datasource. Configuration: %s.", self.__name,
                          conf)
         self.__engine = create_engine(conf['url'], **engine_params)
 
@@ -289,7 +289,7 @@ class SqlalchemyConnector(Connector):
         expire_on_commit = kwargs.get("expire_on_commit", True)
         info = kwargs.get("info")
 
-        from firenado.util.sqlalchemy_util import Session
+        from .sqlalchemy import Session
         Session.configure(bind=self.__engine, autoflush=autoflush,
                           autocommit=autocommit,
                           expire_on_commit=expire_on_commit, info=info)
@@ -350,7 +350,7 @@ class SqlalchemyConnector(Connector):
 
 
 def config_to_data_source(name, conf, data_connected):
-    """ Convert a data source conf to it's respective data source. We need
+    """ Convert a data source conf to its respective data source. We need
     a data connected to use while instantiating the data source.
     :param name: Datasource name
     :param conf: A data source confuration item

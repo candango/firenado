@@ -23,7 +23,7 @@ import warnings
 
 
 class FileSessionTestCase(unittest.TestCase):
-    """ Case that tests an Firenado application after being loaded from its
+    """ Case that tests a Firenado application after being loaded from its
     configuration file.
     """
 
@@ -75,9 +75,8 @@ class FileSessionTestCase(unittest.TestCase):
 
 
 class RedisSessionTestCase(unittest.TestCase):
-    """ Case that tests an Firenado application after being loaded from its
-    configuration file.
-    """
+    """ Tests a Firenado application after being loaded from its configuration
+    file. """
 
     def setUp(self):
         """ Application configuration file will be read and components will be
@@ -106,14 +105,14 @@ class EncodersSessionTestCase(unittest.TestCase):
         """ Checks if the pickle session encoder will keep a dict structure
         and values intact after encoding and decoding it.
         """
-        from firenado.session import PickeSessionEncoder
+        from firenado.session import PickleSessionEncoder
         my_dict = {
             'value1': "My value1",
             'value2': {
                 'value3': "My value3",
             }
         }
-        encoder = PickeSessionEncoder()
+        encoder = PickleSessionEncoder()
         encoded_data = encoder.encode(my_dict)
         decoded_data = encoder.decode(encoded_data)
         self.assertEqual(decoded_data['value1'], my_dict['value1'])
