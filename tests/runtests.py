@@ -16,8 +16,9 @@
 
 import unittest
 from tests import (components_test, conf_test, config_test, data_test,
-                   security_test, service_test, session_test, tornadoweb_test)
-from tests.util import sqlalchemy_util_test, url_util_test
+                   security_test, service_test, session_test, sqlalchemy_test,
+                   tornadoweb_test)
+from tests.util import url_util_test
 
 
 def suite():
@@ -30,8 +31,8 @@ def suite():
     alltests.addTests(testLoader.loadTestsFromModule(security_test))
     alltests.addTests(testLoader.loadTestsFromModule(service_test))
     alltests.addTests(testLoader.loadTestsFromModule(session_test))
+    alltests.addTests(testLoader.loadTestsFromModule(sqlalchemy_test))
     alltests.addTests(testLoader.loadTestsFromModule(tornadoweb_test))
-    alltests.addTests(testLoader.loadTestsFromModule(sqlalchemy_util_test))
     alltests.addTests(testLoader.loadTestsFromModule(url_util_test))
     return alltests
 
