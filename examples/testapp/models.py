@@ -20,4 +20,4 @@ class UserBase(Base):
     created = Column('created', DateTime, nullable=False,
                      server_default=text('now()'))
     modified = Column('modified', DateTime, nullable=False,
-                     server_default=text('now()'))
+                      server_default=text('now()'))
