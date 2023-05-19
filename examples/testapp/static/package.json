@@ -1,0 +1,24 @@
+{
+    "name": "testappjs",
+    "version": "0.0.1",
+    "description": "Test App Js Project",
+    "main": "index.js",
+    "scripts": {
+        "esbuild": "rm -rf build && node build.mjs",
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "yarn": "npm run yarn:clean && npm run yarn:v2 && npm run yarn:install",
+        "yarn:install": "yarn install",
+        "yarn:clean": "rm -rf yarn.lock .yarn .yarnrc.yml .next node_modules",
+        "yarn:v2": "yarn set version berry && yarn config set nodeLinker node-modules"
+    },
+    "author": "Flavio Garcia",
+    "license": "Apache-2.0",
+    "dependencies": {
+        "bootstrap": "5.2.3"
+    },
+    "devDependencies": {
+        "esbuild": "0.17.19",
+        "esbuild-plugin-copy": "2.1.1"
+    },
+    "packageManager": "yarn@3.5.1"
+}

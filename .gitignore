@@ -3,8 +3,11 @@ __pycache__
 
 database.sqlite
 
-# Bower
-bower_components
+# Esbuild/yarn
+.yarn
+.yarnrc.yml
+yarn.lock
+node_modules
 
 # C extensions
 *.so
