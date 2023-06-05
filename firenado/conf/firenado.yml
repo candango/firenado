@@ -39,7 +39,7 @@ session:
     - name: json
       class: firenado.session.JsonSessionEncoder
     - name: pickle
-      class: firenado.session.PickeSessionEncoder
+      class: firenado.session.PickleSessionEncoder
   id_generators:
     - name: default
       function: firenado.session.generate_session_id
