@@ -79,6 +79,36 @@ class FirenadoLauncher(object):
         raise NotImplementedError()
 
 
+def expect_list_mp(self, pattern_list, timeout=-1, searchwindowsize=-1,
+                   async_=False, **kw):
+    from pexpect import Expecter, searcher_re
+    '''This takes a list of compiled regular expressions and returns the
+    index into the pattern_list that matched the child output. The list may
+    also contain EOF or TIMEOUT(which are not compiled regular
+    expressions). This method is similar to the expect() method except that
+    expect_list() does not recompile the pattern list on every call. This
+    may help if you are trying to optimize for speed, otherwise just use
+    the expect() method.  This is called by expect().
+
+
+    Like :meth:`expect`, passing ``async_=True`` will make this return an
+    asyncio coroutine.
+    '''
+    if timeout == -1:
+        timeout = self.timeout
+    if 'async' in kw:
+        async_ = kw.pop('async')
+    if kw:
+        raise TypeError("Unknown keyword arguments: {}".format(kw))
+
+    exp = Expecter(self, searcher_re(pattern_list), searchwindowsize)
+    if async_:
+        from ._pexpect_async_patch import expect_async
+        return expect_async(exp, timeout)
+    else:
+        return exp.expect_loop(timeout)
+
+
 class ProcessLauncher(FirenadoLauncher):
     try:
         import pexpect
@@ -141,6 +171,8 @@ class ProcessLauncher(FirenadoLauncher):
             if self.logfile is not None:
                 parameters['logfile'] = self.logfile
             self.process = pexpect.spawn(**parameters)
+            self.process.expect_list = expect_list_mp.__get__(self.process,
+                                                              pexpect.spawn)
             warnings.simplefilter("ignore")
             await self.process.expect(
                 [r"[Firenado server started successfully].*"], async_=True)
