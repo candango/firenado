@@ -63,7 +63,7 @@ def get_request(url, **kwargs):
     return request
 
 
-class TornadoErrorHandler(object):
+class TornadoErrorHandler:
 
     def __init__(self, host):
         self._host = host
@@ -197,7 +197,7 @@ class TornadoApplication(tornado.web.Application, data.DataConnectedMixin,
                 self.components[key].initialize()
 
 
-class TornadoComponent(object):
+class TornadoComponent:
     """ Firenado applications are organized in components. A component could be
     an application or something that can be distributed as an add-on or a
     plugin.
@@ -343,7 +343,7 @@ class SessionHandler:
 
 
 class ComponentHandler(SessionHandler):
-    """ This mixing will define a handler with components and session.
+    """ This mixin will define a handler with components and session.
     ComponentHandler is the base of what a Firenado handler should be and it
     will be used to unify TornadoHandler and TornadoWebSocketHandler logic.
     Other functionalities will be implemented in TemplateHandler that assumes
@@ -433,6 +433,11 @@ class ComponentHandler(SessionHandler):
         """
         pass
 
+    def get_rooted_path(self, path):
+        from .util.url_util import rooted_path
+        root = firenado.conf.app['url_root_path']
+        return rooted_path(root, path)
+
 
 class TemplateHandler:
     """ Deals with all aspects related to templates. This mixin will assume
@@ -509,29 +514,12 @@ class TemplateHandler:
             template_path, component=self.component, **kwargs)
 
 
-class WebUtilHandler:
-    """ Holds everything else related to web utilities.
-    """
-
-    def is_mobile(self):
-        from mobiledetect import MobileDetect
-        if 'User-Agent' in self.request.headers:
-            return MobileDetect(
-                useragent=self.request.headers['User-Agent']
-            ).is_mobile()
-        return False
-
-    def get_rooted_path(self, path):
-        from .util.url_util import rooted_path
-        root = firenado.conf.app['url_root_path']
-        return rooted_path(root, path)
-
-
-class TornadoHandler(ComponentHandler, TemplateHandler, WebUtilHandler,
+class TornadoHandler(ComponentHandler, TemplateHandler,
                      tornado.web.RequestHandler):
     """ Base request handler to be used on a Firenado application.
     It provides session and handles component paths.
     """
+
     def __init__(self, application, request, **kwargs):
         ComponentHandler.__init__(self, **kwargs)
         TemplateHandler.__init__(self)
@@ -540,7 +528,6 @@ class TornadoHandler(ComponentHandler, TemplateHandler, WebUtilHandler,
 
 
 class TornadoWebSocketHandler(ComponentHandler, TemplateHandler,
-                              WebUtilHandler,
                               tornado.websocket.WebSocketHandler):
 
     def __init__(self, application, request, **kwargs):
@@ -553,6 +540,7 @@ class TornadoWebSocketHandler(ComponentHandler, TemplateHandler,
 class FirenadoComponentLoader(Loader):
     """ A template loader that loads from a single root directory.
     """
+
     def __init__(self, root_directory, component=None, **kwargs):
         # TODO: Check if we should alter/use the root_directory value
         # here or on the resolve_path method.
