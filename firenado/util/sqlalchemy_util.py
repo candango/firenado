@@ -17,8 +17,8 @@
 import warnings
 
 warnings.warn("The \"firenado.util.sqlalchemy_util\" module is depreciated. "
-              "Please use firenado.sqlalchemy  instead.", DeprecationWarning,
+              "Please use firenado.sqlalchemy  instead. This module will be "
+              "removed on Firenado 0.9.1.", DeprecationWarning,
               2)
 
-from ..sqlalchemy import (Base, sessionmaker, logger, base_to_dict, fast_count,
-                          run_script)
+from ..sqlalchemy import (base_to_dict, fast_count, run_script)

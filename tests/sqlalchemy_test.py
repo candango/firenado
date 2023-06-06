@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-#
 # Copyright 2015-2023 Flávio Gonçalves Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,29 +12,35 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from tests.service_test import MockDataConnected, ServedByInstance
-from firenado.sqlalchemy import Base, base_to_dict, with_session
+from datetime import datetime
+from tests.service_test import TestableDataConnected, ServedByInstance
+from firenado.sqlalchemy import base_to_dict, with_session
 from firenado.service import FirenadoService, with_service
-from sqlalchemy import Column, String
-from sqlalchemy.types import Integer, DateTime
+from sqlalchemy import String
+from sqlalchemy.types import DateTime
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from sqlalchemy.sql import text
 import unittest
+
+
+class Base(DeclarativeBase):
+    pass
 
 
 class TestBase(Base):
 
     __tablename__ = "test"
 
-    id = Column("id", Integer, primary_key=True)
-    username = Column("username", String(150), nullable=False)
-    first_name = Column("first_name", String(150), nullable=False)
-    last_name = Column("last_name", String(150), nullable=False)
-    password = Column("password", String(150), nullable=False)
-    email = Column("email", String(150), nullable=False)
-    created = Column("created", DateTime, nullable=False,
-                     server_default=text("now()"))
-    modified = Column("modified", DateTime, nullable=False,
-                      server_default=text("now()"))
+    id: Mapped[int] = mapped_column(primary_key=True)
+    username: Mapped[str] = mapped_column(String(150), nullable=False)
+    first_name: Mapped[str] = mapped_column(String(150), nullable=False)
+    last_name: Mapped[str] = mapped_column(String(150), nullable=False)
+    password: Mapped[str] = mapped_column(String(150), nullable=False)
+    email: Mapped[str] = mapped_column(String(150), nullable=False)
+    created: Mapped[datetime] = mapped_column(DateTime, nullable=False,
+                                              server_default=text("now()"))
+    modified: Mapped[datetime] = mapped_column(DateTime, nullable=False,
+                                               server_default=text("now()"))
 
 
 class MockSessionedService(FirenadoService):
@@ -100,7 +104,7 @@ class SessionedTestCase(unittest.TestCase):
         """ Setting up an object that has firenado.core.service.served_by
         decorators on some methods.
         """
-        self.data_connected_instance = MockDataConnected()
+        self.data_connected_instance = TestableDataConnected()
         self.served_by_instance = ServedByInstance(
             self.data_connected_instance)
 
