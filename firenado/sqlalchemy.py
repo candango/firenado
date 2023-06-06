@@ -1,5 +1,3 @@
-# -*- coding: UTF-8 -*-
-#
 # Copyright 2015-2023 Flávio Gonçalves Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,10 +16,7 @@ import functools
 from inspect import isfunction, ismethod
 import logging
 from sqlalchemy import inspect, func, text
-from sqlalchemy.orm import declarative_base, sessionmaker
 
-Base = declarative_base()
-Session = sessionmaker()
 logger = logging.getLogger(__name__)
 
 
@@ -150,4 +145,3 @@ def with_session(*args, **kwargs):
             return method_wrapper(_function)
         return func_wrapper(service)
     return method_wrapper
-

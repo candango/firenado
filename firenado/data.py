@@ -1,5 +1,3 @@
-# -*- coding: UTF-8 -*-
-#
 # Copyright 2015-2023 Flávio Gonçalves Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -136,6 +134,7 @@ class RedisConnector(Connector):
 
 
 class SqlalchemyConnector(Connector):
+    from sqlalchemy.orm import Session
     """ Connects a sqlalchemy engine to a data connected instance.
     Sqlalchemy support a big variety of relational database backends. The
     connection returned by this handler contains an engine and session created
@@ -149,7 +148,6 @@ class SqlalchemyConnector(Connector):
             'backend': None,
             'session': {
                 'autoflush': True,
-                'autocommit': False,
                 'expire_on_commit': True,
                 'info': None
             }
@@ -198,9 +196,6 @@ class SqlalchemyConnector(Connector):
             if "autoflush" in conf['session']:
                 self.__connection['session']['autoflush'] = conf['session'][
                     'autoflush']
-            if "autocommit" in conf['session']:
-                self.__connection['session']['autocommit'] = conf['session'][
-                    'autocommit']
             if "expire_on_commit" in conf['session']:
                 self.__connection['session']['expire_on_commit'] = conf[
                     'session']['expire_on_commit']
@@ -233,7 +228,7 @@ class SqlalchemyConnector(Connector):
                 # the SELECT of a scalar value without a table is
                 # appropriately formatted for the backend
                 logger.debug("Testing sqlalchemy connection.")
-                connection.scalar(select([1]))
+                connection.scalar(select(1))
             except exc.DBAPIError as err:
                 logger.warning(err)
                 logger.warning("Firenado will try to reestablish the data "
@@ -273,26 +268,23 @@ class SqlalchemyConnector(Connector):
             logger.fatal("Error trying to connect to database: %s", op_error)
             sys.exit(errno.ECONNREFUSED)
 
-    def get_a_session(self, **kwargs) -> "sqlalchemy.orm.Session":
+    def get_a_session(self, **kwargs) -> Session:
         """ Return a session bind to the datasource engine.
 
         Default parameters based on: https://bit.ly/3MjWDzF
         :param dict kwargs:
         :key bool autoflush: Default to True
-        :key bool autocommit: Default to False
         :key bool expire_on_commit: Default to False
         :key dict info: Default to None
-        :return "sqlalchemy.orm.session.Session":
+        :return Session:
         """
         autoflush = kwargs.get("autoflush", True)
-        autocommit = kwargs.get("autocommit", False)
         expire_on_commit = kwargs.get("expire_on_commit", True)
         info = kwargs.get("info")
 
-        from .sqlalchemy import Session
-        Session.configure(bind=self.__engine, autoflush=autoflush,
-                          autocommit=autocommit,
-                          expire_on_commit=expire_on_commit, info=info)
+        from sqlalchemy.orm import sessionmaker
+        Session = sessionmaker(bind=self.__engine, autoflush=autoflush,
+                               expire_on_commit=expire_on_commit, info=info)
         return Session()
 
     @property

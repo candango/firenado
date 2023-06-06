@@ -1,6 +1,4 @@
-#!/usr/bin/env python
-#
-# Copyright 2015-2022 Flávio Gonçalves Garcia
+# Copyright 2015-2023 Flávio Gonçalves Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,11 +13,11 @@
 # limitations under the License.
 
 from firenado.data import DataConnectedMixin
-from firenado.service import served_by, sessionned, FirenadoService
+from firenado.service import with_service, FirenadoService
 import unittest
 
 
-class MockServiceDataConnected(FirenadoService):
+class TestableServiceDataConnected(FirenadoService):
     """ Serves a data connected method directly.
     When decorating a data connected directly the service must return the
     consumer.
@@ -27,7 +25,7 @@ class MockServiceDataConnected(FirenadoService):
     pass
 
 
-class MockSession(object):
+class TestableSession(object):
 
     def __init__(self, data_source):
         self._data_source = data_source
@@ -49,7 +47,7 @@ class MockSession(object):
         self._oppened = False
 
 
-class MockDataSource(object):
+class TestableDataSource(object):
 
     def __init__(self, name):
         self._name = name
@@ -60,7 +58,7 @@ class MockDataSource(object):
 
     @property
     def session(self):
-        return MockSession(self)
+        return TestableSession(self)
 
     @property
     def session_resolved_string(self):
@@ -70,21 +68,23 @@ class MockDataSource(object):
         return "%s: %s" % (self.session_resolved_string, self.name)
 
 
-class MockDataConnected(DataConnectedMixin):
+class TestableDataConnected(DataConnectedMixin):
     """ Data connected mock object. This object holds the data sources to be
     used in the test cases.
     """
 
+    testable_service_data_connected: TestableServiceDataConnected
+
     def __init__(self):
-        self.data_sources['datasource1'] = MockDataSource("DataSource1")
-        self.data_sources['datasource2'] = MockDataSource("DataSource2")
+        self.data_sources['datasource1'] = TestableDataSource("DataSource1")
+        self.data_sources['datasource2'] = TestableDataSource("DataSource2")
 
-    @served_by(MockServiceDataConnected)
+    @with_service(TestableServiceDataConnected)
     def get_service_data_sources_directly(self):
-        return self.mock_service_data_connected.get_data_sources()
+        return self.testable_service_data_connected.get_data_sources()
 
 
-class MockTestService(FirenadoService):
+class TestableService(FirenadoService):
     """ Service that decorates the instance to be served directly and
     indirectly thought MockTestServiceRecursion.
     When decorating directly data connected and data sources will be returned
@@ -95,195 +95,71 @@ class MockTestService(FirenadoService):
     pass
 
 
-class MockTestServiceRecursion(FirenadoService):
-    """ Service that decorates the instance to be served and will be used
-    to return the data connected and data sources when MockTestService
-    delegates to during the recursive test.
+class RecursiveService(FirenadoService):
+    """ This service will be used to return the data connected reference
+    and data source, during the recursive test, delegating to MockTestService.
     """
 
-    @served_by(MockTestService)
+    testable_service: TestableService
+
+    @with_service(TestableService)
     def get_service_data_sources_recursively(self):
-        return self.mock_test_service.get_data_sources()
+        return self.testable_service.get_data_sources()
 
-    @served_by(MockTestService)
+    @with_service(TestableService)
     def get_data_connected_recursively(self):
-        return self.mock_test_service.data_connected
-
-
-class MockSessionedService(FirenadoService):
-
-    @sessionned
-    def resolve_from_default_data_source(self, **kwargs):
-        return kwargs
-
-    @sessionned(data_source="datasource1")
-    def resolve_from_data_source(self, **kwargs):
-        return kwargs
-
-    @property
-    def default_data_source(self):
-        return "datasource2"
+        return self.testable_service.data_connected
 
 
 class ServedByInstance(object):
     """ Class with methods to be decorated with the served_by decorator.
     """
 
+    testable_service: TestableService
+    recursive_service: RecursiveService
+
     def __init__(self, data_connected):
         self.data_connected = data_connected
 
-    @served_by(MockTestService)
+    @with_service(TestableService)
     def do_served_by_class(self):
         """ Method to be decorated with served_by with a class reference
         """
         pass
 
-    @served_by('tests.service_test.MockTestService')
+    @with_service("tests.service_test.TestableService")
     def do_served_by_string(self):
         """ Method to be decorated with served_by with a string as class
         reference
         """
         pass
 
-    @served_by(MockTestService)
+    @with_service(TestableService)
     def get_service_data_connected(self):
-        return self.mock_test_service.data_connected
+        return self.testable_service.data_connected
 
-    @served_by(MockTestServiceRecursion)
+    @with_service(RecursiveService)
     def get_service_data_connected_recursively(self):
-        return (self.mock_test_service_recursion.
-                get_data_connected_recursively())
+        return (self.recursive_service.get_data_connected_recursively())
 
-    @served_by(MockTestService)
+    @with_service(TestableService)
     def get_service_data_sources(self):
         """ This method returns the data sources from the data connected
         instance of this class. The method is returned by the service defined
         on the served_by decorator. Here there is no recursion once
         MockTestService is directly serving the ServiceByInstance.
         """
-        return self.mock_test_service.get_data_sources()
+        return self.testable_service.get_data_sources()
 
-    @served_by(MockTestServiceRecursion)
+    @with_service(RecursiveService)
     def get_service_data_sources_recursively(self):
-        """ Same as get_service_data_sources but the a service will be serving
-        the service defined here and then access the data sources
+        """ Same as get_service_data_sources but service will be serving
+        another service defined here and then access the data sources
         """
-        return (self.mock_test_service_recursion.
-                get_service_data_sources_recursively())
+        return (self.recursive_service.get_service_data_sources_recursively())
 
     def get_data_connected(self):
         return self.data_connected
-
-
-class SessionedTestCase(unittest.TestCase):
-
-    mock_sessioned_service: MockSessionedService
-
-    def setUp(self):
-        """ Setting up an object that has firenado.core.service.served_by
-        decorators on some methods.
-        """
-        self.data_connected_instance = MockDataConnected()
-        self.served_by_instance = ServedByInstance(
-            self.data_connected_instance)
-
-    @property
-    def data_connected(self):
-        return self.served_by_instance.data_connected
-
-    @served_by(MockSessionedService)
-    def test_sessioned_default_data_source(self):
-        """ Method resolve_from_default_data_source is anoteded with sessioned
-        and no parameter. The data source to be used is the one defined either
-        in the property or method named default_data_source. In this case we're
-        using a property.
-
-        As no session was provided the session will be closed
-        """
-        resolved_kwargs = (
-            self.mock_sessioned_service.resolve_from_default_data_source()
-        )
-        self.assertEqual("datasource2", resolved_kwargs['data_source'])
-        data_source = self.data_connected.get_data_source(
-            resolved_kwargs['data_source']
-        )
-        self.assertEqual(data_source.resolve_session(),
-                         resolved_kwargs['session'].name)
-        self.assertFalse(resolved_kwargs['session'].is_oppened)
-
-    @served_by(MockSessionedService)
-    def test_sessioned_default_data_source_my_session(self):
-        """ Method resolve_from_default_data_source is anoteded with sessioned
-        and no parameter. Instead of getting the session from the default data
-        source, we're providing our own session.
-        """
-        data_source = self.data_connected.get_data_source("datasource1")
-        resolved_kwargs = (
-            self.mock_sessioned_service.resolve_from_default_data_source(
-                session=data_source.session
-            )
-        )
-        # No datasource will be added to the kwards
-        self.assertIsNone(resolved_kwargs.get("data_source"))
-        # Using session provided
-        self.assertEqual(data_source.resolve_session(),
-                         resolved_kwargs['session'].name)
-        self.assertTrue(resolved_kwargs['session'].is_oppened)
-
-    @served_by(MockSessionedService)
-    def test_sessioned_from_data_source(self):
-        """ Method resolve_from_data_source is anoteded with sessioned and
-        datasource1 as parameter. It will be injected to the method kwargs
-        session from datasource1.
-        """
-        resolved_kwargs = (
-            self.mock_sessioned_service.resolve_from_data_source()
-        )
-        self.assertEqual("datasource1", resolved_kwargs['data_source'])
-        data_source = self.data_connected.get_data_source(
-            resolved_kwargs['data_source']
-        )
-        self.assertEqual(data_source.resolve_session(),
-                         resolved_kwargs['session'].name)
-        self.assertFalse(resolved_kwargs['session'].is_oppened)
-
-    @served_by(MockSessionedService)
-    def test_sessioned_from_data_source_provide_session(self):
-        """ Method resolve_from_default_data_source is anoteded with sessioned
-        and no parameter. This time we provide the session and provided to
-        close the datasource after executing resolve_from_data_source.
-        """
-        data_source = self.data_connected.get_data_source("datasource2")
-        resolved_kwargs = (
-            self.mock_sessioned_service.resolve_from_data_source(
-                session=data_source.session, close=True
-            )
-        )
-        # No datasource will be added to the kwards
-        self.assertIsNone(resolved_kwargs.get("data_source"))
-        # Using session provided
-        self.assertEqual(data_source.resolve_session(),
-                         resolved_kwargs['session'].name)
-        self.assertFalse(resolved_kwargs['session'].is_oppened)
-
-    @served_by(MockSessionedService)
-    def test_sessioned_with_my_data_source_closing_connection(self):
-        """ Method resolve_from_data_source is anoteded with sessioned and
-        datasource1 as parameter. We're overwriting the data_source parameter
-        during the method call, changing to datasource2. It will be injected
-        to the method kwargs a session from data_source1.
-        """
-        resolved_kwargs = (
-            self.mock_sessioned_service.resolve_from_data_source(
-                data_source="datasource2")
-        )
-        self.assertEqual("datasource2", resolved_kwargs['data_source'])
-        data_source = self.data_connected.get_data_source(
-            resolved_kwargs['data_source']
-        )
-        self.assertEqual(data_source.resolve_session(),
-                         resolved_kwargs['session'].name)
-        self.assertFalse(resolved_kwargs['session'].is_oppened)
 
 
 class ServiceTestCase(unittest.TestCase):
@@ -292,24 +168,24 @@ class ServiceTestCase(unittest.TestCase):
         """ Setting up an object that has firenado.core.service.served_by
         decorators on some methods.
         """
-        self.data_connected_instance = MockDataConnected()
+        self.data_connected_instance = TestableDataConnected()
         self.served_by_instance = ServedByInstance(
             self.data_connected_instance)
 
     def test_served_by_class_reference(self):
-        self.assertFalse(hasattr(self.served_by_instance, 'mock_test_service'))
+        self.assertFalse(hasattr(self.served_by_instance, 'testable_service'))
         self.served_by_instance.do_served_by_class()
-        self.assertTrue(hasattr(self.served_by_instance, 'mock_test_service'))
+        self.assertTrue(hasattr(self.served_by_instance, 'testable_service'))
         self.assertTrue(isinstance(
-            self.served_by_instance.mock_test_service, MockTestService))
+            self.served_by_instance.testable_service, TestableService))
 
     def test_served_by_class_name_string(self):
-        self.assertFalse(hasattr(self.served_by_instance, 'mock_test_service'))
+        self.assertFalse(hasattr(self.served_by_instance, 'testable_service'))
         self.served_by_instance.do_served_by_string()
-        self.assertTrue(hasattr(self.served_by_instance, 'mock_test_service'))
+        self.assertTrue(hasattr(self.served_by_instance, 'testable_service'))
         self.assertEqual(
-            self.served_by_instance.mock_test_service.__class__.__name__,
-            MockTestService.__name__)
+            self.served_by_instance.testable_service.__class__.__name__,
+            TestableService.__name__)
 
     def test_data_connected_from_service(self):
         data_connected = self.served_by_instance.get_data_connected()
@@ -321,8 +197,8 @@ class ServiceTestCase(unittest.TestCase):
         self.assertEqual(data_connected, self.data_connected_instance)
 
     def test_data_connected_from_service_none(self):
-        mock_service = MockTestService(None)
-        data_connected = mock_service.data_connected
+        service = TestableService(None)
+        data_connected = service.data_connected
         self.assertIsNone(data_connected)
 
     def test_get_data_source_from_service(self):
@@ -346,6 +222,6 @@ class ServiceTestCase(unittest.TestCase):
         self.assertEqual(data_sources['datasource2'].name, "DataSource2")
 
     def test_get_data_source_from_service_none(self):
-        mock_service = MockTestService(None)
-        data_sources = mock_service.get_data_sources()
+        service = TestableService(None)
+        data_sources = service.get_data_sources()
         self.assertIsNone(data_sources)

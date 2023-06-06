@@ -1,6 +1,4 @@
-#!/usr/bin/env python
-#
-# Copyright 2015-2020 Flavio Garcia
+# Copyright 2015-2023 Flávio Gonçalves Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,8 +13,10 @@
 # limitations under the License.
 
 from .models import UserBase
-import datetime
-from firenado import service
+from firenado.service import FirenadoService, with_service
+from firenado.sqlalchemy import with_session
+from sqlalchemy import select
+from sqlalchemy.orm import Session
 
 
 def password_digest(pass_phrase):
@@ -26,12 +26,35 @@ def password_digest(pass_phrase):
     return m.hexdigest()
 
 
-class LoginService(service.FirenadoService):
+class UserService(FirenadoService):
 
-    def __init__(self, handler, data_source=None):
-        service.FirenadoService.__init__(self, handler, data_source)
+    @with_session(data_source="test")
+    def create(self, user_data, **kwargs):
+        session: Session = kwargs.get("session")
+        user = UserBase()
+        user.username = user_data['username']
+        user.first_name = user_data['first_name']
+        user.last_name = user_data['last_name']
+        user.password = password_digest(user_data['password'])
+        user.email = user_data['email']
+        session = self.get_data_source('test').session
+        session.add(user)
+        session.commit()
+        return user
 
-    @service.served_by("testapp.services.UserService")
+    @with_session(data_source="test")
+    def by_username(self, username, **kwargs):
+        session: Session = kwargs.get("session")
+        stmt = select(UserBase).where(UserBase.username == username)
+        user = session.scalars(stmt).one()
+        return user
+
+
+class LoginService(FirenadoService):
+
+    user_service: UserService
+
+    @with_service(UserService)
     def is_valid(self, username, password):
         """ Checks if challenge username and password matches
         username and password defined on the service constructor..
@@ -51,25 +74,3 @@ class LoginService(service.FirenadoService):
         return False
 
 
-class UserService(service.FirenadoService):
-
-    def create(self, user_data):
-        created_utc = datetime.datetime.utcnow()
-        user = UserBase()
-        user.username = user_data['username']
-        user.first_name = user_data['first_name']
-        user.last_name = user_data['last_name']
-        user.password = password_digest(user_data['password'])
-        user.email = user_data['email']
-        db_session = self.get_data_source('test').session
-        db_session.add(user)
-        db_session.commit()
-        db_session.close()
-        return user
-
-    def by_username(self, username):
-        session = self.get_data_source('test').session
-        user = session.query(UserBase).filter(
-            UserBase.username == username).one_or_none()
-        session.close()
-        return user
