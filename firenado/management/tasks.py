@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 #
-# Copyright 2015-2021 Flavio Garcia
+# Copyright 2015-2023 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@
 from cartola import fs
 import firenado.conf
 from firenado.management import ManagementTask
-from firenado.util import argparse_util
 import logging
 import os
 import sys
@@ -26,10 +25,10 @@ logger = logging.getLogger(__name__)
 
 
 class CreateProjectTask(ManagementTask):
-    """
-    Creates a new project from scratch
-    """
     def run(self, namespace):
+        """
+        Creates a new project from scratch
+        """
         from tornado import template
         if len(sys.argv) > 2:
             module = namespace.module
@@ -94,6 +93,7 @@ class InstallProjectTask(ManagementTask):
     """ Triggers the install method of all components registered in the
     application.
     """
+
     def run(self, namespace):
         # TODO: Resolve module if doesn't exists
         if firenado.conf.app['pythonpath']:
@@ -116,10 +116,10 @@ class RunApplicationTask(ManagementTask):
         parser.add_argument("-P", "--port", type=int)
         parser.add_argument("-s", "--socket", default=None)
 
-    """ Runs a Firenado Tornado Application based
-    on the it's project configuration
-    """
     def run(self, namespace):
+        """ Runs a Firenado Tornado Application based
+        on the it's project configuration
+        """
         # TODO throw a custom error when type is not found
         from firenado.config import get_class_from_config
         parameters = {}
@@ -163,9 +163,9 @@ class GenerateRandomStringTask(ManagementTask):
 
 
 class GenerateUuidTask(ManagementTask):
-    """ Generates an uuid4 string
-    """
     def run(self, namespace):
+        """ Generates an uuid4 string
+        """
         from uuid import uuid4
         logger.debug("Displaying a random uuid4 string.")
         print(uuid4())
