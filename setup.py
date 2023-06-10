@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright 2015-2022 Flávio Gonçalves Garcia
+# Copyright 2015-2023 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -59,7 +59,7 @@ setup(
     maintainer=firenado.get_author(),
     maintainer_email=firenado.get_author_email(),
     install_requires=resolve_requires("requirements/basic.txt"),
-    python_requires=">= 3.7",
+    python_requires=">= 3.8",
     extras_require={
         'all': resolve_requires("requirements/all.txt"),
         'redis': resolve_requires("requirements/redis.txt"),
