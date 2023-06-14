@@ -1,6 +1,6 @@
 #!/bin/bash
 ##
-## Copyright 2015-2022 Flávio Gonçalves Garcia
+## Copyright 2015-2023 Flavio Garcia
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -16,8 +16,8 @@
 ##
 ## build.sh    Build packages to be uploaded to pypi.
 ##
+## See: https://blog.ganssle.io/articles/2021/10/setup-py-deprecated.html
 ## Author: Flavio Garcia <piraz@candango.org>
 
-python setup.py bdist_wheel --universal
-python setup.py sdist
+python -m build
 rm -rf build
