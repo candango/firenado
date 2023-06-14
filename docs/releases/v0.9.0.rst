@@ -1,0 +1,56 @@
+What's new in Firenado 0.9.0
+============================
+
+Jun 14, 2023
+------------
+
+We are pleased to announce the release of Firenado 0.9.0.
+
+This release sets to tone for a new Firenado future.
+
+Tornado was upgraded to 6.3.x, sqlalchemy was set to 2.0, and several data and
+services were restructured aiming consistency and simplicity.
+
+Upgrading from Firenado 0.2.7 to this version will force an upgrade of data,
+services, and sqlalchemy structures.
+
+Here are the highlights:
+
+Build Changes
+~~~~~~~~~~~~~
+
+ * Set key dependencies relative to the minor version instead of a fixed version `#413 <https://github.com/candango/firenado/issues/413>`_
+ * Remove python 3.6 and add python 3.10 to the compatibility list `#414 <https://github.com/candango/firenado/issues/414>`_
+ * Remove python 3.7 and add python 3.11 to the compatibility list `#419 <https://github.com/candango/firenado/issues/419>`_
+
+Bug Fixes
+~~~~~~~~~
+
+ * Monkey patch pexpect async until official fix on a release `#428 <https://github.com/candango/firenado/issues/428>`_
+ * Addresses parameter was overriding port in ProcessLauncher `#435 <https://github.com/candango/firenado/issues/435>`_
+
+Enhancement
+~~~~~~~~~~~
+
+ * Change session destroyed http error code from 505 to 500 `#406 <https://github.com/candango/firenado/issues/406>`_
+ * Remove deprecation notice from pip install `#423 <https://github.com/candango/firenado/issues/423>`_
+ * Remove pymobiledetect `#424 <https://github.com/candango/firenado/issues/424>`_
+
+Features
+~~~~~~~~
+
+ * Create a test case launching ProcessLauncher `#400 <https://github.com/candango/firenado/issues/400>`_
+ * Make session read and write asynchronous `#404 <https://github.com/candango/firenado/issues/404>`_
+ * Add kwargs to handler.session.set to provide more flexibility to session handler implementation `#408 <https://github.com/candango/firenado/issues/408>`_
+ * Get the isolation level from data source config `#410 <https://github.com/candango/firenado/issues/410>`_
+ * Transform firenado bin directory into a module `#416 <https://github.com/candango/firenado/issues/416>`_
+
+Refactory
+~~~~~~~~~
+
+ * Convert transaction schema to sqlalchemy `#324 <https://github.com/candango/firenado/issues/324>`_
+ * Remove gen.coroutine from ProcessLauncher `#402 <https://github.com/candango/firenado/issues/402>`_
+ * Use tornado 6.3.x `#412 <https://github.com/candango/firenado/issues/412>`_
+ * Replace bower to esbuild for test app `#425 <https://github.com/candango/firenado/issues/425>`_
+ * Rename data.served_by to data.with_service `#426 <https://github.com/candango/firenado/issues/426>`_
+ * Remove WebUtilHandler `#430 <https://github.com/candango/firenado/issues/430>`_
