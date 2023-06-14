@@ -135,9 +135,12 @@ session['redis']['data'] = {}
 session['redis']['data']['source'] = ""
 session['type'] = ""
 
+taskio_conf = {}
+
 if HAS_LIB_CONFIG_FILE:
     lib_config = load_yaml_file(LIB_CONFIG_FILE)
     _config.process_config(sys.modules[__name__], lib_config)
+    taskio_conf = load_yaml_file(LIB_CONFIG_FILE)
 
 if HAS_SYS_CONFIG_FILE:
     sys_config = load_yaml_file(SYS_CONFIG_FILE)
