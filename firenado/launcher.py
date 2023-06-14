@@ -1,6 +1,4 @@
-# -*- coding: UTF-8 -*-
-#
-# Copyright 2015-2022 Flávio Gonçalves Garcia
+# Copyright 2015-2023 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,12 +18,11 @@ from importlib import reload
 import logging
 import os
 import sys
-import warnings
 
 logger = logging.getLogger(__name__)
 
 
-class FirenadoLauncher(object):
+class FirenadoLauncher:
 
     def __init__(self, **settings):
         self.app = settings.get("app", None)
@@ -48,13 +45,11 @@ class FirenadoLauncher(object):
         if "PYTHONPATH" in os.environ and os.environ['PYTHONPATH'] is not None:
             current_pythonpaths = os.environ['PYTHONPATH'].split(":")
             for path in current_pythonpaths:
-                if path.strip() != "":
-                    if path.strip() not in real_pythonpaths:
-                        real_pythonpaths.append(path.strip())
+                if path.strip() != "" and path.strip() not in real_pythonpaths:
+                    real_pythonpaths.append(path.strip())
             for path in sys.path:
-                if path.strip() != "":
-                    if path.strip() not in real_pythonpaths:
-                        real_pythonpaths.append(path.strip())
+                if path.strip() != "" and path.strip() not in real_pythonpaths:
+                    real_pythonpaths.append(path.strip())
         sys.path = real_pythonpaths
         os.environ['PYTHONPATH'] = ":".join(real_pythonpaths)
         if self.dir is not None:
@@ -112,7 +107,7 @@ def expect_list_mp(self, pattern_list, timeout=-1, searchwindowsize=-1,
 class ProcessLauncher(FirenadoLauncher):
     try:
         import pexpect
-        process = None  # type: pexpect.spawn
+        process: pexpect.spawn = None
     except ImportError:
         logger.debug("The pexpect module ins't isn't installed. Consider "
                      "installing it in order to launch applications using "
@@ -130,21 +125,15 @@ class ProcessLauncher(FirenadoLauncher):
     def load(self):
         firenado_script = os.path.join(firenado.conf.ROOT, "bin",
                                        "firenado-cli.py")
-        self.command = "%s %s app run" % (sys.executable, firenado_script)
+        self.command = f"{sys.executable} {firenado_script} app run"
         if self.dir is not None:
-            dir_parameter = "--dir=%s" % self.dir
-            self.command = "%s %s" % (self.command, dir_parameter)
-
-        if self.socket is None:
-            if self.addresses is not None:
-                addresses_parameter = "--port=%s" % self.addresses
-                self.command = "%s %s" % (self.command, addresses_parameter)
-            if self.port is not None:
-                port_parameter = "--port=%s" % self.port
-                self.command = "%s %s" % (self.command, port_parameter)
-        else:
-            socket_parameter = "--port=%s" % self.socket
-            self.command = "%s %s" % (self.command, socket_parameter)
+            self.command = f"{self.command} --dir={self.dir}"
+        if self.socket is None and self.addresses is not None:
+            self.command = f"{self.command} --addresses={self.addresses}"
+        if self.socket is None and self.port is not None:
+            self.command = f"{self.command} --port={self.port}"
+        if self.socket is not None:
+            self.command = f"{self.command} --socke={self.socket}"
 
     async def read_process(self):
         import pexpect
@@ -158,29 +147,27 @@ class ProcessLauncher(FirenadoLauncher):
         self.process_callback.start()
 
     async def launch(self):
-        with warnings.catch_warnings():
-            import pexpect
-            import tornado.ioloop
-            logger.info("Launching %s", self.command)
-            parameters = {
-                'command': self.command,
-                'encoding': "utf-8"
-            }
-            if self.dir:
-                parameters['cwd'] = self.dir
-            if self.logfile is not None:
-                parameters['logfile'] = self.logfile
-            self.process = pexpect.spawn(**parameters)
-            self.process.expect_list = expect_list_mp.__get__(self.process,
-                                                              pexpect.spawn)
-            warnings.simplefilter("ignore")
-            await self.process.expect(
-                [r"[Firenado server started successfully].*"], async_=True)
-            self.process_callback = tornado.ioloop.PeriodicCallback(
-                self.read_process,
-                self.process_callback_time
-            )
-            self.process_callback.start()
+        import pexpect
+        import tornado.ioloop
+        logger.info("Launching %s", self.command)
+        parameters = {
+            'command': self.command,
+            'encoding': "utf-8"
+        }
+        if self.dir:
+            parameters['cwd'] = self.dir
+        if self.logfile is not None:
+            parameters['logfile'] = self.logfile
+        self.process = pexpect.spawn(**parameters)
+        self.process.expect_list = expect_list_mp.__get__(self.process,
+                                                          pexpect.spawn)
+        await self.process.expect(
+            [r"[Firenado server started successfully].*"], async_=True)
+        self.process_callback = tornado.ioloop.PeriodicCallback(
+            self.read_process,
+            self.process_callback_time
+        )
+        self.process_callback.start()
 
     def send(self, line):
         logger.info("Sending line %s", line)
@@ -219,6 +206,7 @@ class TornadoLauncher(FirenadoLauncher):
 
     def launch(self):
         import signal
+        from tornado.ioloop import IOLoop
         import tornado.httpserver
         signal.signal(signal.SIGTERM, self.sig_handler)
         signal.signal(signal.SIGINT, self.sig_handler)
@@ -259,21 +247,22 @@ class TornadoLauncher(FirenadoLauncher):
                     listening_count += 1
         if listening_count:
             if listening_count > 1:
-                listening_what = "%ss" % listening_what
+                listening_what = f"{listening_what}s"
             logger.info("Firenado server started successfully. Listening at %s"
                         " %s.", listening_count, listening_what)
             if firenado.conf.app['process']['num_processes'] is not None:
-                import tornado.process
+                from tornado.process import fork_processes
                 num_processes = firenado.conf.app['process']['num_processes']
                 max_restarts = firenado.conf.app['process']['max_restarts']
                 num_processes_alert = num_processes
                 if num_processes == 0:
-                    num_processes_alert = ("0 (assuming %s as cpu count)" %
-                                           tornado.process.cpu_count())
+                    num_processes_alert = (
+                        f"0 (assuming {tornado.process.cpu_count()} as cpu "
+                        "count)")
                 logger.info("Tornado set to start %s processes with %s max "
                             "restarts.", num_processes_alert, max_restarts)
-                tornado.process.fork_processes(num_processes, max_restarts)
-            tornado.ioloop.IOLoop.current().start()
+                fork_processes(num_processes, max_restarts)
+            IOLoop.current().start()
         else:
             logger.critical("Firenado unable to start.")
             sysexits.exit_fatal(sysexits.EX_SOFTWARE)
@@ -283,7 +272,7 @@ class TornadoLauncher(FirenadoLauncher):
         :param sig:  Signal set to the process
         :param _: Frame is not being used
         """
-        import tornado.ioloop
+        from tornado.ioloop import IOLoop
         from tornado.process import task_id
         tid = task_id()
         pid = os.getpid()
@@ -292,73 +281,64 @@ class TornadoLauncher(FirenadoLauncher):
         else:
             logger.warning("child %s (pid %s) caught signal: %s", tid, pid,
                            sig)
-        tornado.ioloop.IOLoop.current().add_callback_from_signal(self.shutdown)
+        IOLoop.current().add_callback_from_signal(self.shutdown)
 
-    def add_sockets(self, port, address=None):
+    def add_sockets(self, port: int, address: str = None):
         from socket import gaierror
+        from tornado.netutil import bind_sockets
         try:
-            from tornado.netutil import bind_sockets
-            if address:
-                sockets = bind_sockets(port, address.strip())
-            else:
-                sockets = bind_sockets(port)
+            if address is None:
                 address = "127.0.0.1"
+            sockets = bind_sockets(port, address.strip())
             self.http_server.add_sockets(sockets)
             logger.info("Firenado listening at http://%s:%s.", address.strip(),
                         port)
             return True
-        except gaierror as error:
+        except gaierror:
             logger.error("Firenado failed to listen at http://%s:%s.",
                          address.strip(), port)
-        except OSError as error:
+        except OSError:
             logger.error("Firenado failed to listen at http://%s:%s. Check if "
                          "another process is listening at this port or if you "
                          "provided a dns name and the correspondent ip in the "
                          "addresses configuration or if the machine owns the "
-                         "ip Fireando will start to listen.", address, port)
+                         "ip Firenado will start to listen.", address, port)
         return False
 
     def shutdown(self):
-        import time
-        import tornado.ioloop
+        from tornado.ioloop import IOLoop
         from tornado.process import task_id
+        import time
+
+        def log_message(message: str, pid: int, tid: int = None):
+            if tid is None:
+                logger.info("main process (pid %s): %s", pid, message)
+                return
+            logger.info("child %s (pid %s): %s", tid, pid, message)
+
         tid = task_id()
         pid = os.getpid()
-        if tid is None:
-            logger.info("main process (pid %s): stopping http server.", pid)
-        else:
-            logger.info("child %s (pid %s): stopping http server.", tid, pid)
+        log_message("stopping http server", pid, tid)
         for key, component in self.application.components.items():
             component.shutdown()
         self.http_server.stop()
 
-        io_loop = tornado.ioloop.IOLoop.current()
+        io_loop: IOLoop = IOLoop.current()
 
         if self.MAX_WAIT_SECONDS_BEFORE_SHUTDOWN == 0:
             io_loop.stop()
-            if tid is None:
-                logger.info("main process (pid %s): application is down", pid)
-            else:
-                logger.info("child %s (pid %s): application is down", tid, pid)
-        else:
-            if tid is None:
-                logger.info("main process (pid %s): shutdown in %s seconds "
-                            "...", pid, self.MAX_WAIT_SECONDS_BEFORE_SHUTDOWN)
-            else:
-                logger.info("child %s (pid %s): shutdown in %s seconds ...",
-                            tid, pid, self.MAX_WAIT_SECONDS_BEFORE_SHUTDOWN)
-            deadline = time.time() + self.MAX_WAIT_SECONDS_BEFORE_SHUTDOWN
+            log_message("application is down", pid, tid)
+            return
 
-            def stop_loop():
-                now = time.time()
-                if now < deadline:
-                    io_loop.add_timeout(now + 1, stop_loop)
-                else:
-                    io_loop.stop()
-                    if tid is None:
-                        logger.info("main process (pid %s): application is "
-                                    "down", pid)
-                    else:
-                        logger.info("child %s (pid %s): application is down",
-                                    tid, pid)
-            stop_loop()
+        log_message(f"shutdown in {self.MAX_WAIT_SECONDS_BEFORE_SHUTDOWN}s"
+                    " seconds", pid, tid)
+        deadline = time.time() + self.MAX_WAIT_SECONDS_BEFORE_SHUTDOWN
+
+        def stop_loop():
+            now = time.time()
+            if now < deadline:
+                io_loop.add_timeout(now + 1, stop_loop)
+                return
+            io_loop.stop()
+            log_message("application is down", pid, tid)
+        stop_loop()

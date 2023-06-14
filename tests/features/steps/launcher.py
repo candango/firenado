@@ -1,5 +1,3 @@
-# -*- coding: UTF-8 -*-
-#
 # Copyright 2015-2023 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,11 +21,9 @@ from tornado.httpclient import AsyncHTTPClient
 import sys
 
 
-@given("We launch {application} application using process launcher at {port} "
-       "port")
+@given("{application} application is launched at {port} port")
 @async_run_until_complete
-async def step_we_launch_application_using_process_launcher(context,
-                                                            application, port):
+async def step_application_launched_at_port(context, application, port):
     application_dir = chdir_fixture_app(application, suppress_log=True)
     context.launcher = ProcessLauncher(
         dir=application_dir, path=PROJECT_ROOT, port=port, logfile=sys.stderr)
@@ -42,8 +38,7 @@ async def step_we_launch_application_using_process_launcher(context,
 async def step_application_running_correctly_at_port(context, port):
     http_client = AsyncHTTPClient()
     try:
-        response = await http_client.fetch("http://localhost:%s" %
-                                           port)
+        response = await http_client.fetch("http://localhost:%s" % port)
     except Exception as e:
         print("Error: %s" % e)
         context.tester.assertTrue(False)
