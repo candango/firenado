@@ -56,6 +56,7 @@ class ProcessLauncherTestCase(AsyncHTTPTestCase):
 
     @async_run_until_complete(should_close=False, loop=get_event_loop())
     async def setUp(self) -> None:
+        self.should_close_asyncio_loop = False
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
             sock, port = bind_unused_port()
