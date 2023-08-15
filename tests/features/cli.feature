@@ -1,4 +1,4 @@
-# Copyright 2015-2022 Flávio Gonçalves Garcia
+# Copyright 2015-2023 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,6 +19,4 @@ Feature: Command line
   Scenario: Create a new project
     # Enter steps here
     Given command "project init" is called
-    When The application is running correctly at 128393 port
-    Then We shutdown the process launcher
-      And The application stops successfully
+

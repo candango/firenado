@@ -12,11 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import asyncio
 from behave import given, when, then
 from behave.api.async_step import async_run_until_complete
 from tests import PROJECT_ROOT, chdir_fixture_app
 from firenado.launcher import ProcessLauncher
-from tornado import gen
 from tornado.httpclient import AsyncHTTPClient
 import sys
 
@@ -29,7 +29,7 @@ async def step_application_launched_at_port(context, application, port):
         dir=application_dir, path=PROJECT_ROOT, port=port, logfile=sys.stderr)
     context.launcher.load()
     await context.launcher.launch()
-    await gen.sleep(1)
+    await asyncio.sleep(1)
     context.tester.assertTrue(context.launcher.is_alive())
 
 
