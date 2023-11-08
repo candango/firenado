@@ -1,2 +1,2 @@
-cartola>=0.16
+cartola>=0.17
 tornado==6.3.3
