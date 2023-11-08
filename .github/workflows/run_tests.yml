@@ -18,6 +18,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
         run: |
+          pip install --upgade pip
           pip install -r requirements/basic.txt
           pip install -r requirements/all.txt
           pip install -r requirements/tests.txt
