@@ -2,4 +2,4 @@
 -r basic.txt
 -r tests.txt
 -r docs.txt
-pymysql==1.0.2
+pymysql==1.1.0

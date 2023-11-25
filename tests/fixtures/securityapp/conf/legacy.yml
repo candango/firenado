@@ -1,0 +1,8 @@
+app:
+  component: 'legacyapp'
+  data:
+    sources:
+        # Set here references from sources defined on data.sources
+  pythonpath: '..'
+  #type: 'tornado'
+  port: 8889

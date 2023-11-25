@@ -1,0 +1,24 @@
+What's new in Firenado 0.9.1
+============================
+
+Nov 25, 2023
+------------
+
+We are pleased to announce the release of Firenado 0.9.1.
+
+This release updates pexpect to 4.9.0 and removes the monkey patch from the
+launcher.
+
+Python 3.12 has been added to the compatibility list.
+
+Here are the highlights:
+
+Build Changes
+~~~~~~~~~~~~~
+
+ * Add python 3.12 to the compatibility list `#432 <https://github.com/candango/firenado/issues/432>`_
+
+Refactory
+~~~~~~~~~
+
+ * Revert pexpect async monkey patch `#429 <https://github.com/candango/firenado/issues/429>`_

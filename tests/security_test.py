@@ -14,8 +14,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from firenado import security
+import asyncio
+from tests import chdir_fixture_app, PROJECT_ROOT
+from firenado import security, testing
+from firenado.launcher import ProcessLauncher
+import sys
 import unittest
+from behave.api.async_step import async_run_until_complete
+
+
+class MockApplication:
+
+    def __init__(self):
+        pass
+
+    @property
+    def ui_methods(self):
+        return {}
+
+    @property
+    def ui_modules(self):
+        return {}
 
 
 class MockRequest:
@@ -45,6 +64,12 @@ class MockHandler:
         pass
 
 
+class MockComponent:
+
+    def before_request(self):
+        pass
+
+
 class SecurityTestCase(unittest.TestCase):
 
     def setUp(self):
@@ -66,3 +91,18 @@ class SecurityTestCase(unittest.TestCase):
         self.assertEqual(self.handler.status, 403)
         self.assertEqual(self.handler.response, "This is a XMLHttpRequest "
                                                 "request only.")
+
+
+class CurrentSecurityTestCase(testing.ProcessLauncherTestCase):
+
+    def get_launcher(self) -> ProcessLauncher:
+        application_dir = chdir_fixture_app("securityapp")
+        return ProcessLauncher(
+            dir=application_dir, path=PROJECT_ROOT, logfile=sys.stderr)
+
+    # @async_run_until_complete(loop=testing.get_event_loop())
+    # async def test_auth_decorated_class(self):
+    #     response = await self.fetch('/authenticated')
+    #     await asyncio.sleep(1)
+    #     print(response.code)
+    #     self.assertEqual(response.body, b'Authenticated')

@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 #
-# Copyright 2015-2023 Flavio Garcia
+# Copyright 2015-2022 Flávio Gonçalves Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,23 +14,3 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
-"""The Firenado Framework"""
-
-__author__ = "Flavio Garcia <piraz@candango.org>"
-__version__ = (0, 9, 3)
-__licence__ = "Apache License V2.0"
-
-
-def get_version():
-    if isinstance(__version__[-1], str):
-        return '.'.join(map(str, __version__[:-1])) + __version__[-1]
-    return ".".join(map(str, __version__))
-
-
-def get_author():
-    return __author__.split(" <")[0]
-
-
-def get_author_email():
-    return __author__.split(" <")[1][:-1]

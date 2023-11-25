@@ -1,1 +1,1 @@
-sqlalchemy>=2.0.15
+sqlalchemy>=2.0.23

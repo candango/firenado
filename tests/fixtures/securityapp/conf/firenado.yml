@@ -1,0 +1,31 @@
+apps:
+  - name: current
+    file: current.yml
+  - name: legacy
+    file: legacy.yml
+
+components:
+  - id: currentapp
+    class: securityapp.apps.CurrentSecurityApp
+    enabled: true
+  - id: legacyapp
+    class: securityapp.apps.LegacySecurityApp
+    enabled: true
+  #- id: admin
+  #  enabled: true
+  #- id: info
+  #  enabled: true
+
+log:
+  level: DEBUG
+
+# Session types could be:
+# file or redis.
+session:
+  type: redis
+  enabled: false
+  # Redis session handler configuration
+  data:
+    source: session
+  # File session handler related configuration
+  # path: /tmp
