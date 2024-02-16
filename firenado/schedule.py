@@ -1,6 +1,4 @@
-# -*- coding: UTF-8 -*-
-#
-# Copyright 2015-2023 Flavio Garcia
+# Copyright 2015-2024 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -42,8 +40,8 @@ except ImportError:
 
 
 def next_from_cron(cron: str) -> datetime:
-    """ Return a datatetime object with the next execution based on the informed
-    cron string and the current time.
+    """ Return a datatetime object with the next execution based on the
+    informed cron string and the current time.
 
     :param str cron: The cron string
     :return datetime: A datetime object with the next execution
@@ -121,7 +119,7 @@ class Scheduler(object):
         job = self.get_job(job_id)
         if job is None:
             return None
-        del(self._jobs[job_id])
+        del self._jobs[job_id]
         return job.id
 
     def run(self):
@@ -135,8 +133,8 @@ class Scheduler(object):
     def _manage_jobs(self):
         logger.debug("Scheduler [id: %s, name: %s] managing jobs.", self.id,
                      self.name)
-        logger.debug("Scheduler [id: %s, name: %s] stopping periodic callback."
-                     , self.id, self.name)
+        logger.debug("Scheduler [id: %s, name: %s] stopping periodic "
+                     "callback.", self.id, self.name)
         self._periodic_callback.stop()
         for job in self.jobs:
             if not job.already_scheduled:
@@ -154,8 +152,8 @@ class Scheduler(object):
 
         logger.debug("Scheduler [id: %s, name: %s] ending of managing jobs.",
                      self.id, self.name)
-        logger.debug("Scheduler [id: %s, name: %s] starting periodic callback."
-                     , self.id, self.name)
+        logger.debug("Scheduler [id: %s, name: %s] starting periodic "
+                     "callback.", self.id, self.name)
         self._periodic_callback.start()
 
 
