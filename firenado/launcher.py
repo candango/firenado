@@ -1,4 +1,4 @@
-# Copyright 2015-2023 Flavio Garcia
+# Copyright 2015-2024 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -181,13 +181,13 @@ class TornadoLauncher(FirenadoLauncher):
         if os.name == "posix":
             signal.signal(signal.SIGTSTP, self.sig_handler)
         self.http_server = tornado.httpserver.HTTPServer(self.application)
-        if firenado.conf.app['xheaders'] is not None and type(
-                firenado.conf.app['xheaders']) == bool:
+        if firenado.conf.app['xheaders'] is not None and isinstance(
+                firenado.conf.app['xheaders'], bool):
             logger.debug("Setting http server xheaders as %s.",
                          firenado.conf.app['xheaders'])
             self.http_server.xheaders = firenado.conf.app['xheaders']
-        if firenado.conf.app['xheaders'] is not None and type(
-                firenado.conf.app['xheaders']) != bool:
+        if firenado.conf.app['xheaders'] is not None and isinstance(
+                firenado.conf.app['xheaders'], bool):
             logger.warning("The xheaders defined in the application section"
                            "must be bool instead of %s. Ignoring the "
                            "configuration item.",
