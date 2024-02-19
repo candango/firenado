@@ -152,16 +152,15 @@ class ProcessLauncher(FirenadoLauncher):
 class TornadoLauncher(FirenadoLauncher):
 
     def __init__(self, **settings):
-        super(TornadoLauncher, self).__init__(**settings)
+        super().__init__(**settings)
         self.http_server = None
         self.application = None
         self.MAX_WAIT_SECONDS_BEFORE_SHUTDOWN = firenado.conf.app[
             'wait_before_shutdown']
-        if self.addresses is None or self.addresses == ['']:
-            if firenado.conf.app['addresses']:
-                self.addresses = firenado.conf.app['addresses']
-            else:
-                self.addresses = firenado.conf.app['default_addresses']
+        self.addresses = firenado.conf.app['default_addresses']
+        if ((self.addresses is None or self.addresses == ['']) and
+                firenado.conf.app['addresses']):
+            self.addresses = firenado.conf.app['addresses']
         if self.port is None:
             self.port = firenado.conf.app['port']
 
