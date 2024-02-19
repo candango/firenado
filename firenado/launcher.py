@@ -56,13 +56,16 @@ class FirenadoLauncher:
             os.chdir(self.dir)
         if self.app is not None or self.dir is not None:
             reload(firenado.conf)
+        self.configure_logging()
 
+    def configure_logging(self, **kargs):
+        format = kargs.get("format", firenado.conf.log['format'])
+        level = kargs.get("level", firenado.conf.log['level'])
         # Set logging basic configurations
         for handler in logging.root.handlers[:]:
             # clearing loggers, solution from: https://bit.ly/2yTchyx
             logging.root.removeHandler(handler)
-        logging.basicConfig(level=firenado.conf.log['level'],
-                            format=firenado.conf.log['format'])
+        logging.basicConfig(level=level, format=format)
 
     def load(self):
         raise NotImplementedError()
