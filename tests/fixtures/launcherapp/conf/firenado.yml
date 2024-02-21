@@ -21,7 +21,7 @@ components:
   #  enabled: true
 
 log:
-  level: DEBUG
+  level: INFO
 
 # Session types could be:
 # file or redis.

@@ -101,6 +101,7 @@ class CurrentSecurityTestCase(testing.TornadoAsyncHTTPTestCase):
         # print(response.code)
         self.assertEqual(response.body, b"IndexHandler output")
 
+    # TODO: finish authentication tests
     # def test_auth_decorated_class(self):
     #     response = self.fetch("/authenticated")
     #     # print(response.code)

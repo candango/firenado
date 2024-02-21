@@ -40,6 +40,9 @@ class TornadoAsyncTestCase(AsyncTestCase):
         """
         raise NotImplementedError()
 
+    def http_port(self) -> int:
+        return self.__port
+
     def setUp(self) -> None:
         import logging
         super().setUp()
@@ -51,7 +54,6 @@ class TornadoAsyncTestCase(AsyncTestCase):
         self.__launcher.port = self.__port
         self.__launcher.load()
         asyncio.run(self.__launcher.launch())
-        self.__launcher.launch()
 
     def tearDown(self) -> None:
         self.__launcher.shutdown()
