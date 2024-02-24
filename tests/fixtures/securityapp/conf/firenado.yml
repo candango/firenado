@@ -17,15 +17,15 @@ components:
   #  enabled: true
 
 log:
-  level: DEBUG
+  level: ERROR
 
 # Session types could be:
 # file or redis.
 session:
-  type: redis
-  enabled: false
+  type: file
+  enabled: true
   # Redis session handler configuration
-  data:
-    source: session
+  # data:
+  #   source: session
   # File session handler related configuration
-  # path: /tmp
+  path: tmp

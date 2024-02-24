@@ -1,6 +1,4 @@
-# -*- coding: UTF-8 -*-
-#
-# Copyright 2015-2023 Flavio Garcia
+# Copyright 2015-2024 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -122,8 +120,9 @@ def default_class_authentication(self: tornadoweb.TornadoHandler):
     import firenado.conf
     if "login" in firenado.conf.app:
         warnings.warn("The \"login\" configuration in the application %s is"
-                      "depreciated. Please replace the configuration app.login"
-                      "to app.security.auth instead.", DeprecationWarning, 2)
+                      "depreciated. Please replace the configuration "
+                      "app.login to app.security.auth instead.",
+                      DeprecationWarning, 2)
     login_urls = self.get_rooted_path(
         firenado.conf.app['login']['urls']['default']
     )

@@ -1,4 +1,4 @@
-# Copyright 2015-2023 Flavio Garcia
+# Copyright 2015-2024 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -56,13 +56,16 @@ class FirenadoLauncher:
             os.chdir(self.dir)
         if self.app is not None or self.dir is not None:
             reload(firenado.conf)
+        self.configure_logging()
 
+    def configure_logging(self, **kargs):
+        format = kargs.get("format", firenado.conf.log['format'])
+        level = kargs.get("level", firenado.conf.log['level'])
         # Set logging basic configurations
         for handler in logging.root.handlers[:]:
             # clearing loggers, solution from: https://bit.ly/2yTchyx
             logging.root.removeHandler(handler)
-        logging.basicConfig(level=firenado.conf.log['level'],
-                            format=firenado.conf.log['format'])
+        logging.basicConfig(level=level, format=format)
 
     def load(self):
         raise NotImplementedError()
@@ -152,16 +155,15 @@ class ProcessLauncher(FirenadoLauncher):
 class TornadoLauncher(FirenadoLauncher):
 
     def __init__(self, **settings):
-        super(TornadoLauncher, self).__init__(**settings)
+        super().__init__(**settings)
         self.http_server = None
         self.application = None
         self.MAX_WAIT_SECONDS_BEFORE_SHUTDOWN = firenado.conf.app[
             'wait_before_shutdown']
-        if self.addresses is None or self.addresses == ['']:
-            if firenado.conf.app['addresses']:
-                self.addresses = firenado.conf.app['addresses']
-            else:
-                self.addresses = firenado.conf.app['default_addresses']
+        self.addresses = firenado.conf.app['default_addresses']
+        if ((self.addresses is None or self.addresses == ['']) and
+                firenado.conf.app['addresses']):
+            self.addresses = firenado.conf.app['addresses']
         if self.port is None:
             self.port = firenado.conf.app['port']
 
@@ -181,13 +183,13 @@ class TornadoLauncher(FirenadoLauncher):
         if os.name == "posix":
             signal.signal(signal.SIGTSTP, self.sig_handler)
         self.http_server = tornado.httpserver.HTTPServer(self.application)
-        if firenado.conf.app['xheaders'] is not None and type(
-                firenado.conf.app['xheaders']) == bool:
+        if firenado.conf.app['xheaders'] is not None and isinstance(
+                firenado.conf.app['xheaders'], bool):
             logger.debug("Setting http server xheaders as %s.",
                          firenado.conf.app['xheaders'])
             self.http_server.xheaders = firenado.conf.app['xheaders']
-        if firenado.conf.app['xheaders'] is not None and type(
-                firenado.conf.app['xheaders']) != bool:
+        if firenado.conf.app['xheaders'] is not None and isinstance(
+                firenado.conf.app['xheaders'], bool):
             logger.warning("The xheaders defined in the application section"
                            "must be bool instead of %s. Ignoring the "
                            "configuration item.",

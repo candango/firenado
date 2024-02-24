@@ -43,7 +43,7 @@ async def step_application_running_correctly_at_port(context, port):
         print("Error: %s" % e)
         context.tester.assertTrue(False)
     else:
-        context.tester.assertEqual(b"IndexHandler output", response.body)
+        context.tester.assertEqual(b"Get output", response.body)
         context.tester.assertTrue(context.launcher.is_alive())
 
 

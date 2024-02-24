@@ -1,6 +1,4 @@
-# -*- coding: UTF-8 -*-
-#
-# Copyright 2015-2023 Flavio Garcia
+# Copyright 2015-2024 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,13 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import asyncio
 from tests import chdir_fixture_app, PROJECT_ROOT
 from firenado import security, testing
-from firenado.launcher import ProcessLauncher
-import sys
+from firenado.launcher import TornadoLauncher
 import unittest
-from behave.api.async_step import async_run_until_complete
 
 
 class MockApplication:
@@ -48,6 +43,7 @@ class MockRequest:
 class MockHandler:
     """ Mock the handler being decorated by the security functions.
     """
+
     def __init__(self):
         self.status = 200
         self.response = None
@@ -93,16 +89,20 @@ class SecurityTestCase(unittest.TestCase):
                                                 "request only.")
 
 
-class CurrentSecurityTestCase(testing.ProcessLauncherTestCase):
+class CurrentSecurityTestCase(testing.TornadoAsyncHTTPTestCase):
 
-    def get_launcher(self) -> ProcessLauncher:
+    def get_launcher(self):
         application_dir = chdir_fixture_app("securityapp")
-        return ProcessLauncher(
-            dir=application_dir, path=PROJECT_ROOT, logfile=sys.stderr)
+        return TornadoLauncher(
+            dir=application_dir, path=PROJECT_ROOT)
 
-    # @async_run_until_complete(loop=testing.get_event_loop())
-    # async def test_auth_decorated_class(self):
-    #     response = await self.fetch('/authenticated')
-    #     await asyncio.sleep(1)
-    #     print(response.code)
-    #     self.assertEqual(response.body, b'Authenticated')
+    def test_root(self):
+        response = self.fetch("/")
+        # print(response.code)
+        self.assertEqual(response.body, b"IndexHandler output")
+
+    # TODO: finish authentication tests
+    # def test_auth_decorated_class(self):
+    #     response = self.fetch("/authenticated")
+    #     # print(response.code)
+    #     self.assertEqual(response.body, b"Authenticated")

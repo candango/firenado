@@ -1,0 +1,17 @@
+What's new in Firenado 0.9.4
+============================
+
+Feb 23, 2024
+------------
+
+We are pleased to announce the release of Firenado 0.9.4.
+
+This release adds proper testers to the Firenado framework.
+
+Here are the highlights:
+
+Features
+~~~~~~~~
+
+ * Create a TornadoLoader test case `#444 <https://github.com/candango/firenado/issues/444>`_
+ * Create a ProcessLoader test case `#445 <https://github.com/candango/firenado/issues/445>`_
