@@ -1,4 +1,4 @@
-# Copyright 2015-2023 Flavio Garcia
+# Copyright 2015-2024 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -147,7 +147,7 @@ class SqlalchemyConnector(Connector):
         self.__connection = {
             'backend': None,
             'session': {
-                'autoflush': True,
+                'autoflush': False,
                 'expire_on_commit': True,
                 'info': None
             }
@@ -273,14 +273,16 @@ class SqlalchemyConnector(Connector):
 
         Default parameters based on: https://bit.ly/3MjWDzF
         :param dict kwargs:
-        :key bool autoflush: Default to True
-        :key bool expire_on_commit: Default to False
+        :key bool autoflush: Default to False
+        :key bool expire_on_commit: Default to True
         :key dict info: Default to None
         :return Session:
         """
-        autoflush = kwargs.get("autoflush", True)
-        expire_on_commit = kwargs.get("expire_on_commit", True)
-        info = kwargs.get("info")
+        session_config = self.__connection['session']
+        autoflush = kwargs.get("autoflush", session_config['autoflush'])
+        expire_on_commit = kwargs.get("expire_on_commit",
+                                      session_config['expire_on_commit'])
+        info = kwargs.get("info", session_config['info'])
 
         from sqlalchemy.orm import sessionmaker
         Session = sessionmaker(bind=self.__engine, autoflush=autoflush,
