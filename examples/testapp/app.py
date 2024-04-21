@@ -68,10 +68,10 @@ class TestappComponent(tornadoweb.TornadoComponent):
         data_source_conf = {
             'connector': "sqlalchemy",
             'url': "mysql+pymysql://root@localhost:3306/test",
+            # 'isolation_level': 'REPEATABLE READ',
             'pool': {
                 'size': 10,
                 'max_overflow': 10,
-                # 'isolation_level': 'REPEATABLE READ',
                 # 'pool_recycle': 400
             }
         }
@@ -85,7 +85,7 @@ class TestappComponent(tornadoweb.TornadoComponent):
     def install(self):
         """  Installing test database
         """
-        from firenado.util.sqlalchemy_util import Base
+        from testapp.models import Base
         print('Installing Testapp App...')
         print('Creating App ...')
         engine = self.application.get_data_source(

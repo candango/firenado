@@ -72,5 +72,3 @@ class LoginService(FirenadoService):
             if user.password == password_digest(password):
                 return True
         return False
-
-

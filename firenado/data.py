@@ -161,7 +161,6 @@ class SqlalchemyConnector(Connector):
         # We will set the isolation level to READ UNCOMMITTED by default
         # to avoid the "cache" effect sqlalchemy has without this option.
         # Solution from: http://bit.ly/2bDq0Nv
-        # TODO: Get the isolation level from data source conf
         engine_params = {
             'isolation_level': "READ UNCOMMITTED"
         }
@@ -176,15 +175,16 @@ class SqlalchemyConnector(Connector):
             if conf['future']:
                 engine_params['future'] = True
 
+        if "isolation_level" in conf:
+            if conf['isolation_level']:
+                engine_params['isolation_level'] = conf['isolation_level']
+
         if "pool" in conf:
             if "class" in conf['pool']:
                 engine_params['pool_class'] = conf['pool']['class']
                 if isinstance(engine_params['pool_class'], str):
                     engine_params['pool_class'] = config.get_from_string(
                         engine_params['pool_class'])
-            if "isolation_level" in conf['pool']:
-                engine_params['isolation_level'] = conf['pool'][
-                    'isolation_level']
             if "max_overflow" in conf['pool']:
                 engine_params['max_overflow'] = conf['pool']['max_overflow']
             if "pool_recycle" in conf['pool']:
