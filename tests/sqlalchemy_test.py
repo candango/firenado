@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from datetime import datetime
-from tests.service_test import TestableDataConnected, ServedByInstance
+from tests.service_test import TestableDataConnected, ServedInstance
 from firenado.sqlalchemy import base_to_dict, with_session
 from firenado.service import FirenadoService, with_service
 from firenado.testing import ServiceTestCase
@@ -106,8 +106,7 @@ class SessionedTestCase(ServiceTestCase):
         decorators on some methods.
         """
         self.data_connected_instance = TestableDataConnected()
-        self.served_by_instance = ServedByInstance(
-            self.data_connected_instance)
+        self.served_by_instance = ServedInstance(self.data_connected_instance)
 
     @property
     def data_connected(self):

@@ -151,6 +151,7 @@ class SqlalchemyConnector(Connector):
         self.__name = name
         self.__connection = {
             'backend': None,
+            'ping': False,
             'session': {
                 'autobegin': False,
                 'autoflush': False,
@@ -178,6 +179,10 @@ class SqlalchemyConnector(Connector):
         if "isolation_level" in conf:
             if conf['isolation_level']:
                 engine_params['isolation_level'] = conf['isolation_level']
+
+        if "ping" in conf:
+            if conf['ping']:
+                engine_params['ping'] = conf['ping']
 
         if "pool" in conf:
             if "class" in conf['pool']:
@@ -213,6 +218,8 @@ class SqlalchemyConnector(Connector):
 
         @event.listens_for(self.__engine, "engine_connect")
         def ping_connection(conn: Connection, branch):
+            if not self.__connection['ping']:
+                return
             # Adding ping connection event handler as described at the
             # pessimistic disconnect section of: http://bit.ly/2c8Sm2t
             logger.debug("Pinging sqlalchemy connection.")

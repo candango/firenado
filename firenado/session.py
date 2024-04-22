@@ -190,15 +190,15 @@ class Session(object):
         self.__changed = False
 
     def clear(self):
-        """ Clear all data stored into the session. This is not 
-        renewing/creating a new session id. If you want that use 
+        """ Clear all data stored into the session. This is not
+        renewing/creating a new session id. If you want that use
         session.destroy() """
         self.__data.clear()
         self.__changed = True
 
     def destroy(self, request_handler):
-        """ Clearing session data and marking the session to be
-        renewed at the end of the request. """
+        """ Clearing session data and marking the session to be renewed at the
+        end of the request. """
         self.clear()
         self.__destroyed = True
         self.__engine.store_session(request_handler)
