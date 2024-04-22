@@ -83,19 +83,22 @@ class TestappComponent(tornadoweb.TornadoComponent):
 
     @service.served_by(services.UserService)
     def install(self):
+        from sqlalchemy.engine import Engine
         """  Installing test database
         """
         from testapp.models import Base
         print('Installing Testapp App...')
         print('Creating App ...')
-        engine = self.application.get_data_source(
+        engine: Engine = self.application.get_data_source(
             'test').engine
         engine.echo = True
-        # Dropping all
-        # TODO Not to drop all if something is installed right?
-        Base.metadata.drop_all(engine)
-        # Creating database
-        Base.metadata.create_all(engine)
+        with engine.connect() as conn:
+            # Dropping all
+            # TODO Not to drop all if something is installed right?
+            Base.metadata.drop_all(conn)
+            # Creating database
+            Base.metadata.create_all(conn)
+            conn.commit()
         self.user_service.create({
             'username': "Test",
             'first_name': "Test",

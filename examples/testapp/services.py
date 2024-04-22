@@ -37,9 +37,8 @@ class UserService(FirenadoService):
         user.last_name = user_data['last_name']
         user.password = password_digest(user_data['password'])
         user.email = user_data['email']
-        session = self.get_data_source('test').session
-        session.add(user)
-        session.commit()
+        with session.begin():
+            session.add(user)
         return user
 
     @with_session(data_source="test")

@@ -13,8 +13,7 @@
 # limitations under the License.
 
 from datetime import datetime
-from sqlalchemy import String
-from sqlalchemy.types import DateTime
+from sqlalchemy import DateTime, Integer, String
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from sqlalchemy.sql import text
 
@@ -25,11 +24,12 @@ class Base(DeclarativeBase):
 
 class UserBase(Base):
     __tablename__ = "users"
+    __table_args__ = {
+        'mysql_engine': "InnoDB",
+        'mysql_charset': "utf8",
+    }
 
-    mysql_engine = "MyISAM"
-    mysql_charset = "utf8"
-
-    id: Mapped[int] = mapped_column(primary_key=True)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
     username: Mapped[str] = mapped_column(String(150), nullable=False)
     first_name: Mapped[str] = mapped_column(String(150), nullable=False)
     last_name: Mapped[str] = mapped_column(String(150), nullable=False)

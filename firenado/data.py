@@ -134,30 +134,30 @@ class RedisConnector(Connector):
 
 
 class SqlalchemyConnector(Connector):
+    from sqlalchemy import Engine
     from sqlalchemy.orm import Session
     """ Connects a sqlalchemy engine to a data connected instance.
     Sqlalchemy support a big variety of relational database backends. The
     connection returned by this handler contains an engine and session created
     by sqlalchemy and the database backend name.
     """
+    __name: str
+    __engine: Engine
+    __connection: dict
 
-    def __init__(self, data_connected):
-        super(SqlalchemyConnector, self).__init__(data_connected)
-        self.__name = None
+    def configure(self, name, conf):
+        from sqlalchemy import Connection, create_engine
+        from sqlalchemy import exc, event, select
+        self.__name = name
         self.__connection = {
             'backend': None,
             'session': {
+                'autobegin': False,
                 'autoflush': False,
                 'expire_on_commit': True,
                 'info': None
             }
         }
-        self.__engine = None
-
-    def configure(self, name, conf):
-        self.__name = name
-        from sqlalchemy import create_engine
-        from sqlalchemy import exc, event, select
         # We will set the isolation level to READ UNCOMMITTED by default
         # to avoid the "cache" effect sqlalchemy has without this option.
         # Solution from: http://bit.ly/2bDq0Nv
@@ -193,6 +193,9 @@ class SqlalchemyConnector(Connector):
                 engine_params['pool_size'] = conf['pool']['size']
 
         if "session" in conf:
+            if "autobegin" in conf['session']:
+                self.__connection['session']['autobegin'] = conf['session'][
+                    'autobegin']
             if "autoflush" in conf['session']:
                 self.__connection['session']['autoflush'] = conf['session'][
                     'autoflush']
@@ -209,7 +212,7 @@ class SqlalchemyConnector(Connector):
         self.__engine = create_engine(conf['url'], **engine_params)
 
         @event.listens_for(self.__engine, "engine_connect")
-        def ping_connection(connection, branch):
+        def ping_connection(conn: Connection, branch):
             # Adding ping connection event handler as described at the
             # pessimistic disconnect section of: http://bit.ly/2c8Sm2t
             logger.debug("Pinging sqlalchemy connection.")
@@ -221,14 +224,16 @@ class SqlalchemyConnector(Connector):
                 return
             # turn off "close with result".  This flag is only used with
             # "connectionless" execution, otherwise will be False in any case
-            save_should_close_with_result = connection.should_close_with_result
-            connection.should_close_with_result = False
+            save_should_close_with_result = conn.should_close_with_result
+            conn.should_close_with_result = False
             try:
                 # run a SELECT 1.   use a core select() so that
                 # the SELECT of a scalar value without a table is
                 # appropriately formatted for the backend
                 logger.debug("Testing sqlalchemy connection.")
-                connection.scalar(select(1))
+                conn.begin()
+                conn.scalar(select(1))
+                conn.commit()
             except exc.DBAPIError as err:
                 logger.warning(err)
                 logger.warning("Firenado will try to reestablish the data "
@@ -244,13 +249,15 @@ class SqlalchemyConnector(Connector):
                     # The disconnect detection here also causes the whole
                     # connection pool to be invalidated so that all stale
                     # connections are discarded.
-                    connection.scalar(select([1]))
+                    conn.begin()
+                    conn.scalar(select(1))
+                    conn.commit()
                     logger.warning("Data source connection reestablished.")
                 else:
                     raise
             finally:
                 # restore "close with result"
-                connection.should_close_with_result = (
+                conn.should_close_with_result = (
                     save_should_close_with_result)
         logger.info("Connecting to the database using the engine: %s.",
                     self.__engine)
@@ -273,21 +280,24 @@ class SqlalchemyConnector(Connector):
 
         Default parameters based on: https://bit.ly/3MjWDzF
         :param dict kwargs:
+        :key bool autobegin: Default to False
         :key bool autoflush: Default to False
         :key bool expire_on_commit: Default to True
         :key dict info: Default to None
         :return Session:
         """
         session_config = self.__connection['session']
+        autobegin = kwargs.get("autobegin", session_config['autobegin'])
         autoflush = kwargs.get("autoflush", session_config['autoflush'])
         expire_on_commit = kwargs.get("expire_on_commit",
                                       session_config['expire_on_commit'])
         info = kwargs.get("info", session_config['info'])
 
         from sqlalchemy.orm import sessionmaker
-        Session = sessionmaker(bind=self.__engine, autoflush=autoflush,
-                               expire_on_commit=expire_on_commit, info=info)
-        return Session()
+        maker = sessionmaker(bind=self.__engine, autoflush=autoflush,
+                             expire_on_commit=expire_on_commit, info=info,
+                             autobegin=autobegin)
+        return maker()
 
     @property
     def backend(self):

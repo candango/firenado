@@ -133,6 +133,8 @@ def with_session(*args, **kwargs):
                 if not session:
                     logger.warning("No session was resolved.")
                 logger.debug("Closing session %s.", session)
+                if not session.autoflush:
+                    session.flush()
                 session.close()
             return result
         return wrapper
