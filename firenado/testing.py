@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import asyncio
+from firenado.service import FirenadoService
 from firenado.launcher import ProcessLauncher, TornadoLauncher
 from tornado.testing import (bind_unused_port, AsyncTestCase,
                              AsyncHTTPTestCase)
@@ -48,6 +49,14 @@ class ServiceTestCase(TestCase):
         instance
         """
         raise NotImplementedError()
+
+
+class TestableService(FirenadoService):
+    """ Serves a data connected method directly.
+    When decorating a data connected directly the service must return the
+    consumer.
+    """
+    pass
 
 
 class TornadoAsyncTestCase(AsyncTestCase):

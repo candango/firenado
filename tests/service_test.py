@@ -14,15 +14,7 @@
 
 from firenado.data import DataConnectedMixin
 from firenado.service import with_service, FirenadoService
-import unittest
-
-
-class TestableServiceDataConnected(FirenadoService):
-    """ Serves a data connected method directly.
-    When decorating a data connected directly the service must return the
-    consumer.
-    """
-    pass
+from firenado.testing import ServiceTestCase, TestableService
 
 
 class TestableSession(object):
@@ -69,35 +61,24 @@ class TestableDataSource(object):
 
 
 class TestableDataConnected(DataConnectedMixin):
-    """ Data connected mock object. This object holds the data sources to be
+    """ Data connected dummy object. This object holds the data sources to be
     used in the test cases.
     """
 
-    testable_service_data_connected: TestableServiceDataConnected
+    testable_service: TestableService
 
     def __init__(self):
         self.data_sources['datasource1'] = TestableDataSource("DataSource1")
         self.data_sources['datasource2'] = TestableDataSource("DataSource2")
 
-    @with_service(TestableServiceDataConnected)
+    @with_service(TestableService)
     def get_service_data_sources_directly(self):
-        return self.testable_service_data_connected.get_data_sources()
-
-
-class TestableService(FirenadoService):
-    """ Service that decorates the instance to be served directly and
-    indirectly thought MockTestServiceRecursion.
-    When decorating directly data connected and data sources will be returned
-    in one interaction.
-    When decorating indirectly MockTestServiceRecursion will be used to return
-    the data connected instance and data sources.
-    """
-    pass
+        return self.testable_service.get_data_sources()
 
 
 class RecursiveService(FirenadoService):
     """ This service will be used to return the data connected reference
-    and data source, during the recursive test, delegating to MockTestService.
+    and data source, during the recursive test, delegating to TestableService.
     """
 
     testable_service: TestableService
@@ -111,7 +92,7 @@ class RecursiveService(FirenadoService):
         return self.testable_service.data_connected
 
 
-class ServedByInstance(object):
+class ServedInstance(object):
     """ Class with methods to be decorated with the served_by decorator.
     """
 
@@ -122,13 +103,13 @@ class ServedByInstance(object):
         self.data_connected = data_connected
 
     @with_service(TestableService)
-    def do_served_by_class(self):
+    def do_with_service_by_class(self):
         """ Method to be decorated with served_by with a class reference
         """
         pass
 
     @with_service("tests.service_test.TestableService")
-    def do_served_by_string(self):
+    def do_with_service_by_string(self):
         """ Method to be decorated with served_by with a string as class
         reference
         """
@@ -162,37 +143,36 @@ class ServedByInstance(object):
         return self.data_connected
 
 
-class ServiceTestCase(unittest.TestCase):
+class WithServiceTestCase(ServiceTestCase):
 
-    def setUp(self):
+    def configure_data_connected(self):
         """ Setting up an object that has firenado.core.service.served_by
         decorators on some methods.
         """
         self.data_connected_instance = TestableDataConnected()
-        self.served_by_instance = ServedByInstance(
-            self.data_connected_instance)
+        self.served_instance = ServedInstance(self.data_connected_instance)
 
-    def test_served_by_class_reference(self):
-        self.assertFalse(hasattr(self.served_by_instance, 'testable_service'))
-        self.served_by_instance.do_served_by_class()
-        self.assertTrue(hasattr(self.served_by_instance, 'testable_service'))
+    def test_with_service_class_reference(self):
+        self.assertFalse(hasattr(self.served_instance, "testable_service"))
+        self.served_instance.do_with_service_by_class()
+        self.assertTrue(hasattr(self.served_instance, "testable_service"))
         self.assertTrue(isinstance(
-            self.served_by_instance.testable_service, TestableService))
+            self.served_instance.testable_service, TestableService))
 
-    def test_served_by_class_name_string(self):
-        self.assertFalse(hasattr(self.served_by_instance, 'testable_service'))
-        self.served_by_instance.do_served_by_string()
-        self.assertTrue(hasattr(self.served_by_instance, 'testable_service'))
+    def test_with_service_class_name_string(self):
+        self.assertFalse(hasattr(self.served_instance, 'testable_service'))
+        self.served_instance.do_with_service_by_string()
+        self.assertTrue(hasattr(self.served_instance, 'testable_service'))
         self.assertEqual(
-            self.served_by_instance.testable_service.__class__.__name__,
+            self.served_instance.testable_service.__class__.__name__,
             TestableService.__name__)
 
     def test_data_connected_from_service(self):
-        data_connected = self.served_by_instance.get_data_connected()
+        data_connected = self.served_instance.get_data_connected()
         self.assertEqual(data_connected, self.data_connected_instance)
 
     def test_data_connected_from_service_recursively(self):
-        data_connected = (self.served_by_instance.
+        data_connected = (self.served_instance.
                           get_service_data_connected_recursively())
         self.assertEqual(data_connected, self.data_connected_instance)
 
@@ -202,7 +182,7 @@ class ServiceTestCase(unittest.TestCase):
         self.assertIsNone(data_connected)
 
     def test_get_data_source_from_service(self):
-        data_sources = self.served_by_instance.get_service_data_sources()
+        data_sources = self.served_instance.get_service_data_sources()
         self.assertTrue(len(data_sources) == 2)
         self.assertEqual(data_sources['datasource1'].name, "DataSource1")
         self.assertEqual(data_sources['datasource2'].name, "DataSource2")
@@ -215,7 +195,7 @@ class ServiceTestCase(unittest.TestCase):
         self.assertEqual(data_sources['datasource2'].name, "DataSource2")
 
     def test_get_data_source_from_service_recursively(self):
-        data_sources = (self.served_by_instance.
+        data_sources = (self.served_instance.
                         get_service_data_sources_recursively())
         self.assertTrue(len(data_sources) == 2)
         self.assertEqual(data_sources['datasource1'].name, "DataSource1")
