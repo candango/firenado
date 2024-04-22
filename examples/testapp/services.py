@@ -1,4 +1,4 @@
-# Copyright 2015-2023 Flávio Gonçalves Garcia
+# Copyright 2015-2024 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -42,10 +42,12 @@ class UserService(FirenadoService):
         return user
 
     @with_session(data_source="test")
-    def by_username(self, username, **kwargs):
+    def by_username(self, username, **kwargs) -> UserBase:
         session: Session = kwargs.get("session")
+        session.begin()
         stmt = select(UserBase).where(UserBase.username == username)
-        user = session.scalars(stmt).one()
+        user = session.scalars(stmt).one_or_none()
+        session.flush()
         return user
 
 
@@ -67,6 +69,7 @@ class LoginService(FirenadoService):
 
         """
         user = self.user_service.by_username(username)
+        print(user)
         if user:
             if user.password == password_digest(password):
                 return True

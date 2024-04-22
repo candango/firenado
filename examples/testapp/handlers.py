@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 #
-# Copyright 2015-2023 Flavio Garcia
+# Copyright 2015-2024 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,6 +13,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+from .services import LoginService, UserService
 
 import firenado.conf
 from firenado import security, service, tornadoweb
@@ -115,6 +117,9 @@ class SessionCounterHandler(tornadoweb.TornadoHandler):
 
 class LoginHandler(AuthHandler, tornadoweb.TornadoHandler):
 
+    login_service: LoginService
+    user_service: UserService
+
     def get(self):
         default_login = firenado.conf.app['login']['urls']['default']
         errors = {}
@@ -126,8 +131,9 @@ class LoginHandler(AuthHandler, tornadoweb.TornadoHandler):
         self.render("login.html", errors=errors,
                     login_url=default_login)
 
-    @service.served_by("testapp.services.LoginService")
-    @service.served_by("testapp.services.UserService")
+    # you can user either the class rererence or string
+    @service.with_service(LoginService)
+    @service.with_service("testapp.services.UserService")
     def post(self):
         self.session.delete('login_errors')
         default_login = firenado.conf.app['login']['urls']['default']

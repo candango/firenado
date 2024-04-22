@@ -153,8 +153,8 @@ class SqlalchemyConnector(Connector):
             'backend': None,
             'ping': False,
             'session': {
-                'autobegin': False,
-                'autoflush': False,
+                'autobegin': True,
+                'autoflush': True,
                 'expire_on_commit': True,
                 'info': None
             }
