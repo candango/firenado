@@ -1,6 +1,4 @@
-#!/usr/bin/env python
-#
-# Copyright 2015-2023 Flavio Garcia
+# Copyright 2015-2024 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from cartola.config import get_from_module, get_from_string
 import unittest
-from firenado.config import (get_class_from_config, get_class_from_module,
-                             get_class_from_name)
+from firenado.config import get_class_from_config
 from firenado.session import SessionEngine
 
 
@@ -40,10 +38,10 @@ class GetClassTestCase(unittest.TestCase):
 
     def test_get_class_from_name(self):
         """ Getting a class from the full class name."""
-        result = get_class_from_name("firenado.session.SessionEngine")
+        result = get_from_string("firenado.session.SessionEngine")
         self.assertTrue(result == SessionEngine)
 
     def test_get_class_from_module(self):
         """ Getting a class from a given module and class name parameters. """
-        result = get_class_from_module("firenado.session", "SessionEngine")
+        result = get_from_module("firenado.session", "SessionEngine")
         self.assertTrue(result == SessionEngine)
