@@ -13,9 +13,10 @@
 # limitations under the License.
 
 from datetime import datetime
-from tests.service_test import TestableDataConnected, ServedByInstance
+from tests.service_test import TestableDataConnected, ServedInstance
 from firenado.sqlalchemy import base_to_dict, with_session
 from firenado.service import FirenadoService, with_service
+from firenado.testing import ServiceTestCase
 from sqlalchemy import String
 from sqlalchemy.types import DateTime
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
@@ -43,7 +44,7 @@ class TestBase(Base):
                                                server_default=text("now()"))
 
 
-class MockSessionedService(FirenadoService):
+class DummySessionedService(FirenadoService):
 
     @with_session
     def resolve_from_default_data_source(self, **kwargs):
@@ -96,23 +97,22 @@ class BaseToDictTestCase(unittest.TestCase):
         self.assertTrue("modified" not in dict_from_base)
 
 
-class SessionedTestCase(unittest.TestCase):
+class SessionedTestCase(ServiceTestCase):
 
-    mock_sessioned_service: MockSessionedService
+    dummy_sessioned_service: DummySessionedService
 
-    def setUp(self):
+    def configure_data_connected(self):
         """ Setting up an object that has firenado.core.service.served_by
         decorators on some methods.
         """
         self.data_connected_instance = TestableDataConnected()
-        self.served_by_instance = ServedByInstance(
-            self.data_connected_instance)
+        self.served_by_instance = ServedInstance(self.data_connected_instance)
 
     @property
     def data_connected(self):
         return self.served_by_instance.data_connected
 
-    @with_service(MockSessionedService)
+    @with_service(DummySessionedService)
     def test_sessioned_default_data_source(self):
         """ Method resolve_from_default_data_source is anoteded with sessioned
         and no parameter. The data source to be used is the one defined either
@@ -122,7 +122,7 @@ class SessionedTestCase(unittest.TestCase):
         As no session was provided the session will be closed
         """
         resolved_kwargs = (
-            self.mock_sessioned_service.resolve_from_default_data_source()
+            self.dummy_sessioned_service.resolve_from_default_data_source()
         )
         self.assertEqual("datasource2", resolved_kwargs['data_source'])
         data_source = self.data_connected.get_data_source(
@@ -132,7 +132,7 @@ class SessionedTestCase(unittest.TestCase):
                          resolved_kwargs['session'].name)
         self.assertFalse(resolved_kwargs['session'].is_oppened)
 
-    @with_service(MockSessionedService)
+    @with_service(DummySessionedService)
     def test_sessioned_default_data_source_my_session(self):
         """ Method resolve_from_default_data_source is anoteded with sessioned
         and no parameter. Instead of getting the session from the default data
@@ -140,7 +140,7 @@ class SessionedTestCase(unittest.TestCase):
         """
         data_source = self.data_connected.get_data_source("datasource1")
         resolved_kwargs = (
-            self.mock_sessioned_service.resolve_from_default_data_source(
+            self.dummy_sessioned_service.resolve_from_default_data_source(
                 session=data_source.session
             )
         )
@@ -151,14 +151,14 @@ class SessionedTestCase(unittest.TestCase):
                          resolved_kwargs['session'].name)
         self.assertTrue(resolved_kwargs['session'].is_oppened)
 
-    @with_service(MockSessionedService)
+    @with_service(DummySessionedService)
     def test_sessioned_from_data_source(self):
         """ Method resolve_from_data_source is anoteded with sessioned and
         datasource1 as parameter. It will be injected to the method kwargs
         session from datasource1.
         """
         resolved_kwargs = (
-            self.mock_sessioned_service.resolve_from_data_source()
+            self.dummy_sessioned_service.resolve_from_data_source()
         )
         self.assertEqual("datasource1", resolved_kwargs['data_source'])
         data_source = self.data_connected.get_data_source(
@@ -168,7 +168,7 @@ class SessionedTestCase(unittest.TestCase):
                          resolved_kwargs['session'].name)
         self.assertFalse(resolved_kwargs['session'].is_oppened)
 
-    @with_service(MockSessionedService)
+    @with_service(DummySessionedService)
     def test_sessioned_from_data_source_provide_session(self):
         """ Method resolve_from_default_data_source is anoteded with sessioned
         and no parameter. This time we provide the session and provided to
@@ -176,7 +176,7 @@ class SessionedTestCase(unittest.TestCase):
         """
         data_source = self.data_connected.get_data_source("datasource2")
         resolved_kwargs = (
-            self.mock_sessioned_service.resolve_from_data_source(
+            self.dummy_sessioned_service.resolve_from_data_source(
                 session=data_source.session, close=True
             )
         )
@@ -187,7 +187,7 @@ class SessionedTestCase(unittest.TestCase):
                          resolved_kwargs['session'].name)
         self.assertFalse(resolved_kwargs['session'].is_oppened)
 
-    @with_service(MockSessionedService)
+    @with_service(DummySessionedService)
     def test_sessioned_with_my_data_source_closing_connection(self):
         """ Method resolve_from_data_source is anoteded with sessioned and
         datasource1 as parameter. We're overwriting the data_source parameter
@@ -195,7 +195,7 @@ class SessionedTestCase(unittest.TestCase):
         to the method kwargs a session from data_source1.
         """
         resolved_kwargs = (
-            self.mock_sessioned_service.resolve_from_data_source(
+            self.dummy_sessioned_service.resolve_from_data_source(
                 data_source="datasource2")
         )
         self.assertEqual("datasource2", resolved_kwargs['data_source'])

@@ -1,6 +1,4 @@
-# -*- coding: UTF-8 -*-
-#
-# Copyright 2015-2023 Flavio Garcia
+# Copyright 2015-2024 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,7 +13,7 @@
 # limitations under the License.
 
 from cartola import sysexits
-from cartola.config import load_yaml_file, log_level_from_string
+from cartola.config import get_from_dict, load_yaml_file, log_level_from_string
 import logging
 import os
 
@@ -70,44 +68,11 @@ def get_config_from_package(package):
     :param package: A package string.
     :return: A config dict with class and module.
     """
-    package_x = package.split('.')
+    package_x = package.split(".")
     package_conf = {}
     package_conf['class'] = package_x[-1]
-    package_conf['module'] = '.'.join(package_x[:-1][:])
+    package_conf['module'] = ".".join(package_x[:-1][:])
     return package_conf
-
-
-def get_class_from_name(name):
-    """ Return a class reference from the class name provided as a parameter.
-    Class name must be the full class reference, in another words, the module
-    with the class absolute reference.
-
-    Example:
-    >>> get_class_from_name("my.module.Myclass")
-
-    :param basestring name: Class absolute reference.
-    :return: The class resolved from the absolute reference name provided.
-    """
-    return get_class_from_module(
-        ".".join(name.split(".")[:-1]),
-        name.split(".")[-1]
-    )
-
-
-def get_class_from_module(module, class_name):
-    """ Returns a class from a module and a class name parameters.
-    This function is used by get_class_from_config and get_class_from_name.
-
-    Example:
-    >>> get_class_from_module("my.module", "MyClass")
-
-    :param basestring module: The module name.
-    :param basestring class_name: The class name.
-    :return: The class resolved by the module and class name provided.
-    """
-    import importlib
-    module = importlib.import_module(module)
-    return getattr(module, class_name)
 
 
 def get_class_from_config(config, index="class"):
@@ -128,7 +93,7 @@ def get_class_from_config(config, index="class"):
     :param basestring index: Index to be used to get the class name
     :return: The class resolved at the module referred into the config.
     """
-    return get_class_from_module(config['module'], config[index])
+    return get_from_dict(config, module_index="module", attr_index=index)
 
 
 def process_config(config, config_data):
@@ -235,53 +200,50 @@ def process_app_config_section(config, app_config):
     configuration data from the config_data.
     :param app_config: App section from a config data dict.
     """
-    if 'addresses' in app_config:
+    if "addresses" in app_config:
         config.app['addresses'] = app_config['addresses']
-    if 'component' in app_config:
+    if "component" in app_config:
         config.app['component'] = app_config['component']
-    if 'data' in app_config:
-        if 'sources' in app_config['data']:
-            config.app['data']['sources'] = app_config['data']['sources']
-    if 'id' in app_config:
+    if "data" in app_config and "sources" in app_config['data']:
+        config.app['data']['sources'] = app_config['data']['sources']
+    if "id" in app_config:
         config.app['id'] = app_config['id']
-    if 'login' in app_config:
-        if 'urls' in app_config['login']:
-            if app_config['login']['urls']:
-                for url in app_config['login']['urls']:
-                    config.app['login']['urls'][url['name']] = url['value']
-    if 'pythonpath' in app_config:
+    if "login" in app_config and "urls" in app_config['login']:
+        if len(app_config['login']['urls']) > 0:
+            for url in app_config['login']['urls']:
+                config.app['login']['urls'][url['name']] = url['value']
+    if "pythonpath" in app_config:
         config.app['pythonpath'] = app_config['pythonpath']
-    if 'port' in app_config:
+    if "port" in app_config:
         config.app['port'] = app_config['port']
-    if 'process' in app_config:
-        if 'num_processes' in app_config['process']:
-            config.app['process']['num_processes'] = app_config[
+    if "process" in app_config and "num_processes" in app_config['process']:
+        config.app['process']['num_processes'] = app_config[
                 'process']['num_processes']
-    if 'url_root_path' in app_config:
+    if "url_root_path" in app_config:
         root_url = app_config['url_root_path'].strip()
         if root_url[0] == "/":
             root_url = root_url[1:]
         if root_url == "":
             root_url = None
         config.app['url_root_path'] = root_url
-    if 'settings' in app_config:
+    if "settings" in app_config:
         config.app['settings'] = app_config['settings']
-    if 'socket' in app_config:
+    if "socket" in app_config:
         config.app['socket'] = app_config['socket']
-    if 'static_path' in app_config:
+    if "static_path" in app_config:
         config.app['static_path'] = app_config['static_path']
-    if 'static_url_prefix' in app_config:
+    if "static_url_prefix" in app_config:
         config.app['static_url_prefix'] = app_config['static_url_prefix']
-    if 'type' in app_config:
+    if "type" in app_config:
         config.app['type'] = app_config['type']
-    if 'types' in app_config:
+    if "types" in app_config:
         for app_type in app_config['types']:
             app_type['launcher'] = get_config_from_package(
                 app_type['launcher'])
             config.app['types'][app_type['name']] = app_type
-    if 'xheaders' in app_config:
+    if "xheaders" in app_config:
         config.app['xheaders'] = app_config['xheaders']
-    if 'wait_before_shutdown' in app_config:
+    if "wait_before_shutdown" in app_config:
         config.app['wait_before_shutdown'] = app_config['wait_before_shutdown']
 
 
@@ -293,7 +255,7 @@ def process_components_config_section(config, components_config):
     :param components_config: Data section from a config data dict.
     """
     for component_config in components_config:
-        if 'id' not in component_config:
+        if "id" not in component_config:
             raise Exception('The component %s was defined without an id.' %
                             component_config)
         component_id = component_config['id']
@@ -301,12 +263,12 @@ def process_components_config_section(config, components_config):
             config.components[component_id] = {}
             config.components[component_id]['enabled'] = False
             config.components[component_id]['config'] = {}
-        if 'class' in component_config:
-            class_config_x = component_config['class'].split('.')
+        if "class" in component_config:
+            class_config_x = component_config['class'].split(".")
             config.components[component_id]['class'] = class_config_x[-1]
-            config.components[component_id]['module'] = '.'.join(
+            config.components[component_id]['module'] = ".".join(
                 class_config_x[:-1])
-        if 'enabled' in component_config:
+        if "enabled" in component_config:
             config.components[component_id]['enabled'] = bool(
                 component_config['enabled'])
 
@@ -319,14 +281,13 @@ def process_data_config_section(config, data_config):
     configuration data from the config_data.
     :param data_config: Data configuration section from a config data dict.
     """
-    if 'connectors' in data_config:
+    if "connectors" in data_config:
         for connector in data_config['connectors']:
             config.data['connectors'][
                 connector['name']] = get_config_from_package(
                 connector['class'])
-    if 'sources' in data_config:
-        if data_config['sources']:
-            process_data_sources_config(config, data_config['sources'])
+    if "sources" in data_config and data_config['sources']:
+        process_data_sources_config(config, data_config['sources'])
 
 
 def process_data_sources_config_file(config, file):
@@ -352,9 +313,9 @@ def process_log_config_section(config, log_config):
     configuration data from the config_data.
     :param log_config: Log section from a config data dict.
     """
-    if 'format' in log_config:
+    if "format" in log_config:
         config.log['format'] = log_config['format']
-    if 'level' in log_config:
+    if "level" in log_config:
         config.log['level'] = log_level_from_string(log_config['level'])
 
 
@@ -365,7 +326,7 @@ def process_management_config_section(config, management_config):
     configuration data from the config_data.
     :param management_config: Management section from a config data dict.
     """
-    if 'commands' in management_config:
+    if "commands" in management_config:
         for command in management_config['commands']:
             config.management['commands'].append(command)
 
@@ -379,27 +340,25 @@ def process_session_config_section(config, session_config):
     dict.
     """
     # Setting session type as file by default
-    config.session['type'] = 'file'
-    if 'enabled' in session_config:
+    config.session['type'] = "file"
+    if "enabled" in session_config:
         config.session['enabled'] = session_config['enabled']
-    if 'type' in session_config:
+    if "type" in session_config:
         config.session['type'] = session_config['type']
-        if config.session['type'] == 'file':
-            if 'path' in session_config:
-                config.session['file']['path'] = session_config['path']
-        if config.session['type'] == 'redis':
-            if 'data' in session_config:
-                if 'source' in session_config['data']:
-                    config.session['redis']['data']['source'] = session_config[
-                        'data']['source']
-    if 'handlers' in session_config:
+        if config.session['type'] == 'file' and "path" in session_config:
+            config.session['file']['path'] = session_config['path']
+        if (config.session['type'] == 'redis' and "data" in session_config and
+                "source" in session_config['data']):
+            config.session['redis']['data']['source'] = session_config[
+                'data']['source']
+    if "handlers" in session_config:
         for handler in session_config['handlers']:
-            handler_class_x = handler['class'].split('.')
+            handler_class_x = handler['class'].split(".")
             handler['class'] = handler_class_x[-1]
-            handler['module'] = '.'.join(handler_class_x[:-1][:])
+            handler['module'] = ".".join(handler_class_x[:-1][:])
             config.session['handlers'][handler['name']] = handler
             del config.session['handlers'][handler['name']]['name']
-    if 'encoders' in session_config:
+    if "encoders" in session_config:
         for encoder in session_config['encoders']:
             encoder_class_x = encoder['class'].split('.')
             encoder['encoder'] = encoder_class_x[-1]
@@ -407,26 +366,26 @@ def process_session_config_section(config, session_config):
             encoder['module'] = '.'.join(encoder_class_x[:-1][:])
             config.session['encoders'][encoder['name']] = encoder
             del config.session['encoders'][encoder['name']]['name']
-    if 'id_generators' in session_config:
+    if "id_generators" in session_config:
         for generator in session_config['id_generators']:
-            generator_ref_x = generator['function'].split('.')
+            generator_ref_x = generator['function'].split(".")
             generator['function'] = generator_ref_x[-1]
-            generator['module'] = '.'.join(generator_ref_x[:-1][:])
+            generator['module'] = ".".join(generator_ref_x[:-1][:])
             config.session['id_generators'][generator['name']] = generator
             del config.session['id_generators'][generator['name']]['name']
-    if 'name' in session_config:
+    if "name" in session_config:
         config.session['name'] = session_config['name']
-    if 'life_time' in session_config:
+    if "life_time" in session_config:
         config.session['life_time'] = session_config['life_time']
-    if 'callback_hiccup' in session_config:
+    if "callback_hiccup" in session_config:
         config.session['callback_hiccup'] = session_config['callback_hiccup']
-    if 'callback_time' in session_config:
+    if "callback_time" in session_config:
         config.session['callback_time'] = session_config['callback_time']
-    if 'prefix' in session_config:
+    if "prefix" in session_config:
         config.session['prefix'] = session_config['prefix']
-    if 'purge_limit' in session_config:
+    if "purge_limit" in session_config:
         config.session['purge_limit'] = session_config['purge_limit']
-    if 'encoder' in session_config:
+    if "encoder" in session_config:
         if session_config['encoder'] in config.session['encoders']:
             config.session['encoder'] = session_config['encoder']
         else:

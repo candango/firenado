@@ -13,9 +13,11 @@
 # limitations under the License.
 
 import asyncio
+from firenado.service import FirenadoService
 from firenado.launcher import ProcessLauncher, TornadoLauncher
 from tornado.testing import (bind_unused_port, AsyncTestCase,
                              AsyncHTTPTestCase)
+from unittest import TestCase
 
 
 def get_event_loop():
@@ -26,6 +28,35 @@ def get_event_loop():
     """
     loop = asyncio.get_event_loop_policy().get_event_loop()
     return loop if loop else asyncio.new_event_loop()
+
+
+class ServiceTestCase(TestCase):
+
+    def setUp(self):
+        """ Call the configure data connection method
+        """
+        self.configure_data_connected()
+
+    def configure_data_connected(self):
+        """Should be overridden with the configutation of the data connected
+        instance
+        """
+        raise NotImplementedError()
+
+    @property
+    def data_connected(self):
+        """Should be overridden by subclasses to return a data connected
+        instance
+        """
+        raise NotImplementedError()
+
+
+class TestableService(FirenadoService):
+    """ Serves a data connected method directly.
+    When decorating a data connected directly the service must return the
+    consumer.
+    """
+    pass
 
 
 class TornadoAsyncTestCase(AsyncTestCase):
