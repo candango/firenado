@@ -1,0 +1,32 @@
+What's new in Firenado 0.9.5
+============================
+
+Apr 23, 2024
+------------
+
+We are pleased to announce the release of Firenado 0.9.5.
+
+This release fix the sqlalchemy connection ping rolling back transactions while
+using 2.x style ORM.
+
+It was also added a test case for Services to the project.
+
+Here are the highlights:
+
+Bug Fixes
+~~~~~~~~~
+
+ * When creating a new sqlalchemy session, get default values from the data source configuration `#448 <https://github.com/candango/firenado/issues/448>`_
+ * Sqlalchemy data source ping connection will rollback every transaction `#449 <https://github.com/candango/firenado/issues/449>`_
+ * Fix requirements resolution while building distribution files `#451 <https://github.com/candango/firenado/issues/451>`_
+
+Features
+~~~~~~~~
+
+ * Create a test case for services `#450 <https://github.com/candango/firenado/issues/450>`_
+ * Disable sqlalchemy connection_ping by default `#452 <https://github.com/candango/firenado/issues/452>`_
+
+Refactory
+~~~~~~~~~
+
+ * Move isolation_level to the root of a sqlalchemy data source configuration `#447 <https://github.com/candango/firenado/issues/447>`_
