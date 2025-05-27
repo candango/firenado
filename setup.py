@@ -54,7 +54,7 @@ setup(
     maintainer=firenado.get_author(),
     maintainer_email=firenado.get_author_email(),
     install_requires=resolve_requires("requirements/basic.txt"),
-    python_requires=">= 3.8",
+    python_requires=">= 3.9",
     extras_require={
         'all': resolve_requires("requirements/all.txt"),
         'redis': resolve_requires("requirements/redis.txt"),
