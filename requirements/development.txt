@@ -14,6 +14,8 @@ cartola==0.20
     #   taskio
 click==8.1.7
     # via taskio
+croniter==2.0.1
+    # via -r /home/fpiraz/source/candango/firenado/requirements/schedule.in
 greenlet==3.2.2
     # via sqlalchemy
 hiredis==3.2.1
@@ -40,6 +42,10 @@ pymysql==1.1.1
     # via
     #   -r /home/fpiraz/source/candango/firenado/requirements/tests.in
     #   -r development.in
+python-dateutil==2.9.0.post0
+    # via croniter
+pytz==2025.2
+    # via croniter
 pyyaml==6.0.2
     # via
     #   bandit
@@ -52,10 +58,9 @@ six==1.17.0
     # via
     #   behave
     #   parse-type
+    #   python-dateutil
 sqlalchemy==2.0.41
-    # via
-    #   -r /home/fpiraz/source/candango/firenado/requirements/schedule.in
-    #   -r /home/fpiraz/source/candango/firenado/requirements/sqlalchemy.in
+    # via -r /home/fpiraz/source/candango/firenado/requirements/sqlalchemy.in
 stevedore==5.4.1
     # via bandit
 taskio==0.0.7

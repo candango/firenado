@@ -1,1 +1,1 @@
-sqlalchemy>=2.0.29
+croniter==2.0.1

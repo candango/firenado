@@ -4,9 +4,11 @@
 #
 #    pip-compile --strip-extras schedule.in
 #
-greenlet==3.2.2
-    # via sqlalchemy
-sqlalchemy==2.0.41
+croniter==2.0.1
     # via -r schedule.in
-typing-extensions==4.13.2
-    # via sqlalchemy
+python-dateutil==2.9.0.post0
+    # via croniter
+pytz==2025.2
+    # via croniter
+six==1.17.0
+    # via python-dateutil
