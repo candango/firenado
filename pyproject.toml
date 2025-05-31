@@ -1,0 +1,52 @@
+[build-system]
+requires = [ "setuptools>=61.0", "wheel" ]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "firenado"
+dynamic = [ "dependencies", "optional-dependencies", "version" ]
+description = "Firenado is a python web framework based on Tornado web framework/server."
+readme = { file = "README.md", content-type = "text/markdown" }
+requires-python = ">=3.9"
+authors = [
+    { name = "Flavio Garcia", email = "piraz@candango.org" }
+]
+maintainers = [
+    { name = "Flavio Garcia", email = "piraz@candango.org" }
+]
+license = "Apache-2.0"
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Console",
+    "Environment :: Web Environment",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3 :: Only",
+    "Topic :: Internet :: WWW/HTTP",
+    "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
+    "Topic :: Internet :: WWW/HTTP :: WSGI",
+    "Topic :: Software Development :: Libraries :: Application Frameworks",
+    "Topic :: Software Development :: Libraries :: Python Modules"
+]
+urls = { Homepage = "https://github.com/candango/firenado" }
+
+[project.scripts]
+firenado = "firenado.management:run_from_command_line"
+
+[tool.setuptools.packages.find]
+where = ["."]
+exclude = ["tests*"]
+
+[tool.setuptools.dynamic]
+dependencies = { file = ["requirements/basic.txt"] }
+optional-dependencies.all = { file = ["requirements/all.txt"] }
+optional-dependencies.redis = { file = ["requirements/redis.txt"] }
+optional-dependencies.pexpect = { file = ["requirements/pexpect.txt"] }
+optional-dependencies.schedule = { file = ["requirements/schedule.txt"] }
+optional-dependencies.sqlalchemy = { file = ["requirements/sqlalchemy.txt"] }
+version = { attr = "firenado.get_version" }
