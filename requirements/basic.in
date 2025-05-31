@@ -1,0 +1,3 @@
+cartola>=0.20
+taskio==0.0.7
+tornado==6.5.1

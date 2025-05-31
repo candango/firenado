@@ -1,0 +1,4 @@
+-r pexpect.in
+-r redis.in
+-r schedule.in
+-r sqlalchemy.in

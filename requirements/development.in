@@ -1,0 +1,5 @@
+-r all.in
+-r basic.in
+-r tests.in
+# -r docs.in
+pymysql==1.1.1
