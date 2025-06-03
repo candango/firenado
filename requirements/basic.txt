@@ -5,14 +5,12 @@
 #    pip-compile --strip-extras basic.in
 #
 cartola==0.20
-    # via
-    #   -r basic.in
-    #   taskio
+    # via -r basic.in
 click==8.1.7
-    # via taskio
+    # via cloup
+cloup==3.0.7
+    # via -r basic.in
 pyyaml==6.0.2
     # via cartola
-taskio==0.0.7
-    # via -r basic.in
 tornado==6.5.1
     # via -r basic.in

@@ -9,11 +9,11 @@ bandit==1.8.3
 behave==1.2.6
     # via -r /home/fpiraz/source/candango/firenado/requirements/tests.in
 cartola==0.20
-    # via
-    #   -r /home/fpiraz/source/candango/firenado/requirements/basic.in
-    #   taskio
+    # via -r /home/fpiraz/source/candango/firenado/requirements/basic.in
 click==8.1.7
-    # via taskio
+    # via cloup
+cloup==3.0.7
+    # via -r /home/fpiraz/source/candango/firenado/requirements/basic.in
 croniter==2.0.1
     # via -r /home/fpiraz/source/candango/firenado/requirements/schedule.in
 greenlet==3.2.2
@@ -63,8 +63,6 @@ sqlalchemy==2.0.41
     # via -r /home/fpiraz/source/candango/firenado/requirements/sqlalchemy.in
 stevedore==5.4.1
     # via bandit
-taskio==0.0.7
-    # via -r /home/fpiraz/source/candango/firenado/requirements/basic.in
 tornado==6.5.1
     # via -r /home/fpiraz/source/candango/firenado/requirements/basic.in
 typing-extensions==4.13.2
