@@ -1,6 +1,4 @@
-# -*- coding: UTF-8 -*-
-#
-# Copyright 2015-2022 Flávio Gonçalves Garcia
+# Copyright 2015-2025 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,3 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import cloup
+from firenado.cli.root import cli, FirenadoGroup, section
+
+
+@cloup.group(aliases=['proj'], cls=FirenadoGroup)
+def project():
+    """Project related commands"""
+    return 0
+
+
+cli.add_command(project, section=section)
+
+
+@project.command()
+@cloup.argument('name')
+def init(name: str):
+    """Initialize a new Firenado project"""
+    print('install', name)
