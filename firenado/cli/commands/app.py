@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from ..root import cli, FirenadoHeaded
+from ..root import cli, FirenadoGroup
 from ..section import get_section
 import cloup
 import firenado.conf
@@ -21,7 +21,7 @@ import sys
 firenado_section = get_section("firenado")
 
 
-@cloup.group(cls=FirenadoHeaded)
+@cloup.group(cls=FirenadoGroup)
 def app():
     """Application related commands."""
     return 0
@@ -32,7 +32,7 @@ cli.add_command(app, section=firenado_section)
 app_section = app.section("Sub-commands are")
 
 
-@app.command(cls=FirenadoHeaded, section=app_section)
+@app.command(section=app_section)
 def install():
     """Triggers all components install methods(to install the app"""
     # TODO: Resolve module if doesn't exists
@@ -46,7 +46,7 @@ def install():
         component.install()
 
 
-@app.command(cls=FirenadoHeaded, section=app_section)
+@app.command(section=app_section)
 @cloup.option("-a", "--addresses", default=None)
 @cloup.option("-A", "--app", default=None)
 @cloup.option("-d", "--dir", default=None)

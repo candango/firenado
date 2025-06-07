@@ -4,5 +4,5 @@ from firenado import tornadoweb
 class {{ handler_name }}Handler(tornadoweb.TornadoHandler):
 
     def get(self):
-        self.write("{{ handler_name }}Handler output")
+        self.render("index.html")
 {% end %}

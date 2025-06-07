@@ -19,7 +19,7 @@ from firenado import get_version
 import importlib
 
 
-class FirenadoHeaded:
+class FirenadoGroup(cloup.Group):
 
     def get_help(self, ctx: click.Context) -> str:
         """Formats the help into a string and returns it.
@@ -32,7 +32,7 @@ class FirenadoHeaded:
         return help.replace("__version__", get_version())
 
 
-@cloup.group("Firenado", show_subcommand_aliases=True, cls=FirenadoHeaded)
+@cloup.group("Firenado", show_subcommand_aliases=True, cls=FirenadoGroup)
 def cli():
     return 0
 
