@@ -1,0 +1,10 @@
+from . import handlers
+from firenado import tornadoweb
+
+
+class {{component}}Component(tornadoweb.TornadoComponent):
+
+    def get_handlers(self):
+        return [
+            (r'/', handlers.IndexHandler),
+        ]

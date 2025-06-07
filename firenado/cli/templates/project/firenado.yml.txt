@@ -1,0 +1,36 @@
+app:
+  component: '{{app_name}}'
+  data:
+    sources:
+        # Set here references from sources defined on data.sources
+        - 'session'
+  #pythonpath: '..'
+  #type: 'tornado'
+  port: 8888
+
+data:
+  sources:
+    - name: session
+      connector: redis
+      # host: localhost
+      # port: 6379
+      # db: 0
+components:
+  - id: {{app_name}}
+    class: {{module}}.app.{{component}}Component
+    enabled: true
+  #- id: admin
+  #  enabled: true
+  #- id: info
+  #  enabled: true
+
+# Session types could be:
+# file or redis.
+session:
+  type: redis
+  enabled: true
+  # Redis session handler configuration
+  data:
+    source: session
+  # File session handler related configuration
+  # path: /tmp

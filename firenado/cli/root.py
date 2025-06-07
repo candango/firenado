@@ -1,5 +1,3 @@
-# -*- coding: UTF-8 -*-
-#
 # Copyright 2015-2025 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,13 +11,15 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+from .section import create_section
 import click
 import cloup
 from firenado import get_version
 import importlib
 
 
-class FirenadoGroup(cloup.Group):
+class FirenadoHeaded:
 
     def get_help(self, ctx: click.Context) -> str:
         """Formats the help into a string and returns it.
@@ -32,12 +32,12 @@ class FirenadoGroup(cloup.Group):
         return help.replace("__version__", get_version())
 
 
-@cloup.group("Firenado", show_subcommand_aliases=True, cls=FirenadoGroup)
-def firenado_cli():
+@cloup.group("Firenado", show_subcommand_aliases=True, cls=FirenadoHeaded)
+def cli():
     return 0
 
 
-firenado_section = firenado_cli.section("Commands are:\n\nFirenado")
+create_section("firenado", cli, "Commands are:\n\nFirenado")
 
 submodules = ["app", "project"]
 for submodule in submodules:

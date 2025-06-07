@@ -1,0 +1,8 @@
+from firenado import tornadoweb
+
+{% for handler_name in handlers %}
+class {{ handler_name }}Handler(tornadoweb.TornadoHandler):
+
+    def get(self):
+        self.write("{{ handler_name }}Handler output")
+{% end %}

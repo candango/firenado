@@ -12,21 +12,66 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from ..root import cli, FirenadoHeaded
+from ..section import get_section
+from cartola import fs
 import cloup
-from firenado.cli.root import cli, FirenadoGroup, section
+import firenado.conf
+from tornado import template
+import os
+import sys
+
+firenado_section = get_section("firenado")
 
 
-@cloup.group(aliases=['proj'], cls=FirenadoGroup)
+@cloup.group(aliases=['proj'], cls=FirenadoHeaded)
 def project():
     """Project related commands"""
     return 0
 
 
-cli.add_command(project, section=section)
+cli.add_command(project, section=firenado_section)
 
 
-@project.command()
-@cloup.argument('name')
-def init(name: str):
-    """Initialize a new Firenado project"""
-    print('install', name)
+@project.command(cls=FirenadoHeaded)
+@cloup.argument('module')
+@cloup.option("-s", "--src", is_flag=True)
+def init(module: str, src: bool):
+    """ Initialize a project """
+    # from tornado import template
+    component = module.replace(".", " ").title().replace(" ", "")
+    project_name = module.lower().split(".")[0]
+    project_root = os.path.join(os.getcwd(), project_name)
+    module_root = project_root
+    if src:
+        module_root = os.path.join(module_root, "src")
+    if not os.path.isdir(module_root):
+        os.makedirs(module_root, exist_ok=True)
+    module_target = os.path.join(module_root, module.replace(".", os.sep))
+    fs.create_module(module, module_root)
+    # TODO: Check if project exists
+    # TODO: If doesn't exists create project
+    # TODO: If exists throw an error
+    loader = template.Loader(os.path.join(firenado.conf.ROOT,
+                                          "cli", "templates",
+                                          "project"))
+    project_init_content = loader.load("app.py.txt").generate(
+        project_name=project_name, module=module, component=component)
+    # Generating application firenado component and handlers
+    fs.b_write(os.path.join(module_target, "app.py"), project_init_content)
+    handlers_file_name = os.path.join(module_target, "handlers.py")
+    fs.touch(handlers_file_name)
+    project_handlers_content = loader.load("handlers.py.txt").generate(
+        handlers=["Index"])
+    fs.write(handlers_file_name,
+             project_handlers_content.decode(sys.stdout.encoding))
+    # Generating configuration
+    project_conf_directory = os.path.join(project_root, "conf")
+    # TODO: Handle when the directory exists
+    os.mkdir(project_conf_directory)
+    project_conf_file = os.path.join(project_conf_directory, "firenado.yml")
+    fs.touch(project_conf_file)
+    project_init_content = loader.load("firenado.yml.txt").generate(
+        app_name=project_name, module=module, component=component)
+    fs.write(project_conf_file,
+             project_init_content.decode(sys.stdout.encoding))
