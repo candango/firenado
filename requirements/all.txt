@@ -8,7 +8,7 @@ croniter==2.0.1
     # via -r schedule.in
 greenlet==3.2.2
     # via sqlalchemy
-hiredis==3.2.1
+hiredis==3.3.0
     # via -r redis.in
 pexpect==4.9.0
     # via -r pexpect.in
@@ -18,7 +18,7 @@ python-dateutil==2.9.0.post0
     # via croniter
 pytz==2025.2
     # via croniter
-redis==6.2.0
+redis==7.0.1
     # via -r redis.in
 six==1.17.0
     # via python-dateutil

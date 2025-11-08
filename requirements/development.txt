@@ -18,7 +18,7 @@ croniter==2.0.1
     # via -r schedule.in
 greenlet==3.2.2
     # via sqlalchemy
-hiredis==3.2.1
+hiredis==3.3.0
     # via -r redis.in
 markdown-it-py==3.0.0
     # via rich
@@ -50,7 +50,7 @@ pyyaml==6.0.3
     # via
     #   bandit
     #   cartola
-redis==6.2.0
+redis==7.0.1
     # via -r redis.in
 rich==14.0.0
     # via bandit
