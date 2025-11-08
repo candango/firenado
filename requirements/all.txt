@@ -22,7 +22,7 @@ redis==7.0.1
     # via -r redis.in
 six==1.17.0
     # via python-dateutil
-sqlalchemy==2.0.41
+sqlalchemy==2.0.44
     # via -r sqlalchemy.in
 typing-extensions==4.13.2
     # via sqlalchemy

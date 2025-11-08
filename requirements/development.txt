@@ -59,7 +59,7 @@ six==1.17.0
     #   behave
     #   parse-type
     #   python-dateutil
-sqlalchemy==2.0.41
+sqlalchemy==2.0.44
     # via -r sqlalchemy.in
 stevedore==5.4.1
     # via bandit
