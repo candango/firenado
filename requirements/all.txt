@@ -5,13 +5,13 @@
 #    pip-compile --strip-extras all.in
 #
 croniter==2.0.1
-    # via -r /home/fpiraz/source/candango/firenado/requirements/schedule.in
+    # via -r schedule.in
 greenlet==3.2.2
     # via sqlalchemy
 hiredis==3.2.1
-    # via -r /home/fpiraz/source/candango/firenado/requirements/redis.in
+    # via -r redis.in
 pexpect==4.9.0
-    # via -r /home/fpiraz/source/candango/firenado/requirements/pexpect.in
+    # via -r pexpect.in
 ptyprocess==0.7.0
     # via pexpect
 python-dateutil==2.9.0.post0
@@ -19,10 +19,10 @@ python-dateutil==2.9.0.post0
 pytz==2025.2
     # via croniter
 redis==6.2.0
-    # via -r /home/fpiraz/source/candango/firenado/requirements/redis.in
+    # via -r redis.in
 six==1.17.0
     # via python-dateutil
 sqlalchemy==2.0.41
-    # via -r /home/fpiraz/source/candango/firenado/requirements/sqlalchemy.in
+    # via -r sqlalchemy.in
 typing-extensions==4.13.2
     # via sqlalchemy

@@ -4,13 +4,13 @@
 #
 #    pip-compile --strip-extras basic.in
 #
-cartola==0.20
+cartola==0.21
     # via
     #   -r basic.in
     #   taskio
 click==8.1.7
     # via taskio
-pyyaml==6.0.2
+pyyaml==6.0.3
     # via cartola
 taskio==0.0.7
     # via -r basic.in
