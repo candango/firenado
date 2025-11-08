@@ -14,7 +14,7 @@ cartola==0.21
     #   taskio
 click==8.1.7
     # via taskio
-croniter==2.0.1
+croniter==6.0.0
     # via -r schedule.in
 greenlet==3.2.2
     # via sqlalchemy
