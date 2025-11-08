@@ -17,7 +17,7 @@
 
 """The Firenado Framework"""
 
-__version__ = (0, 9, 6, "b1")
+__version__ = (0, 9, 6)
 
 
 def get_version():
