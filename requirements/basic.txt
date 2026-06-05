@@ -14,5 +14,5 @@ pyyaml==6.0.3
     # via cartola
 taskio==0.0.7
     # via -r basic.in
-tornado==6.5.2
+tornado==6.5.5
     # via -r basic.in
