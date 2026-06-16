@@ -1,2 +1,2 @@
-redis>=7.0.1
+redis>=8.0.0
 hiredis>=3.3.0
