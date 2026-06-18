@@ -36,7 +36,7 @@ pexpect==4.9.0
     # via -r pexpect.in
 ptyprocess==0.7.0
     # via pexpect
-pygments==2.19.1
+pygments==2.20.0
     # via rich
 pymysql==1.1.1
     # via

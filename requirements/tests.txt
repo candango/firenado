@@ -20,7 +20,7 @@ parse-type==0.6.4
     # via behave
 pbr==6.1.1
     # via stevedore
-pygments==2.19.1
+pygments==2.20.0
     # via rich
 pymysql==1.1.1
     # via -r tests.in
